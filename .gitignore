@@ -1,0 +1,128 @@
+# --------------------------------------------------
+# OS / editor noise
+# --------------------------------------------------
+.DS_Store
+Thumbs.db
+
+.idea/
+*.iml
+.vscode/
+
+# --------------------------------------------------
+# Gradle / Kotlin / JVM
+# --------------------------------------------------
+.gradle/
+build/
+out/
+**/build/
+local.properties
+.kotlin/
+konan/
+
+# --------------------------------------------------
+# Android
+# --------------------------------------------------
+**/captures/
+.cxx/
+.externalNativeBuild/
+
+*.apk
+*.ap_
+*.aab
+
+# Android signing / secrets
+*.jks
+*.keystore
+keystore.properties
+signing.properties
+
+# --------------------------------------------------
+# KMP / native build artifacts
+# --------------------------------------------------
+**/bin/
+**/obj/
+**/.cinterop/
+
+# --------------------------------------------------
+# iOS / Xcode
+# --------------------------------------------------
+DerivedData/
+*.xcworkspace/xcuserdata/
+*.xcodeproj/xcuserdata/
+*.xcuserstate
+*.xccheckout
+*.moved-aside
+*.ipa
+
+.build/
+Package.resolved
+
+# CocoaPods (only if introduced later)
+Pods/
+Podfile.lock
+
+# --------------------------------------------------
+# Tests / reports / coverage
+# --------------------------------------------------
+**/test-results/
+**/reports/
+**/coverage/
+**/jacoco/
+*.profraw
+*.profdata
+
+# --------------------------------------------------
+# Logs
+# --------------------------------------------------
+*.log
+
+# --------------------------------------------------
+# Fastlane
+# --------------------------------------------------
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/
+fastlane/test_output/
+fastlane/readme.md
+
+# Match / signing artifacts if used later
+fastlane/*.mobileprovision
+fastlane/*.cer
+fastlane/*.p12
+
+# --------------------------------------------------
+# Environment / secrets
+# --------------------------------------------------
+.env
+.env.*
+!.env.example
+
+secrets.properties
+config.local.*
+backend.local.*
+api.local.*
+
+*.secret
+*.secrets
+
+# Firebase / service credentials if ever added
+GoogleService-Info.plist
+google-services.json
+
+# Apple App Store Connect API key if ever stored locally
+*.p8
+
+# --------------------------------------------------
+# Temporary files / archives
+# --------------------------------------------------
+tmp/
+temp/
+*.tmp
+*.swp
+*.orig
+
+# --------------------------------------------------
+# Generated docs / local exports
+# --------------------------------------------------
+docs/build/
+site/
