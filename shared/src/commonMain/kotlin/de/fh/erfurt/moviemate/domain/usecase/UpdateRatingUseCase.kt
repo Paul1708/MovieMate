@@ -6,7 +6,8 @@ class UpdateRatingUseCase (
     private val repository: MovieRepository
 ) {
     suspend operator fun invoke(id: String, rating: Int) {
-        require(rating in 1..10) { "The rating must be between 1 and 5." }
+        require(id.isNotBlank()) { "The movie id cannot be blank." }
+        require(rating in 1..10) { "The rating must be between 1 and 10." }
 
         repository.updateRating(id, rating)
     }
