@@ -13,11 +13,11 @@ fun Movie.toUiModel(): MovieUiModel {
     return MovieUiModel(
         id = id,
         title = title,
-        ratingText = rating.toString(),
+        ratingText = "$rating/10",
         categoryText = category.type.displayName(),
         yearText = publishingYear.toString(),
         runtimeText = "$runtime Minutes",
-        posterUri = posterUri,
+        posterUri = posterUri.ifBlank { null },
         isWatched = isWatched
     )
 }

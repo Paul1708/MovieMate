@@ -110,5 +110,8 @@ private fun List<MovieUiModel>.sortForHome(sortCriterion: SortCriterion): List<M
 
 // Macht aus dem angezeigten Bewertungstext einen Zahlenwert für die lokale Mock-Sortierung.
 private fun MovieUiModel.ratingValue(): Double {
-    return ratingText.replace(',', '.').toDoubleOrNull() ?: 0.0
+    return ratingText
+        .substringBefore("/")
+        .replace(',', '.')
+        .toDoubleOrNull() ?: 0.0
 }

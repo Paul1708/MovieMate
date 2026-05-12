@@ -26,6 +26,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import de.fh.erfurt.moviemate.presentation.home.MovieUiModel
 
 /**
  * Einzelne Filmkarte in der Homescreen-Liste.
@@ -36,13 +37,8 @@ import androidx.compose.ui.unit.dp
  */
 @Composable
 fun MovieCard(
-    title: String,
-    year: String,
-    time: String,
-    category: String,
-    isWatched: Boolean,
+    movie: MovieUiModel,
     modifier: Modifier = Modifier,
-    rating: String = "",
     onClick: () -> Unit = {}
 ) {
     Card(
@@ -50,7 +46,8 @@ fun MovieCard(
             .height(128.dp)
             .clickable(onClick = onClick)
             .semantics {
-                contentDescription = "Film $title, Bewertung $rating, Kategorie $category, Jahr $year"
+                contentDescription =
+                    "Film ${movie.title}, Bewertung ${movie.ratingText}, Kategorie ${movie.categoryText}, Jahr ${movie.yearText}"
             },
         shape = RoundedCornerShape(8.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
@@ -71,17 +68,17 @@ fun MovieCard(
                 verticalArrangement = Arrangement.Center
             ) {
                 Text(
-                    text = title,
+                    text = movie.title,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
 
                 Spacer(modifier = Modifier.height(6.dp))
 
-                MovieMetaRow(icon = "★", text = rating.ifBlank { if (isWatched) "Watched" else "Watch later" })
-                MovieMetaRow(icon = "▣", text = category)
-                MovieMetaRow(icon = "▦", text = year)
-                MovieMetaRow(icon = "◷", text = time)
+                MovieMetaRow(icon = "★", text = movie.ratingText)
+                MovieMetaRow(icon = "▣", text = movie.categoryText)
+                MovieMetaRow(icon = "▦", text = movie.yearText)
+                MovieMetaRow(icon = "◷", text = movie.runtimeText)
             }
         }
     }

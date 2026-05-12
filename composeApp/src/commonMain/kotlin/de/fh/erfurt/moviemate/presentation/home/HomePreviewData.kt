@@ -1,59 +1,83 @@
 package de.fh.erfurt.moviemate.presentation.home
 
-// Beispiel-Filme für Preview und Entwicklung ohne Backend.
-fun previewHomeMovies(): List<MovieUiModel> {
+import de.fh.erfurt.moviemate.domain.model.Category
+import de.fh.erfurt.moviemate.domain.model.CategoryType
+import de.fh.erfurt.moviemate.domain.model.Movie
+
+// Beispiel-Filme als Domain-Objekte für Preview und Entwicklung ohne Backend.
+fun previewDomainMovies(): List<Movie> {
     return listOf(
-        MovieUiModel(
+        Movie(
             id = "movie-1",
             title = "Star Wars",
-            ratingText = "10,0",
-            categoryText = "Action",
-            yearText = "2019",
-            runtimeText = "130 Minutes",
-            posterUri = null,
-            isWatched = true
+            posterUri = "",
+            publishingYear = 2019,
+            runtime = 130,
+            rating = 10,
+            isWatched = true,
+            category = Category(id = "action", type = CategoryType.ACTION),
+            description = "A space adventure used as sample data for the homescreen.",
+            creationTimeEpochMillis = 5,
+            updateTimeEpochMillis = 5
         ),
-        MovieUiModel(
+        Movie(
             id = "movie-2",
             title = "Harry Potter",
-            ratingText = "5,5",
-            categoryText = "Drama",
-            yearText = "2025",
-            runtimeText = "60 Minutes",
-            posterUri = null,
-            isWatched = false
+            posterUri = "",
+            publishingYear = 2001,
+            runtime = 152,
+            rating = 8,
+            isWatched = false,
+            category = Category(id = "fantasy", type = CategoryType.FANTASY),
+            description = "A fantasy movie used as sample data for the homescreen.",
+            creationTimeEpochMillis = 4,
+            updateTimeEpochMillis = 4
         ),
-        MovieUiModel(
+        Movie(
             id = "movie-3",
             title = "The Matrix",
-            ratingText = "8,5",
-            categoryText = "Sci-Fi",
-            yearText = "1999",
-            runtimeText = "136 Minutes",
-            posterUri = null,
-            isWatched = true
+            posterUri = "",
+            publishingYear = 1999,
+            runtime = 136,
+            rating = 9,
+            isWatched = true,
+            category = Category(id = "science_fiction", type = CategoryType.SCIENCE_FICTION),
+            description = "A science fiction movie used as sample data for the homescreen.",
+            creationTimeEpochMillis = 3,
+            updateTimeEpochMillis = 3
         ),
-        MovieUiModel(
+        Movie(
             id = "movie-4",
             title = "Inception",
-            ratingText = "9,0",
-            categoryText = "Thriller",
-            yearText = "2010",
-            runtimeText = "148 Minutes",
-            posterUri = null,
-            isWatched = false
-    ),
-        MovieUiModel(
+            posterUri = "",
+            publishingYear = 2010,
+            runtime = 148,
+            rating = 9,
+            isWatched = false,
+            category = Category(id = "action", type = CategoryType.ACTION),
+            description = "A dream thriller used as sample data for the homescreen.",
+            creationTimeEpochMillis = 2,
+            updateTimeEpochMillis = 2
+        ),
+        Movie(
             id = "movie-5",
             title = "The Godfather",
-            ratingText = "9,2",
-            categoryText = "Crime",
-            yearText = "1972",
-            runtimeText = "175 Minutes",
-            posterUri = null,
-            isWatched = true
+            posterUri = "",
+            publishingYear = 1972,
+            runtime = 175,
+            rating = 9,
+            isWatched = true,
+            category = Category(id = "drama", type = CategoryType.DRAMA),
+            description = "A drama movie used as sample data for the homescreen.",
+            creationTimeEpochMillis = 1,
+            updateTimeEpochMillis = 1
         )
     )
+}
+
+// UI-Beispieldaten für den Homescreen. Sie nutzen bereits den echten UI-Mapper.
+fun previewHomeMovies(): List<MovieUiModel> {
+    return previewDomainMovies().map { it.toUiModel() }
 }
 
 // Vollständiger Beispiel-State für den Homescreen.

@@ -94,11 +94,14 @@ fun HomeScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             if (state.errorMessage != null) {
-                Text(state.errorMessage)
+                HomeErrorState(
+                    message = state.errorMessage,
+                    onRetryClicked = { onAction(HomeUiAction.RetryClicked) }
+                )
             } else if (state.isLoading) {
-                Text("Loading movies...")
+                HomeLoadingState()
             } else if (state.movies.isEmpty()) {
-                Text("No movies found")
+                HomeEmptyState()
             } else {
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -108,12 +111,7 @@ fun HomeScreen(
                 ) {
                     items(state.movies, key = { it.id }) { movie ->
                         MovieCard(
-                            title = movie.title,
-                            year = movie.yearText,
-                            time = movie.runtimeText,
-                            category = movie.categoryText,
-                            rating = movie.ratingText,
-                            isWatched = movie.isWatched,
+                            movie = movie,
                             onClick = { onAction(HomeUiAction.MovieClicked(movie.id)) },
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -140,6 +138,36 @@ fun HomeScreen(
 private fun HomeScreenPreview() {
     HomeScreen(
         state = previewHomeUiState(),
+        onAction = {}
+    )
+}
+
+@Preview
+@Composable
+private fun HomeScreenEmptyPreview() {
+    HomeScreen(
+        state = previewHomeUiState().copy(movies = emptyList()),
+        onAction = {}
+    )
+}
+
+@Preview
+@Composable
+private fun HomeScreenLoadingPreview() {
+    HomeScreen(
+        state = previewHomeUiState().copy(isLoading = true),
+        onAction = {}
+    )
+}
+
+@Preview
+@Composable
+private fun HomeScreenErrorPreview() {
+    HomeScreen(
+        state = previewHomeUiState().copy(
+            movies = emptyList(),
+            errorMessage = "Movies could not be loaded."
+        ),
         onAction = {}
     )
 }
