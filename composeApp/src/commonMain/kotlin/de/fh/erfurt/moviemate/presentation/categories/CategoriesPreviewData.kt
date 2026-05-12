@@ -3,7 +3,7 @@ package de.fh.erfurt.moviemate.presentation.categories
 import de.fh.erfurt.moviemate.domain.model.Movie
 import de.fh.erfurt.moviemate.presentation.MovieCategoryTypes
 import de.fh.erfurt.moviemate.presentation.displayName
-import de.fh.erfurt.moviemate.presentation.home.previewDomainMovies
+import de.fh.erfurt.moviemate.presentation.mock.previewDomainMovies
 
 // Beispiel-Kategorien für Preview und Entwicklung ohne Backend.
 // Die Filmzahlen werden aus denselben Mock-Filmen berechnet, die auch der Homescreen nutzt.

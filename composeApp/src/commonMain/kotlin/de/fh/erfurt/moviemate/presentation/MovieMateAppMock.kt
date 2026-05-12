@@ -8,9 +8,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import de.fh.erfurt.moviemate.domain.model.CategoryType
 import de.fh.erfurt.moviemate.presentation.categories.CategoriesRouteMock
 import de.fh.erfurt.moviemate.presentation.home.HomeRouteMock
+import de.fh.erfurt.moviemate.presentation.mock.MovieMateMockStore
 
 /**
  * Gemeinsamer App-Rahmen für die aktuelle Mock-UI.
@@ -21,41 +21,53 @@ import de.fh.erfurt.moviemate.presentation.home.HomeRouteMock
  */
 @Composable
 fun MovieMateAppMock() {
-    var selectedItem by remember { mutableStateOf(BottomNavItem.Home) }
-    var selectedHomeCategory by remember { mutableStateOf<CategoryType?>(null) }
+    val mockStore = remember { MovieMateMockStore() }
+    var destination by remember { mutableStateOf<MovieMateDestination>(MovieMateDestination.Home()) }
 
     Scaffold(
         containerColor = MovieMateColors.ScreenBackground,
         bottomBar = {
             BottomBar(
-                selectedItem = selectedItem,
-                onItemSelected = { selectedItem = it }
+                selectedItem = destination.selectedBottomNavItem(),
+                onItemSelected = { destination = it.toDestination() }
             )
         }
     ) { paddingValues ->
         val contentModifier = Modifier.padding(paddingValues)
 
-        when (selectedItem) {
-            BottomNavItem.Home -> HomeRouteMock(
-                initialCategory = selectedHomeCategory,
-                modifier = contentModifier
-            )
-
-            BottomNavItem.Categories -> CategoriesRouteMock(
+        when (val currentDestination = destination) {
+            is MovieMateDestination.Home -> HomeRouteMock(
+                movies = mockStore.movies,
+                initialCategory = currentDestination.initialCategory,
                 modifier = contentModifier,
-                onCategorySelected = { category ->
-                    selectedHomeCategory = category
-                    selectedItem = BottomNavItem.Home
+                onMovieSelected = { movieId ->
+                    destination = MovieMateDestination.Detail(movieId)
                 }
             )
 
-            BottomNavItem.Add -> HomeRouteMock(
-                initialCategory = selectedHomeCategory,
+            MovieMateDestination.Categories -> CategoriesRouteMock(
+                movies = mockStore.movies,
+                modifier = contentModifier,
+                onCategorySelected = { category ->
+                    destination = MovieMateDestination.Home(initialCategory = category)
+                }
+            )
+
+            is MovieMateDestination.Detail -> PlaceholderScreen(
+                title = "Details",
+                message = "Detail-Screen für ${currentDestination.movieId}",
                 modifier = contentModifier
             )
 
-            BottomNavItem.Backup -> HomeRouteMock(
-                initialCategory = selectedHomeCategory,
+            MovieMateDestination.Add -> PlaceholderScreen(
+                title = "Add",
+                message = "Add-Screen wird vorbereitet.",
+                modifier = contentModifier
+            )
+
+            MovieMateDestination.Backup -> PlaceholderScreen(
+                title = "Backup",
+                message = "Backup-Screen wird vorbereitet.",
                 modifier = contentModifier
             )
         }

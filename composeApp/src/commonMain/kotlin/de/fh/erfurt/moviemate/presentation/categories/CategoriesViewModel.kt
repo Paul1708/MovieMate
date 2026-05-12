@@ -3,6 +3,8 @@ package de.fh.erfurt.moviemate.presentation.categories
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import de.fh.erfurt.moviemate.domain.model.Movie
+import de.fh.erfurt.moviemate.presentation.mock.previewDomainMovies
 
 /**
  * Einfacher State-Holder für den Kategorie-Screen.
@@ -12,8 +14,11 @@ import androidx.compose.runtime.setValue
  * Repository-Daten berechnet werden können.
  */
 class CategoriesViewModel(
-    private val sourceCategories: List<CategoryUiModel> = previewCategories()
+    private val sourceMovies: List<Movie> = previewDomainMovies()
 ) {
+    private val sourceCategories: List<CategoryUiModel>
+        get() = previewCategories(sourceMovies)
+
     var state by mutableStateOf(CategoriesUiState(categories = sourceCategories))
         private set
 

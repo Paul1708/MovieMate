@@ -16,12 +16,8 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -31,15 +27,20 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import de.fh.erfurt.moviemate.domain.model.CategoryType
+import de.fh.erfurt.moviemate.domain.model.Movie
 import de.fh.erfurt.moviemate.presentation.MovieMateColors
+import de.fh.erfurt.moviemate.presentation.ScreenEmptyState
+import de.fh.erfurt.moviemate.presentation.ScreenErrorState
 import de.fh.erfurt.moviemate.presentation.ScreenHeader
 import de.fh.erfurt.moviemate.presentation.ScreenHeaderDefaults
+import de.fh.erfurt.moviemate.presentation.ScreenLoadingState
+import de.fh.erfurt.moviemate.presentation.SearchField
 import de.fh.erfurt.moviemate.presentation.TopBarIconButton
+import de.fh.erfurt.moviemate.presentation.mock.previewDomainMovies
 
 /**
  * Einstieg für den Kategorie-Screen während der UI-Entwicklung.
@@ -49,10 +50,13 @@ import de.fh.erfurt.moviemate.presentation.TopBarIconButton
  */
 @Composable
 fun CategoriesRouteMock(
+    movies: List<Movie> = previewDomainMovies(),
     modifier: Modifier = Modifier,
     onCategorySelected: (CategoryType) -> Unit = {}
 ) {
-    val viewModel = remember { CategoriesViewModel() }
+    val viewModel = remember(movies) {
+        CategoriesViewModel(sourceMovies = movies)
+    }
 
     CategoriesScreen(
         state = viewModel.state,
@@ -100,16 +104,10 @@ fun CategoriesScreen(
 
         if (state.isSearchVisible) {
             Spacer(modifier = Modifier.height(10.dp))
-            OutlinedTextField(
+            SearchField(
                 value = state.searchQuery,
                 onValueChange = { onAction(CategoriesUiAction.SearchChanged(it)) },
-                placeholder = { Text("Find category") },
-                singleLine = true,
-                textStyle = MaterialTheme.typography.bodyMedium,
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = MovieMateColors.CardBackground,
-                    unfocusedContainerColor = MovieMateColors.CardBackground
-                ),
+                placeholder = "Find category",
                 modifier = Modifier.fillMaxWidth()
             )
         }
@@ -117,13 +115,13 @@ fun CategoriesScreen(
         Spacer(modifier = Modifier.height(ScreenHeaderDefaults.ContentTopSpacing))
 
         when {
-            state.errorMessage != null -> CategoriesErrorState(
+            state.errorMessage != null -> ScreenErrorState(
                 message = state.errorMessage,
                 onRetryClicked = { onAction(CategoriesUiAction.RetryClicked) }
             )
 
-            state.isLoading -> CategoriesLoadingState()
-            state.categories.isEmpty() -> CategoriesEmptyState()
+            state.isLoading -> ScreenLoadingState(message = "Loading categories...")
+            state.categories.isEmpty() -> ScreenEmptyState(message = "No categories found")
             else -> CategoriesGrid(
                 categories = state.categories,
                 onCategoryClicked = { onAction(CategoriesUiAction.CategoryClicked(it.type)) }
@@ -231,58 +229,6 @@ private fun CategoryFolderCard(
                 color = MovieMateColors.SecondaryText,
                 modifier = Modifier.padding(top = 6.dp)
             )
-        }
-    }
-}
-
-@Composable
-private fun CategoriesLoadingState() {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 48.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        CircularProgressIndicator()
-        Text(
-            text = "Loading categories...",
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.padding(top = 12.dp)
-        )
-    }
-}
-
-@Composable
-private fun CategoriesEmptyState() {
-    Text(
-        text = "No categories found",
-        style = MaterialTheme.typography.bodyMedium,
-        textAlign = TextAlign.Center,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 48.dp)
-    )
-}
-
-@Composable
-private fun CategoriesErrorState(
-    message: String,
-    onRetryClicked: () -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 48.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        Text(
-            text = message,
-            style = MaterialTheme.typography.bodyMedium,
-            textAlign = TextAlign.Center
-        )
-        TextButton(onClick = onRetryClicked) {
-            Text("Retry")
         }
     }
 }

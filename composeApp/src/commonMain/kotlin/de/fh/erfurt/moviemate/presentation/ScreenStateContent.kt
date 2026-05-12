@@ -1,4 +1,4 @@
-package de.fh.erfurt.moviemate.presentation.home
+package de.fh.erfurt.moviemate.presentation
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -15,14 +15,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
 /**
- * Ladezustand des Homescreens.
+ * Gemeinsame Zustände für Screens, die Daten laden.
  *
- * Dieser Baustein wird angezeigt, wenn später Filme aus Repository, Datenbank
- * oder Netzwerk geladen werden. Aktuell ist er vor allem für Preview und
- * Struktur vorbereitet.
+ * Die Bausteine sind bewusst allgemein gehalten, damit Home, Kategorien,
+ * Detail und Backup dieselbe Darstellung für Laden, Leerstand und Fehler
+ * verwenden können.
  */
 @Composable
-fun HomeLoadingState(
+fun ScreenLoadingState(
+    message: String,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -33,25 +34,20 @@ fun HomeLoadingState(
     ) {
         CircularProgressIndicator()
         Text(
-            text = "Loading movies...",
+            text = message,
             style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier.padding(top = 12.dp)
         )
     }
 }
 
-/**
- * Leerzustand des Homescreens.
- *
- * Dieser Baustein wird genutzt, wenn keine Filme vorhanden sind oder Suche und
- * Filter keine Treffer liefern.
- */
 @Composable
-fun HomeEmptyState(
+fun ScreenEmptyState(
+    message: String,
     modifier: Modifier = Modifier
 ) {
     Text(
-        text = "No movies found",
+        text = message,
         style = MaterialTheme.typography.bodyMedium,
         textAlign = TextAlign.Center,
         modifier = modifier
@@ -60,14 +56,8 @@ fun HomeEmptyState(
     )
 }
 
-/**
- * Fehlerzustand des Homescreens.
- *
- * Dieser Baustein zeigt später Backend- oder Datenbankfehler an und bietet
- * schon einen Retry-Button an, der an `RetryClicked` gebunden ist.
- */
 @Composable
-fun HomeErrorState(
+fun ScreenErrorState(
     message: String,
     onRetryClicked: () -> Unit,
     modifier: Modifier = Modifier

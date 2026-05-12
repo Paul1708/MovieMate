@@ -4,8 +4,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import de.fh.erfurt.moviemate.domain.model.CategoryType
+import de.fh.erfurt.moviemate.domain.model.Movie
 import de.fh.erfurt.moviemate.domain.model.SortCriterion
-import de.fh.erfurt.moviemate.presentation.displayName
+import de.fh.erfurt.moviemate.presentation.mock.previewDomainMovies
 
 /**
  * Einfacher State-Holder für den Homescreen.
@@ -15,7 +16,7 @@ import de.fh.erfurt.moviemate.presentation.displayName
  * einer zentralen Stelle. Später kann hier `GetMoviesUseCase` angebunden werden.
  */
 class HomeViewModel(
-    private val sourceMovies: List<MovieUiModel> = previewHomeMovies(),
+    private val sourceMovies: List<Movie> = previewDomainMovies(),
     initialCategory: CategoryType? = null
 ) {
     var state by mutableStateOf(
@@ -90,8 +91,8 @@ class HomeViewModel(
         updateState()
     }
 
-    // Filtert lokal die Mockdaten. Später übernimmt das Repository diese Aufgabe.
-    private fun List<MovieUiModel>.filterMovies(
+    // Filtert lokal die Mockdaten mit Domain-Werten. Später übernimmt das Repository diese Aufgabe.
+    private fun List<Movie>.filterMovies(
         selectedTab: HomeTab = HomeTab.All,
         searchQuery: String = "",
         selectedCategory: CategoryType? = null,
@@ -109,27 +110,20 @@ class HomeViewModel(
                 searchQuery.isBlank() || movie.title.contains(searchQuery, ignoreCase = true)
             }
             .filter { movie ->
-                selectedCategory == null || movie.categoryText == selectedCategory.displayName()
+                selectedCategory == null || movie.category.type == selectedCategory
             }
             .sortForHome(selectedSortCriterion)
+            .map { movie -> movie.toUiModel() }
     }
 }
 
 // Sortiert die Mockdaten lokal, bis später Repository oder UseCase diese Aufgabe übernehmen.
-private fun List<MovieUiModel>.sortForHome(sortCriterion: SortCriterion): List<MovieUiModel> {
+private fun List<Movie>.sortForHome(sortCriterion: SortCriterion): List<Movie> {
     return when (sortCriterion) {
         SortCriterion.TITLE_ASC -> sortedBy { it.title.lowercase() }
         SortCriterion.TITLE_DESC -> sortedByDescending { it.title.lowercase() }
-        SortCriterion.PUBLISHING_YEAR_DESC -> sortedByDescending { it.yearText.toIntOrNull() ?: 0 }
-        SortCriterion.RATING_DESC -> sortedByDescending { it.ratingValue() }
+        SortCriterion.PUBLISHING_YEAR_DESC -> sortedByDescending { it.publishingYear }
+        SortCriterion.RATING_DESC -> sortedByDescending { it.rating }
         SortCriterion.RECENTLY_ADDED -> this
     }
-}
-
-// Macht aus dem angezeigten Bewertungstext einen Zahlenwert für die lokale Mock-Sortierung.
-private fun MovieUiModel.ratingValue(): Double {
-    return ratingText
-        .substringBefore("/")
-        .replace(',', '.')
-        .toDoubleOrNull() ?: 0.0
 }

@@ -10,10 +10,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -21,10 +17,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import de.fh.erfurt.moviemate.domain.model.CategoryType
+import de.fh.erfurt.moviemate.domain.model.Movie
 import de.fh.erfurt.moviemate.presentation.MovieCard
 import de.fh.erfurt.moviemate.presentation.MovieMateColors
+import de.fh.erfurt.moviemate.presentation.ScreenEmptyState
+import de.fh.erfurt.moviemate.presentation.ScreenErrorState
 import de.fh.erfurt.moviemate.presentation.ScreenHeader
 import de.fh.erfurt.moviemate.presentation.ScreenHeaderDefaults
+import de.fh.erfurt.moviemate.presentation.ScreenLoadingState
+import de.fh.erfurt.moviemate.presentation.SearchField
+import de.fh.erfurt.moviemate.presentation.mock.previewDomainMovies
 
 /**
  * Einstieg für den Homescreen während der UI-Entwicklung.
@@ -35,16 +37,26 @@ import de.fh.erfurt.moviemate.presentation.ScreenHeaderDefaults
  */
 @Composable
 fun HomeRouteMock(
+    movies: List<Movie> = previewDomainMovies(),
     initialCategory: CategoryType? = null,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onMovieSelected: (String) -> Unit = {}
 ) {
-    val viewModel = remember(initialCategory) {
-        HomeViewModel(initialCategory = initialCategory)
+    val viewModel = remember(movies, initialCategory) {
+        HomeViewModel(
+            sourceMovies = movies,
+            initialCategory = initialCategory
+        )
     }
 
     HomeScreen(
         state = viewModel.state,
-        onAction = viewModel::onAction,
+        onAction = { action ->
+            viewModel.onAction(action)
+            if (action is HomeUiAction.MovieClicked) {
+                onMovieSelected(action.movieId)
+            }
+        },
         modifier = modifier
     )
 }
@@ -88,16 +100,10 @@ fun HomeScreen(
 
         if (state.isSearchVisible) {
             Spacer(modifier = Modifier.height(10.dp))
-            OutlinedTextField(
+            SearchField(
                 value = state.searchQuery,
                 onValueChange = { onAction(HomeUiAction.SearchChanged(it)) },
-                placeholder = { Text("Find your movie") },
-                singleLine = true,
-                textStyle = MaterialTheme.typography.bodyMedium,
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = MovieMateColors.CardBackground,
-                    unfocusedContainerColor = MovieMateColors.CardBackground
-                ),
+                placeholder = "Find your movie",
                 modifier = Modifier.fillMaxWidth()
             )
         }
@@ -105,14 +111,14 @@ fun HomeScreen(
         Spacer(modifier = Modifier.height(ScreenHeaderDefaults.ContentTopSpacing))
 
         if (state.errorMessage != null) {
-            HomeErrorState(
+            ScreenErrorState(
                 message = state.errorMessage,
                 onRetryClicked = { onAction(HomeUiAction.RetryClicked) }
             )
         } else if (state.isLoading) {
-            HomeLoadingState()
+            ScreenLoadingState(message = "Loading movies...")
         } else if (state.movies.isEmpty()) {
-            HomeEmptyState()
+            ScreenEmptyState(message = "No movies found")
         } else {
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(14.dp),

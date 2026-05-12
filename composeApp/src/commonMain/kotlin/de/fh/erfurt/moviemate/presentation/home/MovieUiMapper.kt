@@ -14,9 +14,13 @@ fun Movie.toUiModel(): MovieUiModel {
     return MovieUiModel(
         id = id,
         title = title,
+        rating = rating,
         ratingText = "$rating/10",
+        categoryType = category.type,
         categoryText = category.type.displayName(),
+        publishingYear = publishingYear,
         yearText = publishingYear.toString(),
+        runtimeMinutes = runtime,
         runtimeText = "$runtime Minutes",
         posterUri = posterUri.ifBlank { null },
         isWatched = isWatched
