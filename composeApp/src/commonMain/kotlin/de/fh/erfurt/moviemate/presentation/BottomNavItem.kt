@@ -7,7 +7,7 @@ enum class BottomNavItem(
     val iconText: String
 ) {
     Home("Home", "⌂"),
-    Categories("Kategorien", "▦"),
+    Categories("Categories", "▦"),
     Add("Add", "+"),
     Backup("Backup", "≡")
 }

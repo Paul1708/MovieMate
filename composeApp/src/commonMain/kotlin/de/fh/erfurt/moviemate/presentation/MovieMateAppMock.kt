@@ -55,19 +55,19 @@ fun MovieMateAppMock() {
 
             is MovieMateDestination.Detail -> PlaceholderScreen(
                 title = "Details",
-                message = "Detail-Screen für ${currentDestination.movieId}",
+                message = "Detail screen for ${currentDestination.movieId}",
                 modifier = contentModifier
             )
 
             MovieMateDestination.Add -> PlaceholderScreen(
                 title = "Add",
-                message = "Add-Screen wird vorbereitet.",
+                message = "Add screen is prepared.",
                 modifier = contentModifier
             )
 
             MovieMateDestination.Backup -> PlaceholderScreen(
                 title = "Backup",
-                message = "Backup-Screen wird vorbereitet.",
+                message = "Backup screen is prepared.",
                 modifier = contentModifier
             )
         }

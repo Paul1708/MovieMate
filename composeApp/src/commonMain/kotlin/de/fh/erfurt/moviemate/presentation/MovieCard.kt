@@ -48,7 +48,7 @@ fun MovieCard(
             .clickable(onClick = onClick)
             .semantics {
                 contentDescription =
-                    "Film ${movie.title}, Bewertung ${movie.ratingText}, Kategorie ${movie.categoryText}, Jahr ${movie.yearText}"
+                    "Movie ${movie.title}, rating ${movie.ratingText}, category ${movie.categoryText}, year ${movie.yearText}"
             },
         shape = RoundedCornerShape(6.dp),
         colors = CardDefaults.cardColors(containerColor = MovieMateColors.CardBackground),

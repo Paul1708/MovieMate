@@ -61,17 +61,17 @@ fun HomeTopBar(
         ) {
             TopBarIconButton(
                 text = "⌕",
-                contentDescription = "Suche öffnen",
+                contentDescription = "Open search",
                 onClick = onSearchClicked
             )
             TopBarIconButton(
                 text = "▾",
-                contentDescription = "Filter öffnen",
+                contentDescription = "Open filter",
                 onClick = onFilterClicked
             )
             TopBarIconButton(
                 text = "↕",
-                contentDescription = "Sortierung öffnen",
+                contentDescription = "Open sort",
                 onClick = onSortClicked
             )
         }

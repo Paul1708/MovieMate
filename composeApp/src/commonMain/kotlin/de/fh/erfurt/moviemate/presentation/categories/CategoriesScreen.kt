@@ -40,7 +40,7 @@ import de.fh.erfurt.moviemate.presentation.ScreenHeaderDefaults
 import de.fh.erfurt.moviemate.presentation.ScreenLoadingState
 import de.fh.erfurt.moviemate.presentation.SearchField
 import de.fh.erfurt.moviemate.presentation.TopBarIconButton
-import de.fh.erfurt.moviemate.presentation.mock.previewDomainMovies
+import de.fh.erfurt.moviemate.presentation.mock.sampleMovies
 
 /**
  * Einstieg für den Kategorie-Screen während der UI-Entwicklung.
@@ -50,7 +50,7 @@ import de.fh.erfurt.moviemate.presentation.mock.previewDomainMovies
  */
 @Composable
 fun CategoriesRouteMock(
-    movies: List<Movie> = previewDomainMovies(),
+    movies: List<Movie> = sampleMovies(),
     modifier: Modifier = Modifier,
     onCategorySelected: (CategoryType) -> Unit = {}
 ) {
@@ -94,7 +94,7 @@ fun CategoriesScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         ScreenHeader(
-            title = "Kategorien",
+            title = "Categories",
             topBar = {
                 CategoriesTopBar(
                     onSearchClicked = { onAction(CategoriesUiAction.SearchClicked) }
@@ -107,7 +107,7 @@ fun CategoriesScreen(
             SearchField(
                 value = state.searchQuery,
                 onValueChange = { onAction(CategoriesUiAction.SearchChanged(it)) },
-                placeholder = "Find category",
+                placeholder = "Find a category",
                 modifier = Modifier.fillMaxWidth()
             )
         }
@@ -143,7 +143,7 @@ private fun CategoriesTopBar(
 
         TopBarIconButton(
             text = "⌕",
-            contentDescription = "Kategorie suchen",
+            contentDescription = "Search categories",
             onClick = onSearchClicked
         )
     }
@@ -189,7 +189,7 @@ private fun CategoryFolderCard(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .semantics { contentDescription = "Kategorie ${category.label}" }
+            .semantics { contentDescription = "Category ${category.label}" }
             .clickable(onClick = onClick),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {

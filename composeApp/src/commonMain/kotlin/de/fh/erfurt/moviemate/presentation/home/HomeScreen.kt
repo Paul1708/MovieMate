@@ -26,7 +26,7 @@ import de.fh.erfurt.moviemate.presentation.ScreenHeader
 import de.fh.erfurt.moviemate.presentation.ScreenHeaderDefaults
 import de.fh.erfurt.moviemate.presentation.ScreenLoadingState
 import de.fh.erfurt.moviemate.presentation.SearchField
-import de.fh.erfurt.moviemate.presentation.mock.previewDomainMovies
+import de.fh.erfurt.moviemate.presentation.mock.sampleMovies
 
 /**
  * Einstieg für den Homescreen während der UI-Entwicklung.
@@ -37,7 +37,7 @@ import de.fh.erfurt.moviemate.presentation.mock.previewDomainMovies
  */
 @Composable
 fun HomeRouteMock(
-    movies: List<Movie> = previewDomainMovies(),
+    movies: List<Movie> = sampleMovies(),
     initialCategory: CategoryType? = null,
     modifier: Modifier = Modifier,
     onMovieSelected: (String) -> Unit = {}
@@ -103,7 +103,7 @@ fun HomeScreen(
             SearchField(
                 value = state.searchQuery,
                 onValueChange = { onAction(HomeUiAction.SearchChanged(it)) },
-                placeholder = "Find your movie",
+                placeholder = "Find a movie",
                 modifier = Modifier.fillMaxWidth()
             )
         }

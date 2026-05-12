@@ -44,7 +44,7 @@ fun HomeFilterDialog(
             ) {
                 item {
                     Text(
-                        text = "Kategorie",
+                        text = "Category",
                         style = MaterialTheme.typography.titleSmall,
                         modifier = Modifier.padding(bottom = 4.dp)
                     )
@@ -52,7 +52,7 @@ fun HomeFilterDialog(
 
                 item {
                     FilterOptionRow(
-                        label = "Alle Kategorien",
+                        label = "All categories",
                         selected = selectedCategory == null,
                         onClick = { onCategorySelected(null) }
                     )

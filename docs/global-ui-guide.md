@@ -1,0 +1,116 @@
+# Global UI Guide
+
+Diese Datei beschreibt gemeinsame UI-Bausteine, Mockdaten und Navigationsstrukturen der aktuellen Presentation-Schicht.
+
+## Gemeinsame UI-Bausteine
+
+### `ScreenHeader.kt`
+
+Einheitlicher Header für Screens. Er legt Titelhöhe, Topbar-Höhe, Divider und Abstände fest.
+
+Home und Categories nutzen diesen Header bereits. Neue Screens sollten ihn ebenfalls verwenden, damit Titel, Icons und Divider beim Wechsel nicht springen.
+
+### `SearchField.kt`
+
+Einheitliches Suchfeld für Listen-Screens.
+
+Aktuell genutzt von:
+
+- Home
+- Categories
+
+Neue Screens sollten dieses Suchfeld nutzen, wenn sie eine einfache Textsuche anbieten.
+
+### `ScreenStateContent.kt`
+
+Gemeinsame Zustände für datengetriebene Screens:
+
+- `ScreenLoadingState`
+- `ScreenEmptyState`
+- `ScreenErrorState`
+
+Diese Bausteine ersetzen screenspezifische Loading-/Empty-/Error-Komponenten, solange kein spezielles Layout nötig ist.
+
+### `TopBarIconButton.kt`
+
+Einheitliche runde Icon-Schaltfläche für Topbars.
+
+Aktuell werden einfache Text-Symbole genutzt. Später können hier echte Icons eingebunden werden, ohne jeden Screen einzeln umzubauen.
+
+### `MovieMateColors.kt`
+
+Zentrale Farbwerte für die aktuelle UI. Neue Komponenten sollten zuerst diese Farben verwenden, bevor eigene Farben ergänzt werden.
+
+## Mockdaten und Sample-Daten
+
+### `MockMovieData.kt`
+
+Enthält `sampleMovies()`.
+
+Diese Funktion liefert Domain-`Movie`-Objekte und simuliert damit schon den späteren Backend-Datenfluss.
+
+### `MovieMateMockStore.kt`
+
+App-weiter Mock-Speicher für Runtime-Testdaten.
+
+Aktuell vorbereitet:
+
+- `addMovie(movie)`
+- `updateMovie(movie)`
+- `deleteMovie(movieId)`
+- `toggleWatched(movieId)`
+
+Diese Methoden erlauben später UI-Flows mit Add, Edit oder Watch-Status zu testen, ohne Backend-Code anzufassen.
+
+## Navigation
+
+### `BottomNavItem.kt`
+
+Beschreibt nur die Einträge der BottomBar:
+
+- Home
+- Categories
+- Add
+- Backup
+
+### `MovieMateDestination.kt`
+
+Beschreibt interne Navigationsziele der Mock-App:
+
+- Home
+- Categories
+- Detail
+- Add
+- Backup
+
+Detail ist kein BottomBar-Item, sondern wird über MovieCard-Klicks geöffnet. Das bereitet die spätere Navigation sauberer vor.
+
+### `PlaceholderScreen.kt`
+
+Einheitlicher Platzhalter für noch nicht implementierte Screens.
+
+Aktuell genutzt für:
+
+- Detail
+- Add
+- Backup
+
+## Namenskonvention
+
+`ViewModel` bedeutet aktuell noch: einfache UI-State-Klasse für Mockbetrieb.
+
+Die Klassen sind bewusst schon als ViewModels benannt, weil sie später in echte Lifecycle-ViewModels mit Coroutines und UseCases migrieren sollen. In der aktuellen UI-Phase arbeiten sie aber noch direkt mit Sample-Daten.
+
+## Sprache der UI
+
+Die sichtbaren UI-Texte sind aktuell auf Englisch vereinheitlicht. Kommentare und Dokumentation sind weiterhin auf Deutsch, damit die Projektstruktur für das Team leichter nachvollziehbar bleibt.
+
+## Was später weg kann
+
+Bei echter Backend-Anbindung können Runtime-Sample-Daten ersetzt werden:
+
+- `sampleMovies()` als Runtime-Datenquelle
+- lokale Filter- und Sortierlogik in StateHoldern
+- Platzhalter-Screens für Detail, Add und Backup
+
+Für Compose Previews sollten Sample-Daten weiter behalten werden.

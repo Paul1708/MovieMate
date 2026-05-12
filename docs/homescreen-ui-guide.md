@@ -1,98 +1,66 @@
 # Homescreen UI Guide
 
-Diese Datei beschreibt den aktuellen Stand der Homescreen-UI, wie die einzelnen Teile zusammenspielen und welche Bereiche nur für Mockdaten gedacht sind.
+Diese Datei beschreibt den aktuellen Stand der Homescreen-UI und erklärt, welche Teile Runtime-Mockdaten nutzen und welche Teile später bei der Backend-Anbindung bleiben sollen.
 
 ## Aktueller Stand
 
-Der Homescreen ist aktuell eine reine UI-Implementierung mit Mockdaten. Er ist so aufgebaut, dass später echte Filme über Shared-UseCases und Repository angebunden werden können, ohne die sichtbare UI stark umzubauen.
+Der Homescreen ist weiterhin eine UI-Implementierung mit Mockdaten. Die Testfilme liegen aber nicht mehr im Home-Paket, sondern zentral in `presentation/mock`. Dadurch nutzen Home und Kategorien dieselbe Filmliste.
 
 Aktuell vorhanden:
 
-- Homescreen mit Titel, Tabs, Suche, Filter, Filmliste und BottomBar
-- vertikale Movie Cards wie im Mockup
-- lokale Suche auf Mockdaten
-- lokale Tab-Filterung: `All`, `Watched`, `watch later`
-- lokaler Filter-Dialog für Kategorie und Sortierung
-- Loading-, Empty- und Error-State als eigene UI-Bausteine
-- Preview-Daten, die bereits über das Domain-Modell `Movie` laufen
-- Mapper von `Movie` zu `MovieUiModel`
-- einfacher `HomeViewModel`-State-Holder als Platzhalter für ein echtes ViewModel
+- Homescreen mit Titel, Tabs, Suche, Filter, Sortierung, Filmliste und BottomBar
+- vertikale Movie Cards im Stil des Mockups
+- lokale Suche auf Sample-Filmen
+- lokale Tab-Filterung: `All`, `Watched`, `Watch later`
+- lokaler Kategorie-Filter
+- lokaler Sortierdialog
+- gemeinsame Loading-, Empty- und Error-Komponenten
+- MovieCard-Klick als Navigation zum Detail-Platzhalter
+- Mapper von Domain-`Movie` zu `MovieUiModel`
 
 ## Wichtige Dateien
 
 ### `HomeScreen.kt`
 
-Enthält die sichtbare Homescreen-Oberfläche.
+Enthält Route und sichtbare Oberfläche des Homescreens.
 
-Wichtige Funktionen:
-
-- `HomeRouteMock()`: Einstieg für die App während der UI-Entwicklung.
-- `HomeScreen(...)`: reine UI, bekommt State und sendet Aktionen nach außen.
-- mehrere `@Preview`-Funktionen für normale Liste, Empty, Loading und Error.
-
-Die UI kennt keine Backend-Details. Sie arbeitet nur mit:
-
-```kotlin
-HomeUiState
-HomeUiAction
-```
+- `HomeRouteMock(...)` erzeugt aktuell ein `HomeViewModel` mit Sample-Daten.
+- `HomeScreen(...)` ist die reine Compose-UI.
+- `onMovieSelected` ist vorbereitet, damit später der Detail-Screen geöffnet werden kann.
+- Die UI kennt keine Repository- oder Backend-Details.
 
 ### `HomeViewModel.kt`
 
-Ein einfacher State-Holder für Mockdaten.
+Ein einfaches ViewModel-Skelett für Mockdaten. Es nutzt noch kein Lifecycle-ViewModel, ist aber bewusst so benannt, weil es später in diese Richtung migrieren soll.
 
 Er verarbeitet:
 
 - Tab-Wechsel
 - Suche
-- Filter öffnen/schließen
+- Filter öffnen und schließen
 - Kategorie-Auswahl
 - Sortierung
 - Clear Filter
 - Retry als Platzhalter
 
-Wichtig: Das ist noch kein echtes Backend-ViewModel. Es ist nur so strukturiert, dass später `GetMoviesUseCase` eingebaut werden kann.
+Später kann diese Klasse durch ein echtes ViewModel ersetzt werden, das `GetMoviesUseCase` nutzt.
 
-### `HomeUiState.kt`
+### `HomeUiState.kt` und `HomeUiAction.kt`
 
-Beschreibt den gesamten Anzeigezustand des Homescreens:
+`HomeUiState` beschreibt den gesamten Anzeigezustand. `HomeUiAction` beschreibt alle Nutzeraktionen.
 
-- Filme
-- aktiver Tab
-- Suchtext
-- Sichtbarkeit des Suchfelds
-- Kategorie-Filter
-- Sortierung
-- Sichtbarkeit des Filterdialogs
-- Loading/Error
-
-### `HomeUiAction.kt`
-
-Beschreibt alle Nutzeraktionen im Homescreen.
-
-Beispiele:
-
-- `TabSelected`
-- `SearchChanged`
-- `FilterClicked`
-- `CategorySelected`
-- `SortSelected`
-- `MovieClicked`
-
-Dadurch muss `HomeScreen` nicht wissen, wie die Aktion verarbeitet wird.
+Dadurch bleibt `HomeScreen` möglichst dumm: Der Screen zeigt State an und meldet Aktionen nach außen.
 
 ### `MovieUiModel.kt`
 
 UI-Modell für eine Filmkarte.
 
-Dieses Modell enthält bereits formatierte Texte wie:
+Es enthält zwei Arten von Daten:
 
-- `ratingText`
-- `categoryText`
-- `yearText`
-- `runtimeText`
+- Rohwerte für Logik: `rating`, `categoryType`, `publishingYear`, `runtimeMinutes`
+- formatierte Texte für Anzeige: `ratingText`, `categoryText`, `yearText`, `runtimeText`
 
-Die UI muss dadurch keine Domain-Formatierung kennen.
+Dadurch muss die UI nicht aus Texten zurückrechnen, wenn gesucht, gefiltert oder sortiert wird.
 
 ### `MovieUiMapper.kt`
 
@@ -102,57 +70,27 @@ Die UI muss dadurch keine Domain-Formatierung kennen.
 Movie.toUiModel()
 ```
 
-Das ist die wichtigste Vorbereitung für spätere Backend-Anbindung.
+Diese Mapper-Funktion ist die wichtigste Vorbereitung für echte Daten aus dem Backend.
 
 ### `HomePreviewData.kt`
 
-Enthält Mockdaten für Entwicklung und Previews.
+Enthält nur noch Preview-Hilfen für Compose:
 
-Wichtig: Die Mockdaten werden zuerst als echte Domain-`Movie`-Objekte angelegt und danach mit `toUiModel()` in UI-Daten übersetzt. Dadurch wird der spätere Datenfluss schon simuliert.
-
-### `HomeFilterDialog.kt`
-
-Ein einfacher Dialog für Kategorie und Sortierung.
-
-Aktuell filtert er nur lokale Mockdaten. Später können dieselben Werte an `GetMoviesUseCase` übergeben werden.
-
-### `HomeStateContent.kt`
-
-Enthält eigenständige UI-Bausteine für:
-
-- `HomeLoadingState`
-- `HomeEmptyState`
-- `HomeErrorState`
-
-Diese Zustände sind später direkt für Repository- oder Netzwerkzustände nutzbar.
-
-### `Moviecard.kt`
-
-Zeigt eine einzelne Filmkarte in der Liste.
-
-Die Karte bekommt direkt ein `MovieUiModel` und zeigt:
-
-- Poster-Platzhalter
-- Titel
-- Bewertung
-- Kategorie
-- Jahr
-- Laufzeit
-
-## Was aktuell nur Mock ist
-
-Diese Teile sind nur für die UI-Entwicklung gedacht:
-
-- `HomeRouteMock()`
-- `HomeViewModel` in der aktuellen Form
-- `previewDomainMovies()`
 - `previewHomeMovies()`
-- lokale Filterung in `HomeViewModel.filterMovies(...)`
-- lokale Sortierung in `sortForHome(...)`
-- leere Handler für `MovieClicked`
-- Poster-Platzhalter in `MovieCard`
+- `previewHomeUiState()`
 
-Diese Teile dürfen später ersetzt oder stark vereinfacht werden.
+Die echten Sample-Filme liegen zentral in `presentation/mock/MockMovieData.kt`.
+
+## Mockdaten
+
+Runtime-Mockdaten kommen aus:
+
+```text
+presentation/mock/MockMovieData.kt
+presentation/mock/MovieMateMockStore.kt
+```
+
+Der Homescreen bekommt die Filme über `HomeRouteMock(movies = ...)`. In der App kommt diese Liste aktuell aus `MovieMateMockStore`.
 
 ## Was später bleiben soll
 
@@ -165,11 +103,22 @@ Diese Teile sind auch für die echte App sinnvoll:
 - `Movie.toUiModel()`
 - `HomeTopBar`
 - `HomeFilterDialog`
-- `HomeLoadingState`
-- `HomeEmptyState`
-- `HomeErrorState`
+- `HomeSortDialog`
 - `MovieCard`
-- `BottomBar` und `BottomNavItem`
+- gemeinsame UI-Bausteine wie `SearchField` und `ScreenStateContent`
+
+## Was später ersetzt werden kann
+
+Diese Teile sind hauptsächlich für Mockbetrieb oder Previews gedacht:
+
+- `HomeRouteMock()` als Runtime-Einstieg
+- `HomeViewModel` in der aktuellen Form
+- lokale Filterlogik in `HomeViewModel`
+- lokale Sortierlogik in `HomeViewModel`
+- `sampleMovies()` für Runtime-Daten
+- Poster-Platzhalter in `MovieCard`
+
+Für Compose Previews sollten Sample-Daten weiter behalten werden.
 
 ## Spätere Backend-Anbindung
 
@@ -178,22 +127,15 @@ Der spätere Datenfluss sollte ungefähr so aussehen:
 ```text
 HomeScreen
   -> HomeUiAction
-  -> echtes HomeViewModel
+  -> echtes ViewModel
   -> GetMoviesUseCase
   -> MovieRepository
-  -> Local/Remote DataSource
   -> List<Movie>
   -> Movie.toUiModel()
   -> HomeUiState
 ```
 
-Im echten ViewModel kann die aktuelle Mock-Logik ersetzt werden:
-
-```kotlin
-sourceMovies
-```
-
-durch:
+Die aktuelle lokale Logik lässt sich später durch einen UseCase-Aufruf ersetzen:
 
 ```kotlin
 getMoviesUseCase(
@@ -204,24 +146,9 @@ getMoviesUseCase(
 )
 ```
 
-## Was beim Umstieg weg kann
+## Nächste mögliche Schritte ohne Backend
 
-Wenn echte Daten angebunden sind, können diese Teile entfernt oder nur noch für Previews behalten werden:
-
-- `HomeRouteMock()` als App-Einstieg
-- Mockdaten in `HomePreviewData.kt` für Runtime
-- lokale Filterlogik im Mock-`HomeViewModel`
-- lokale Sortierlogik im Mock-`HomeViewModel`
-
-Für Compose Previews sollten die Mockdaten aber weiter behalten werden.
-
-## Nächste mögliche UI-Schritte
-
-Ohne Backend kann man danach noch machen:
-
-- visuelles Fine-Tuning nach Mockup
-- echte Icons statt Text-Symbolen
+- Tests für Filterung und Sortierung ergänzen
+- echte Icons statt Text-Symbolen vorbereiten
 - Posteranzeige vorbereiten
-- BottomBar optisch weiter anpassen
-- Detail-Navigation nur als Callback vorbereiten
-- Tests für Mapper und Mock-ViewModel ergänzen
+- Detail-Platzhalter später durch echten Detail-Screen ersetzen

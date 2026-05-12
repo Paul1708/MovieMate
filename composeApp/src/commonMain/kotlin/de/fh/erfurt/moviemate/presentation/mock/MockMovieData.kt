@@ -5,12 +5,12 @@ import de.fh.erfurt.moviemate.domain.model.CategoryType
 import de.fh.erfurt.moviemate.domain.model.Movie
 
 /**
- * Gemeinsame Testdaten für die Presentation-Schicht.
+ * Gemeinsame Sample-Daten für die Presentation-Schicht.
  *
  * Die Filme sind Domain-Objekte, damit Home, Kategorien und spätere Screens
  * dieselbe Struktur nutzen wie später die Backend-Anbindung.
  */
-fun previewDomainMovies(): List<Movie> {
+fun sampleMovies(): List<Movie> {
     return listOf(
         Movie(
             id = "movie-1",

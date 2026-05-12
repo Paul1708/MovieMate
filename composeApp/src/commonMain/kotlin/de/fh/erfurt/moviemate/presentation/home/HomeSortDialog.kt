@@ -32,7 +32,7 @@ fun HomeSortDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
-            Text("Sortierung")
+            Text("Sort")
         },
         text = {
             LazyColumn {

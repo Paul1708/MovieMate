@@ -6,17 +6,17 @@ import androidx.compose.runtime.setValue
 import de.fh.erfurt.moviemate.domain.model.CategoryType
 import de.fh.erfurt.moviemate.domain.model.Movie
 import de.fh.erfurt.moviemate.domain.model.SortCriterion
-import de.fh.erfurt.moviemate.presentation.mock.previewDomainMovies
+import de.fh.erfurt.moviemate.presentation.mock.sampleMovies
 
 /**
- * Einfacher State-Holder für den Homescreen.
+ * Einfaches ViewModel-Skelett für den Homescreen.
  *
- * Diese Klasse ist ein ViewModel-Skelett für die UI-Entwicklung. Sie arbeitet
- * noch mit Mockdaten, kapselt aber schon Suche, Tabs, Filter und Sortierung an
- * einer zentralen Stelle. Später kann hier `GetMoviesUseCase` angebunden werden.
+ * Diese Klasse arbeitet noch mit Mockdaten, kapselt aber schon Suche, Tabs,
+ * Filter und Sortierung an einer zentralen Stelle. Später kann hier
+ * `GetMoviesUseCase` angebunden werden.
  */
 class HomeViewModel(
-    private val sourceMovies: List<Movie> = previewDomainMovies(),
+    private val sourceMovies: List<Movie> = sampleMovies(),
     initialCategory: CategoryType? = null
 ) {
     var state by mutableStateOf(

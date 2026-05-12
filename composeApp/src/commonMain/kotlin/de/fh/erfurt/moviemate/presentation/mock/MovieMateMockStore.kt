@@ -12,12 +12,32 @@ import de.fh.erfurt.moviemate.domain.model.Movie
  * Add-Screen kann später testweise Filme ergänzen, ohne Backend-Code zu ändern.
  */
 class MovieMateMockStore(
-    initialMovies: List<Movie> = previewDomainMovies()
+    initialMovies: List<Movie> = sampleMovies()
 ) {
     var movies by mutableStateOf(initialMovies)
         private set
 
     fun addMovie(movie: Movie) {
         movies = movies + movie
+    }
+
+    fun updateMovie(movie: Movie) {
+        movies = movies.map { currentMovie ->
+            if (currentMovie.id == movie.id) movie else currentMovie
+        }
+    }
+
+    fun deleteMovie(movieId: String) {
+        movies = movies.filterNot { movie -> movie.id == movieId }
+    }
+
+    fun toggleWatched(movieId: String) {
+        movies = movies.map { movie ->
+            if (movie.id == movieId) {
+                movie.copy(isWatched = !movie.isWatched)
+            } else {
+                movie
+            }
+        }
     }
 }
