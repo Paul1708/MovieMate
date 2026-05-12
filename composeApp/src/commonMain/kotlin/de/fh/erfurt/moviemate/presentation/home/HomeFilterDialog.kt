@@ -17,6 +17,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import de.fh.erfurt.moviemate.domain.model.CategoryType
+import de.fh.erfurt.moviemate.presentation.MovieCategoryTypes
+import de.fh.erfurt.moviemate.presentation.displayName
 
 /**
  * Einfacher Filter-Dialog für den Homescreen.
@@ -56,7 +58,7 @@ fun HomeFilterDialog(
                     )
                 }
 
-                items(CategoryType.entries) { category ->
+                items(MovieCategoryTypes) { category ->
                     FilterOptionRow(
                         label = category.displayName(),
                         selected = selectedCategory == category,
@@ -106,23 +108,5 @@ private fun FilterOptionRow(
             text = label,
             modifier = Modifier.padding(start = 8.dp)
         )
-    }
-}
-
-/**
- * Wandelt den internen Kategorie-Namen in einen gut lesbaren UI-Text um.
- */
-fun CategoryType.displayName(): String {
-    return when (this) {
-        CategoryType.DRAMA -> "Drama"
-        CategoryType.ACTION -> "Action"
-        CategoryType.FANTASY -> "Fantasy"
-        CategoryType.ROMANCE -> "Romance"
-        CategoryType.COMEDY -> "Comedy"
-        CategoryType.HORROR -> "Horror"
-        CategoryType.FAVORITE -> "Favorite"
-        CategoryType.SCIENCE_FICTION -> "Science Fiction"
-        CategoryType.ANIMATION -> "Animation"
-        CategoryType.OTHER -> "Other"
     }
 }

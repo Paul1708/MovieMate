@@ -20,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import de.fh.erfurt.moviemate.domain.model.CategoryType
 import de.fh.erfurt.moviemate.presentation.MovieCard
 import de.fh.erfurt.moviemate.presentation.MovieMateColors
 import de.fh.erfurt.moviemate.presentation.ScreenHeader
@@ -34,9 +35,12 @@ import de.fh.erfurt.moviemate.presentation.ScreenHeaderDefaults
  */
 @Composable
 fun HomeRouteMock(
+    initialCategory: CategoryType? = null,
     modifier: Modifier = Modifier
 ) {
-    val viewModel = remember { HomeViewModel() }
+    val viewModel = remember(initialCategory) {
+        HomeViewModel(initialCategory = initialCategory)
+    }
 
     HomeScreen(
         state = viewModel.state,

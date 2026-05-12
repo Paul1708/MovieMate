@@ -1,6 +1,7 @@
 package de.fh.erfurt.moviemate.presentation.home
 
 import de.fh.erfurt.moviemate.domain.model.Movie
+import de.fh.erfurt.moviemate.presentation.displayName
 
 /**
  * Übersetzt ein Domain-Movie in ein UI-Movie für den Homescreen.

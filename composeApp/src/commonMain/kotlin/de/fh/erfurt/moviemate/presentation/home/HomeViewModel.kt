@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import de.fh.erfurt.moviemate.domain.model.CategoryType
 import de.fh.erfurt.moviemate.domain.model.SortCriterion
+import de.fh.erfurt.moviemate.presentation.displayName
 
 /**
  * Einfacher State-Holder für den Homescreen.
@@ -14,9 +15,15 @@ import de.fh.erfurt.moviemate.domain.model.SortCriterion
  * einer zentralen Stelle. Später kann hier `GetMoviesUseCase` angebunden werden.
  */
 class HomeViewModel(
-    private val sourceMovies: List<MovieUiModel> = previewHomeMovies()
+    private val sourceMovies: List<MovieUiModel> = previewHomeMovies(),
+    initialCategory: CategoryType? = null
 ) {
-    var state by mutableStateOf(HomeUiState(movies = sourceMovies))
+    var state by mutableStateOf(
+        HomeUiState(
+            movies = sourceMovies.filterMovies(selectedCategory = initialCategory),
+            selectedCategory = initialCategory
+        )
+    )
         private set
 
     fun onAction(action: HomeUiAction) {
@@ -47,7 +54,7 @@ class HomeViewModel(
         isSortDialogVisible: Boolean = state.isSortDialogVisible
     ) {
         state = state.copy(
-            movies = filterMovies(
+            movies = sourceMovies.filterMovies(
                 selectedTab = selectedTab,
                 searchQuery = searchQuery,
                 selectedCategory = selectedCategory,
@@ -84,13 +91,13 @@ class HomeViewModel(
     }
 
     // Filtert lokal die Mockdaten. Später übernimmt das Repository diese Aufgabe.
-    private fun filterMovies(
-        selectedTab: HomeTab,
-        searchQuery: String,
-        selectedCategory: CategoryType?,
-        selectedSortCriterion: SortCriterion
+    private fun List<MovieUiModel>.filterMovies(
+        selectedTab: HomeTab = HomeTab.All,
+        searchQuery: String = "",
+        selectedCategory: CategoryType? = null,
+        selectedSortCriterion: SortCriterion = SortCriterion.RECENTLY_ADDED
     ): List<MovieUiModel> {
-        return sourceMovies
+        return this
             .filter { movie ->
                 when (selectedTab) {
                     HomeTab.All -> true

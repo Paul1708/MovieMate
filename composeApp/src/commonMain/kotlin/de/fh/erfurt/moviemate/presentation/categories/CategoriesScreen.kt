@@ -35,6 +35,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import de.fh.erfurt.moviemate.domain.model.CategoryType
 import de.fh.erfurt.moviemate.presentation.MovieMateColors
 import de.fh.erfurt.moviemate.presentation.ScreenHeader
 import de.fh.erfurt.moviemate.presentation.ScreenHeaderDefaults
@@ -48,13 +49,19 @@ import de.fh.erfurt.moviemate.presentation.TopBarIconButton
  */
 @Composable
 fun CategoriesRouteMock(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onCategorySelected: (CategoryType) -> Unit = {}
 ) {
     val viewModel = remember { CategoriesViewModel() }
 
     CategoriesScreen(
         state = viewModel.state,
-        onAction = viewModel::onAction,
+        onAction = { action ->
+            viewModel.onAction(action)
+            if (action is CategoriesUiAction.CategoryClicked) {
+                onCategorySelected(action.type)
+            }
+        },
         modifier = modifier
     )
 }

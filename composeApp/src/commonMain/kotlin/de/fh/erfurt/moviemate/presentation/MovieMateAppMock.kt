@@ -8,6 +8,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import de.fh.erfurt.moviemate.domain.model.CategoryType
 import de.fh.erfurt.moviemate.presentation.categories.CategoriesRouteMock
 import de.fh.erfurt.moviemate.presentation.home.HomeRouteMock
 
@@ -21,6 +22,7 @@ import de.fh.erfurt.moviemate.presentation.home.HomeRouteMock
 @Composable
 fun MovieMateAppMock() {
     var selectedItem by remember { mutableStateOf(BottomNavItem.Home) }
+    var selectedHomeCategory by remember { mutableStateOf<CategoryType?>(null) }
 
     Scaffold(
         containerColor = MovieMateColors.ScreenBackground,
@@ -34,10 +36,28 @@ fun MovieMateAppMock() {
         val contentModifier = Modifier.padding(paddingValues)
 
         when (selectedItem) {
-            BottomNavItem.Home -> HomeRouteMock(modifier = contentModifier)
-            BottomNavItem.Categories -> CategoriesRouteMock(modifier = contentModifier)
-            BottomNavItem.Add -> HomeRouteMock(modifier = contentModifier)
-            BottomNavItem.Backup -> HomeRouteMock(modifier = contentModifier)
+            BottomNavItem.Home -> HomeRouteMock(
+                initialCategory = selectedHomeCategory,
+                modifier = contentModifier
+            )
+
+            BottomNavItem.Categories -> CategoriesRouteMock(
+                modifier = contentModifier,
+                onCategorySelected = { category ->
+                    selectedHomeCategory = category
+                    selectedItem = BottomNavItem.Home
+                }
+            )
+
+            BottomNavItem.Add -> HomeRouteMock(
+                initialCategory = selectedHomeCategory,
+                modifier = contentModifier
+            )
+
+            BottomNavItem.Backup -> HomeRouteMock(
+                initialCategory = selectedHomeCategory,
+                modifier = contentModifier
+            )
         }
     }
 }
