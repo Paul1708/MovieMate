@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import de.fh.erfurt.moviemate.presentation.home.MovieUiModel
 
@@ -43,25 +44,25 @@ fun MovieCard(
 ) {
     Card(
         modifier = modifier
-            .height(128.dp)
+            .height(126.dp)
             .clickable(onClick = onClick)
             .semantics {
                 contentDescription =
                     "Film ${movie.title}, Bewertung ${movie.ratingText}, Kategorie ${movie.categoryText}, Jahr ${movie.yearText}"
             },
-        shape = RoundedCornerShape(8.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        shape = RoundedCornerShape(6.dp),
+        colors = CardDefaults.cardColors(containerColor = MovieMateColors.CardBackground),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(10.dp),
+                .padding(9.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             PosterPlaceholder()
 
-            Spacer(modifier = Modifier.width(16.dp))
+            Spacer(modifier = Modifier.width(14.dp))
 
             Column(
                 modifier = Modifier.fillMaxHeight(),
@@ -70,10 +71,13 @@ fun MovieCard(
                 Text(
                     text = movie.title,
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
+                    color = MovieMateColors.PrimaryText,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
 
-                Spacer(modifier = Modifier.height(6.dp))
+                Spacer(modifier = Modifier.height(7.dp))
 
                 MovieMetaRow(icon = "★", text = movie.ratingText)
                 MovieMetaRow(icon = "▣", text = movie.categoryText)
@@ -96,7 +100,7 @@ private fun PosterPlaceholder() {
     Box(
         modifier = Modifier
             .size(width = 96.dp, height = 108.dp)
-            .background(Color(0xFFB8B8B8), RoundedCornerShape(6.dp)),
+            .background(MovieMateColors.PosterPlaceholder, RoundedCornerShape(5.dp)),
         contentAlignment = Alignment.Center
     ) {
         Text(
@@ -125,13 +129,15 @@ private fun MovieMetaRow(
     ) {
         Text(
             text = icon,
-            style = MaterialTheme.typography.bodyMedium,
-            color = Color(0xFF555555)
+            style = MaterialTheme.typography.bodySmall,
+            color = MovieMateColors.SecondaryText
         )
         Text(
             text = text,
-            style = MaterialTheme.typography.bodyMedium,
-            color = Color(0xFF333333)
+            style = MaterialTheme.typography.bodySmall,
+            color = MovieMateColors.PrimaryText,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
         )
     }
 }

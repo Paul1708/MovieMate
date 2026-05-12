@@ -1,5 +1,6 @@
 package de.fh.erfurt.moviemate.presentation.home
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -14,6 +15,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -22,6 +24,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import de.fh.erfurt.moviemate.presentation.BottomBar
 import de.fh.erfurt.moviemate.presentation.MovieCard
+import de.fh.erfurt.moviemate.presentation.MovieMateColors
 
 /**
  * Einstieg für den Homescreen während der UI-Entwicklung.
@@ -54,6 +57,7 @@ fun HomeScreen(
     onAction: (HomeUiAction) -> Unit
 ) {
     Scaffold(
+        containerColor = MovieMateColors.ScreenBackground,
         bottomBar = {
             BottomBar()
         }
@@ -62,36 +66,49 @@ fun HomeScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(16.dp),
+                .background(MovieMateColors.ScreenBackground)
+                .padding(horizontal = 18.dp, vertical = 18.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
                 text = "Home",
-                style = MaterialTheme.typography.titleMedium
+                style = MaterialTheme.typography.titleMedium,
+                color = MovieMateColors.PrimaryText
             )
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(10.dp))
 
             HomeTopBar(
                 selectedTab = state.selectedTab,
                 onTabSelected = { onAction(HomeUiAction.TabSelected(it)) },
                 onSearchClicked = { onAction(HomeUiAction.SearchClicked) },
-                onFilterClicked = { onAction(HomeUiAction.FilterClicked) }
+                onFilterClicked = { onAction(HomeUiAction.FilterClicked) },
+                onSortClicked = { onAction(HomeUiAction.SortClicked) }
             )
 
-            HorizontalDivider(modifier = Modifier.fillMaxWidth())
+            HorizontalDivider(
+                modifier = Modifier.fillMaxWidth(),
+                thickness = 2.dp,
+                color = MovieMateColors.Divider
+            )
 
             if (state.isSearchVisible) {
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(10.dp))
                 OutlinedTextField(
                     value = state.searchQuery,
                     onValueChange = { onAction(HomeUiAction.SearchChanged(it)) },
                     placeholder = { Text("Find your movie") },
+                    singleLine = true,
+                    textStyle = MaterialTheme.typography.bodyMedium,
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = MovieMateColors.CardBackground,
+                        unfocusedContainerColor = MovieMateColors.CardBackground
+                    ),
                     modifier = Modifier.fillMaxWidth()
                 )
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(18.dp))
 
             if (state.errorMessage != null) {
                 HomeErrorState(
@@ -104,10 +121,10 @@ fun HomeScreen(
                 HomeEmptyState()
             } else {
                 LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(14.dp),
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(top = 4.dp)
+                        .padding(top = 2.dp)
                 ) {
                     items(state.movies, key = { it.id }) { movie ->
                         MovieCard(
@@ -124,11 +141,18 @@ fun HomeScreen(
     if (state.isFilterDialogVisible) {
         HomeFilterDialog(
             selectedCategory = state.selectedCategory,
-            selectedSortCriterion = state.selectedSortCriterion,
             onCategorySelected = { onAction(HomeUiAction.CategorySelected(it)) },
-            onSortSelected = { onAction(HomeUiAction.SortSelected(it)) },
-            onClearClicked = { onAction(HomeUiAction.ClearFiltersClicked) },
+            onClearClicked = { onAction(HomeUiAction.ClearCategoryFilterClicked) },
             onDismiss = { onAction(HomeUiAction.FilterDismissed) }
+        )
+    }
+
+    if (state.isSortDialogVisible) {
+        HomeSortDialog(
+            selectedSortCriterion = state.selectedSortCriterion,
+            onSortSelected = { onAction(HomeUiAction.SortSelected(it)) },
+            onClearClicked = { onAction(HomeUiAction.ClearSortClicked) },
+            onDismiss = { onAction(HomeUiAction.SortDismissed) }
         )
     }
 }

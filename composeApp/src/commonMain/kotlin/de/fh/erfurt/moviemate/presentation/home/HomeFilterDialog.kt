@@ -17,21 +17,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import de.fh.erfurt.moviemate.domain.model.CategoryType
-import de.fh.erfurt.moviemate.domain.model.SortCriterion
 
 /**
  * Einfacher Filter-Dialog für den Homescreen.
  *
- * Der Dialog ist noch ein UI-Platzhalter, funktioniert aber bereits mit den
- * Mockdaten. Später können dieselben Werte an `GetMoviesUseCase` übergeben
- * werden, damit Backend oder lokale Datenbank die Filterung übernehmen.
+ * Dieser Dialog ist nur für Kategorien zuständig. Die Sortierung hat einen
+ * eigenen Dialog, damit beide Bedienungen in der Topbar getrennt bleiben.
  */
 @Composable
 fun HomeFilterDialog(
     selectedCategory: CategoryType?,
-    selectedSortCriterion: SortCriterion,
     onCategorySelected: (CategoryType?) -> Unit,
-    onSortSelected: (SortCriterion) -> Unit,
     onClearClicked: () -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -68,21 +64,6 @@ fun HomeFilterDialog(
                     )
                 }
 
-                item {
-                    Text(
-                        text = "Sortierung",
-                        style = MaterialTheme.typography.titleSmall,
-                        modifier = Modifier.padding(top = 12.dp, bottom = 4.dp)
-                    )
-                }
-
-                items(SortCriterion.entries) { sortCriterion ->
-                    FilterOptionRow(
-                        label = sortCriterion.displayName(),
-                        selected = selectedSortCriterion == sortCriterion,
-                        onClick = { onSortSelected(sortCriterion) }
-                    )
-                }
             }
         },
         confirmButton = {
@@ -101,8 +82,8 @@ fun HomeFilterDialog(
 /**
  * Eine auswählbare Zeile im Filter-Dialog.
  *
- * Sie wird sowohl für Kategorien als auch für Sortieroptionen genutzt, damit
- * der Dialog gleichmäßig aufgebaut bleibt.
+ * Sie wird für jede Kategorie genutzt, damit die Auswahl gleichmäßig aufgebaut
+ * bleibt.
  */
 @Composable
 private fun FilterOptionRow(
@@ -143,18 +124,5 @@ fun CategoryType.displayName(): String {
         CategoryType.SCIENCE_FICTION -> "Science Fiction"
         CategoryType.ANIMATION -> "Animation"
         CategoryType.OTHER -> "Other"
-    }
-}
-
-/**
- * Wandelt das interne Sortierkriterium in einen gut lesbaren UI-Text um.
- */
-fun SortCriterion.displayName(): String {
-    return when (this) {
-        SortCriterion.TITLE_ASC -> "Title A-Z"
-        SortCriterion.TITLE_DESC -> "Title Z-A"
-        SortCriterion.PUBLISHING_YEAR_DESC -> "Newest year"
-        SortCriterion.RATING_DESC -> "Best rating"
-        SortCriterion.RECENTLY_ADDED -> "Recently added"
     }
 }

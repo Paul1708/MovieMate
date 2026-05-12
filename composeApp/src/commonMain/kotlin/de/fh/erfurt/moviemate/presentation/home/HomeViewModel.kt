@@ -25,10 +25,13 @@ class HomeViewModel(
             HomeUiAction.SearchClicked -> updateState(isSearchVisible = !state.isSearchVisible)
             is HomeUiAction.SearchChanged -> updateState(searchQuery = action.query)
             HomeUiAction.FilterClicked -> updateState(isFilterDialogVisible = true)
+            HomeUiAction.SortClicked -> updateState(isSortDialogVisible = true)
             is HomeUiAction.CategorySelected -> updateState(selectedCategory = action.category)
             is HomeUiAction.SortSelected -> updateState(selectedSortCriterion = action.sortCriterion)
-            HomeUiAction.ClearFiltersClicked -> clearFilters()
+            HomeUiAction.ClearCategoryFilterClicked -> clearCategoryFilter()
+            HomeUiAction.ClearSortClicked -> clearSort()
             HomeUiAction.FilterDismissed -> updateState(isFilterDialogVisible = false)
+            HomeUiAction.SortDismissed -> updateState(isSortDialogVisible = false)
             is HomeUiAction.MovieClicked -> Unit
             HomeUiAction.RetryClicked -> refreshMovies()
         }
@@ -40,7 +43,8 @@ class HomeViewModel(
         isSearchVisible: Boolean = state.isSearchVisible,
         selectedCategory: CategoryType? = state.selectedCategory,
         selectedSortCriterion: SortCriterion = state.selectedSortCriterion,
-        isFilterDialogVisible: Boolean = state.isFilterDialogVisible
+        isFilterDialogVisible: Boolean = state.isFilterDialogVisible,
+        isSortDialogVisible: Boolean = state.isSortDialogVisible
     ) {
         state = state.copy(
             movies = filterMovies(
@@ -55,16 +59,23 @@ class HomeViewModel(
             selectedCategory = selectedCategory,
             selectedSortCriterion = selectedSortCriterion,
             isFilterDialogVisible = isFilterDialogVisible,
+            isSortDialogVisible = isSortDialogVisible,
             isLoading = false,
             errorMessage = null
         )
     }
 
-    private fun clearFilters() {
+    private fun clearCategoryFilter() {
         updateState(
             selectedCategory = null,
-            selectedSortCriterion = SortCriterion.RECENTLY_ADDED,
             isFilterDialogVisible = false
+        )
+    }
+
+    private fun clearSort() {
+        updateState(
+            selectedSortCriterion = SortCriterion.RECENTLY_ADDED,
+            isSortDialogVisible = false
         )
     }
 

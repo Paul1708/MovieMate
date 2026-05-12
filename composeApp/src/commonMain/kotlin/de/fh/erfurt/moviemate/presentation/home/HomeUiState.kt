@@ -13,6 +13,7 @@ data class HomeUiState(
     val selectedCategory: CategoryType? = null,
     val selectedSortCriterion: SortCriterion = SortCriterion.RECENTLY_ADDED,
     val isFilterDialogVisible: Boolean = false,
+    val isSortDialogVisible: Boolean = false,
     val isLoading: Boolean = false,
     val errorMessage: String? = null
 )
