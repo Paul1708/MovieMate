@@ -26,7 +26,7 @@ fun previewHomeMovies(): List<MovieUiModel> {
     )
 }
 
-// Vollstaendiger Beispiel-State fuer den Homescreen.
+// Vollständiger Beispiel-State für den Homescreen.
 fun previewHomeUiState(): HomeUiState {
     return HomeUiState(
         movies = previewHomeMovies()

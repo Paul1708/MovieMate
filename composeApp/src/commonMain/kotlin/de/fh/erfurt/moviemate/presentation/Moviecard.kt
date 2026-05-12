@@ -1,62 +1,135 @@
 package de.fh.erfurt.moviemate.presentation
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import de.fh.erfurt.moviemate.domain.model.Category
 
-
+/**
+ * Einzelne Filmkarte in der Homescreen-Liste.
+ *
+ * Die Karte zeigt links das Poster und rechts die wichtigsten Filmdaten:
+ * Titel, Bewertung, Kategorie, Jahr und Laufzeit. Der Klick auf die Karte
+ * ist bereits vorbereitet, damit später der Detail-Screen geöffnet werden kann.
+ */
 @Composable
 fun MovieCard(
     title: String,
     year: String,
     time: String,
-    category:  String,
+    category: String,
     isWatched: Boolean,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    rating: String = "",
+    onClick: () -> Unit = {}
 ) {
-    Card (
-        modifier= modifier
-            .width(110.dp)
-            .height(160.dp),
-        shape= RoundedCornerShape(10.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+    Card(
+        modifier = modifier
+            .height(128.dp)
+            .clickable(onClick = onClick),
+        shape = RoundedCornerShape(8.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
-        Column(
+        Row(
             modifier = Modifier
-                .fillMaxSize()
-                .background(Color(0xFFFFF9B0))
-                .padding(8.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceBetween
-
+                .fillMaxWidth()
+                .padding(10.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Box(
-                modifier= modifier
-                    .fillMaxWidth()
-                    .height(85.dp)
-                    .background(Color(0xFFE0E0E0), RoundedCornerShape(8.dp)),
-                contentAlignment = Alignment.Center
+            PosterPlaceholder()
+
+            Spacer(modifier = Modifier.width(16.dp))
+
+            Column(
+                modifier = Modifier.fillMaxHeight(),
+                verticalArrangement = Arrangement.Center
             ) {
-                Text("Poster")
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+
+                Spacer(modifier = Modifier.height(6.dp))
+
+                MovieMetaRow(icon = "★", text = rating.ifBlank { if (isWatched) "Watched" else "Watch later" })
+                MovieMetaRow(icon = "▣", text = category)
+                MovieMetaRow(icon = "▦", text = year)
+                MovieMetaRow(icon = "◷", text = time)
             }
-
-            Text(title)
-            Text(year)
-            Text(time)
-            Text(category)
-
-            Text(
-                text= if (isWatched) "Watched" else "Not Watched"
-            )
         }
+    }
+}
+
+/**
+ * Platzhalter für das Filmposter.
+ *
+ * Diese Box steht an der Stelle, an der später das echte Poster aus `posterUri`
+ * angezeigt wird. Im aktuellen UI-Schritt hilft sie, die Proportionen aus dem
+ * Mockup nachzubauen.
+ */
+@Composable
+private fun PosterPlaceholder() {
+    Box(
+        modifier = Modifier
+            .size(width = 96.dp, height = 108.dp)
+            .background(Color(0xFFB8B8B8), RoundedCornerShape(6.dp)),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = "▧",
+            color = Color.Black,
+            style = MaterialTheme.typography.headlineSmall
+        )
+    }
+}
+
+/**
+ * Kleine Informationszeile innerhalb einer Filmkarte.
+ *
+ * Sie kombiniert ein einfaches Symbol mit einem Text, zum Beispiel Stern plus
+ * Bewertung oder Kalender plus Jahr. Dadurch bleiben die Metadaten der Karte
+ * einheitlich ausgerichtet.
+ */
+@Composable
+private fun MovieMetaRow(
+    icon: String,
+    text: String
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(6.dp)
+    ) {
+        Text(
+            text = icon,
+            style = MaterialTheme.typography.bodyMedium,
+            color = Color(0xFF555555)
+        )
+        Text(
+            text = text,
+            style = MaterialTheme.typography.bodyMedium,
+            color = Color(0xFF333333)
+        )
     }
 }

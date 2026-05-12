@@ -1,41 +1,30 @@
 package de.fh.erfurt.moviemate.presentation
 
-import androidx.compose.foundation.layout.*
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 
+/**
+ * Untere Navigation der App.
+ *
+ * Die Bar zeigt die Hauptbereiche aus dem Mockup: Home, Kategorien, Add und
+ * Backup. Die Klicks sind schon als Callback vorbereitet, werden aber erst
+ * später an eine echte Navigation angeschlossen.
+ */
 @Composable
-fun BottomBar() {
+fun BottomBar(
+    selectedItem: BottomNavItem = BottomNavItem.Home,
+    onItemSelected: (BottomNavItem) -> Unit = {}
+) {
     NavigationBar {
-        NavigationBarItem(
-            selected = true,
-            onClick = {},
-            icon = { Text("🏠") },
-            label = { Text("Home") }
-        )
-
-        NavigationBarItem(
-            selected = false,
-            onClick = {},
-            icon = { Text("▦") },
-            label = { Text("Categories") }
-        )
-
-        NavigationBarItem(
-            selected = false,
-            onClick = {},
-            icon = { Text("+") },
-            label = { Text("Add") }
-        )
-
-        NavigationBarItem(
-            selected = false,
-            onClick = {},
-            icon = { Text("⚙") },
-            label = { Text("Settings") }
-        )
+        BottomNavItem.entries.forEach { item ->
+            NavigationBarItem(
+                selected = selectedItem == item,
+                onClick = { onItemSelected(item) },
+                icon = { Text(item.iconText) },
+                label = { Text(item.label) }
+            )
+        }
     }
 }

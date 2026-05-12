@@ -1,19 +1,15 @@
 package de.fh.erfurt.moviemate.presentation.home
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.material3.Button
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -25,13 +21,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import de.fh.erfurt.moviemate.presentation.BottomBar
 import de.fh.erfurt.moviemate.presentation.MovieCard
 
-// Container für den Homescreen, solange noch kein echtes ViewModel angebunden ist.
-// Er hält lokalen UI-State und filtert die Mockdaten direkt in der UI-Schicht.
+/**
+ * Einstieg für den Homescreen während der UI-Entwicklung.
+ *
+ * Diese Funktion ersetzt vorübergehend ein echtes ViewModel. Sie merkt sich,
+ * welcher Tab aktiv ist, ob die Suche sichtbar ist und welcher Suchtext
+ * eingegeben wurde. Dadurch kann man den Homescreen schon ausprobieren,
+ * obwohl Backend und Datenbank noch nicht angebunden sind.
+ */
 @Composable
 fun HomeRouteMock() {
     var selectedTab by remember { mutableStateOf(HomeTab.All) }
@@ -39,7 +40,7 @@ fun HomeRouteMock() {
     var isSearchVisible by remember { mutableStateOf(false) }
     val movies = remember { previewHomeMovies() }
 
-    // Platzhalter-Filterung, bis die Filme später über GetMoviesUseCase geladen werden.
+    // Filtert die Beispiel-Filme so, wie es später der GetMoviesUseCase machen soll.
     val filteredMovies = movies
         .filter { movie ->
             when (selectedTab) {
@@ -67,7 +68,14 @@ fun HomeRouteMock() {
     )
 }
 
-// Reine Homescreen-UI. Alle Daten und Nutzeraktionen kommen über Parameter hinein.
+/**
+ * Sichtbare Oberfläche des Homescreens.
+ *
+ * Diese Funktion baut den Screen aus dem Mockup zusammen: Titel, Tab-Leiste,
+ * Suchfeld, Filmliste und untere Navigation. Sie enthält selbst keine
+ * Backend-Logik, sondern bekommt alle Daten über den State und meldet Klicks
+ * über Callbacks nach außen.
+ */
 @Composable
 fun HomeScreen(
     state: HomeUiState,
@@ -91,35 +99,19 @@ fun HomeScreen(
         ) {
             Text(
                 text = "Home",
-                style = MaterialTheme.typography.headlineMedium
+                style = MaterialTheme.typography.titleMedium
             )
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                HomeTab.entries.forEach { tab ->
-                    Text(
-                        text = tab.label,
-                        fontWeight = if (state.selectedTab == tab) FontWeight.Bold else FontWeight.Normal,
-                        modifier = Modifier
-                            .clickable { onTabSelected(tab) }
-                            .padding(horizontal = 4.dp)
-                    )
-                }
+            HomeTopBar(
+                selectedTab = state.selectedTab,
+                onTabSelected = onTabSelected,
+                onSearchClicked = onSearchClicked,
+                onFilterClicked = onFilterClicked
+            )
 
-                Row {
-                    Button(onClick = onSearchClicked) {
-                        Text("Search")
-                    }
-                    Button(onClick = onFilterClicked) {
-                        Text("Filter")
-                    }
-                }
-            }
+            HorizontalDivider(modifier = Modifier.fillMaxWidth())
 
             if (state.isSearchVisible) {
                 Spacer(modifier = Modifier.height(12.dp))
@@ -140,27 +132,23 @@ fun HomeScreen(
             } else if (state.movies.isEmpty()) {
                 Text("No movies found")
             } else {
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(2),
+                LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(12.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top = 4.dp)
                 ) {
                     items(state.movies, key = { it.id }) { movie ->
-                        Box(
-                            modifier = Modifier.clickable {
-                                onMovieClicked(movie.id)
-                            }
-                        ) {
-                            MovieCard(
-                                title = movie.title,
-                                year = movie.yearText,
-                                time = movie.runtimeText,
-                                category = movie.categoryText,
-                                isWatched = movie.isWatched,
-                                modifier = Modifier,
-                            )
-                        }
+                        MovieCard(
+                            title = movie.title,
+                            year = movie.yearText,
+                            time = movie.runtimeText,
+                            category = movie.categoryText,
+                            rating = movie.ratingText,
+                            isWatched = movie.isWatched,
+                            onClick = { onMovieClicked(movie.id) },
+                            modifier = Modifier.fillMaxWidth()
+                        )
                     }
                 }
             }
