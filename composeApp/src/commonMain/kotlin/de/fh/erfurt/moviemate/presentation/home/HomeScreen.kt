@@ -10,10 +10,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -22,9 +20,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import de.fh.erfurt.moviemate.presentation.BottomBar
 import de.fh.erfurt.moviemate.presentation.MovieCard
 import de.fh.erfurt.moviemate.presentation.MovieMateColors
+import de.fh.erfurt.moviemate.presentation.ScreenHeader
+import de.fh.erfurt.moviemate.presentation.ScreenHeaderDefaults
 
 /**
  * Einstieg für den Homescreen während der UI-Entwicklung.
@@ -34,12 +33,15 @@ import de.fh.erfurt.moviemate.presentation.MovieMateColors
  * werden, ohne die sichtbare UI stark umzubauen.
  */
 @Composable
-fun HomeRouteMock() {
+fun HomeRouteMock(
+    modifier: Modifier = Modifier
+) {
     val viewModel = remember { HomeViewModel() }
 
     HomeScreen(
         state = viewModel.state,
-        onAction = viewModel::onAction
+        onAction = viewModel::onAction,
+        modifier = modifier
     )
 }
 
@@ -54,85 +56,72 @@ fun HomeRouteMock() {
 @Composable
 fun HomeScreen(
     state: HomeUiState,
-    onAction: (HomeUiAction) -> Unit
+    onAction: (HomeUiAction) -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    Scaffold(
-        containerColor = MovieMateColors.ScreenBackground,
-        bottomBar = {
-            BottomBar()
-        }
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .background(MovieMateColors.ScreenBackground)
-                .padding(horizontal = 18.dp, vertical = 18.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = "Home",
-                style = MaterialTheme.typography.titleMedium,
-                color = MovieMateColors.PrimaryText
-            )
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            HomeTopBar(
-                selectedTab = state.selectedTab,
-                onTabSelected = { onAction(HomeUiAction.TabSelected(it)) },
-                onSearchClicked = { onAction(HomeUiAction.SearchClicked) },
-                onFilterClicked = { onAction(HomeUiAction.FilterClicked) },
-                onSortClicked = { onAction(HomeUiAction.SortClicked) }
-            )
-
-            HorizontalDivider(
-                modifier = Modifier.fillMaxWidth(),
-                thickness = 2.dp,
-                color = MovieMateColors.Divider
-            )
-
-            if (state.isSearchVisible) {
-                Spacer(modifier = Modifier.height(10.dp))
-                OutlinedTextField(
-                    value = state.searchQuery,
-                    onValueChange = { onAction(HomeUiAction.SearchChanged(it)) },
-                    placeholder = { Text("Find your movie") },
-                    singleLine = true,
-                    textStyle = MaterialTheme.typography.bodyMedium,
-                    colors = TextFieldDefaults.colors(
-                        focusedContainerColor = MovieMateColors.CardBackground,
-                        unfocusedContainerColor = MovieMateColors.CardBackground
-                    ),
-                    modifier = Modifier.fillMaxWidth()
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(MovieMateColors.ScreenBackground)
+            .padding(
+                horizontal = ScreenHeaderDefaults.HorizontalPadding,
+                vertical = ScreenHeaderDefaults.VerticalPadding
+            ),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        ScreenHeader(
+            title = "Home",
+            topBar = {
+                HomeTopBar(
+                    selectedTab = state.selectedTab,
+                    onTabSelected = { onAction(HomeUiAction.TabSelected(it)) },
+                    onSearchClicked = { onAction(HomeUiAction.SearchClicked) },
+                    onFilterClicked = { onAction(HomeUiAction.FilterClicked) },
+                    onSortClicked = { onAction(HomeUiAction.SortClicked) }
                 )
             }
+        )
 
-            Spacer(modifier = Modifier.height(18.dp))
+        if (state.isSearchVisible) {
+            Spacer(modifier = Modifier.height(10.dp))
+            OutlinedTextField(
+                value = state.searchQuery,
+                onValueChange = { onAction(HomeUiAction.SearchChanged(it)) },
+                placeholder = { Text("Find your movie") },
+                singleLine = true,
+                textStyle = MaterialTheme.typography.bodyMedium,
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = MovieMateColors.CardBackground,
+                    unfocusedContainerColor = MovieMateColors.CardBackground
+                ),
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
 
-            if (state.errorMessage != null) {
-                HomeErrorState(
-                    message = state.errorMessage,
-                    onRetryClicked = { onAction(HomeUiAction.RetryClicked) }
-                )
-            } else if (state.isLoading) {
-                HomeLoadingState()
-            } else if (state.movies.isEmpty()) {
-                HomeEmptyState()
-            } else {
-                LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(14.dp),
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(top = 2.dp)
-                ) {
-                    items(state.movies, key = { it.id }) { movie ->
-                        MovieCard(
-                            movie = movie,
-                            onClick = { onAction(HomeUiAction.MovieClicked(movie.id)) },
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
+        Spacer(modifier = Modifier.height(ScreenHeaderDefaults.ContentTopSpacing))
+
+        if (state.errorMessage != null) {
+            HomeErrorState(
+                message = state.errorMessage,
+                onRetryClicked = { onAction(HomeUiAction.RetryClicked) }
+            )
+        } else if (state.isLoading) {
+            HomeLoadingState()
+        } else if (state.movies.isEmpty()) {
+            HomeEmptyState()
+        } else {
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(14.dp),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = 2.dp)
+            ) {
+                items(state.movies, key = { it.id }) { movie ->
+                    MovieCard(
+                        movie = movie,
+                        onClick = { onAction(HomeUiAction.MovieClicked(movie.id)) },
+                        modifier = Modifier.fillMaxWidth()
+                    )
                 }
             }
         }

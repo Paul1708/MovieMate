@@ -17,10 +17,8 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
@@ -37,9 +35,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import de.fh.erfurt.moviemate.presentation.BottomBar
-import de.fh.erfurt.moviemate.presentation.BottomNavItem
 import de.fh.erfurt.moviemate.presentation.MovieMateColors
+import de.fh.erfurt.moviemate.presentation.ScreenHeader
+import de.fh.erfurt.moviemate.presentation.ScreenHeaderDefaults
+import de.fh.erfurt.moviemate.presentation.TopBarIconButton
 
 /**
  * Einstieg für den Kategorie-Screen während der UI-Entwicklung.
@@ -48,12 +47,15 @@ import de.fh.erfurt.moviemate.presentation.MovieMateColors
  * App-Navigation angebunden.
  */
 @Composable
-fun CategoriesRouteMock() {
+fun CategoriesRouteMock(
+    modifier: Modifier = Modifier
+) {
     val viewModel = remember { CategoriesViewModel() }
 
     CategoriesScreen(
         state = viewModel.state,
-        onAction = viewModel::onAction
+        onAction = viewModel::onAction,
+        modifier = modifier
     )
 }
 
@@ -67,96 +69,77 @@ fun CategoriesRouteMock() {
 @Composable
 fun CategoriesScreen(
     state: CategoriesUiState,
-    onAction: (CategoriesUiAction) -> Unit
+    onAction: (CategoriesUiAction) -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    Scaffold(
-        containerColor = MovieMateColors.ScreenBackground,
-        bottomBar = {
-            BottomBar(selectedItem = BottomNavItem.Categories)
-        }
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .background(MovieMateColors.ScreenBackground)
-                .padding(horizontal = 18.dp, vertical = 18.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = "Kategorien",
-                style = MaterialTheme.typography.titleMedium,
-                color = MovieMateColors.PrimaryText
-            )
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(MovieMateColors.ScreenBackground)
+            .padding(
+                horizontal = ScreenHeaderDefaults.HorizontalPadding,
+                vertical = ScreenHeaderDefaults.VerticalPadding
+            ),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        ScreenHeader(
+            title = "Kategorien",
+            topBar = {
+                CategoriesTopBar(
+                    onSearchClicked = { onAction(CategoriesUiAction.SearchClicked) }
+                )
+            }
+        )
 
+        if (state.isSearchVisible) {
             Spacer(modifier = Modifier.height(10.dp))
+            OutlinedTextField(
+                value = state.searchQuery,
+                onValueChange = { onAction(CategoriesUiAction.SearchChanged(it)) },
+                placeholder = { Text("Find category") },
+                singleLine = true,
+                textStyle = MaterialTheme.typography.bodyMedium,
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = MovieMateColors.CardBackground,
+                    unfocusedContainerColor = MovieMateColors.CardBackground
+                ),
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
 
-            CategoriesTopBar(
-                onSearchClicked = { onAction(CategoriesUiAction.SearchClicked) },
-                onFilterClicked = { onAction(CategoriesUiAction.FilterClicked) }
+        Spacer(modifier = Modifier.height(ScreenHeaderDefaults.ContentTopSpacing))
+
+        when {
+            state.errorMessage != null -> CategoriesErrorState(
+                message = state.errorMessage,
+                onRetryClicked = { onAction(CategoriesUiAction.RetryClicked) }
             )
 
-            HorizontalDivider(
-                modifier = Modifier.fillMaxWidth(),
-                thickness = 2.dp,
-                color = MovieMateColors.Divider
+            state.isLoading -> CategoriesLoadingState()
+            state.categories.isEmpty() -> CategoriesEmptyState()
+            else -> CategoriesGrid(
+                categories = state.categories,
+                onCategoryClicked = { onAction(CategoriesUiAction.CategoryClicked(it.type)) }
             )
-
-            if (state.isSearchVisible) {
-                Spacer(modifier = Modifier.height(10.dp))
-                OutlinedTextField(
-                    value = state.searchQuery,
-                    onValueChange = { onAction(CategoriesUiAction.SearchChanged(it)) },
-                    placeholder = { Text("Find category") },
-                    singleLine = true,
-                    textStyle = MaterialTheme.typography.bodyMedium,
-                    colors = TextFieldDefaults.colors(
-                        focusedContainerColor = MovieMateColors.CardBackground,
-                        unfocusedContainerColor = MovieMateColors.CardBackground
-                    ),
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-
-            Spacer(modifier = Modifier.height(18.dp))
-
-            when {
-                state.errorMessage != null -> CategoriesErrorState(
-                    message = state.errorMessage,
-                    onRetryClicked = { onAction(CategoriesUiAction.RetryClicked) }
-                )
-
-                state.isLoading -> CategoriesLoadingState()
-                state.categories.isEmpty() -> CategoriesEmptyState()
-                else -> CategoriesGrid(
-                    categories = state.categories,
-                    onCategoryClicked = { onAction(CategoriesUiAction.CategoryClicked(it.type)) }
-                )
-            }
         }
     }
 }
 
 @Composable
 private fun CategoriesTopBar(
-    onSearchClicked: () -> Unit,
-    onFilterClicked: () -> Unit
+    onSearchClicked: () -> Unit
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.End,
+        horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        CategoryTopBarIconButton(
+        Spacer(modifier = Modifier.weight(1f))
+
+        TopBarIconButton(
             text = "⌕",
             contentDescription = "Kategorie suchen",
             onClick = onSearchClicked
-        )
-        Spacer(modifier = Modifier.size(8.dp))
-        CategoryTopBarIconButton(
-            text = "▾",
-            contentDescription = "Kategorie-Filter öffnen",
-            onClick = onFilterClicked
         )
     }
 }
@@ -242,29 +225,6 @@ private fun CategoryFolderCard(
                 modifier = Modifier.padding(top = 6.dp)
             )
         }
-    }
-}
-
-@Composable
-private fun CategoryTopBarIconButton(
-    text: String,
-    contentDescription: String,
-    onClick: () -> Unit
-) {
-    Box(
-        modifier = Modifier
-            .size(28.dp)
-            .clip(RoundedCornerShape(14.dp))
-            .background(MovieMateColors.SoftControl)
-            .clickable(onClick = onClick)
-            .semantics { this.contentDescription = contentDescription },
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = text,
-            style = MaterialTheme.typography.titleSmall,
-            color = MovieMateColors.SecondaryText
-        )
     }
 }
 

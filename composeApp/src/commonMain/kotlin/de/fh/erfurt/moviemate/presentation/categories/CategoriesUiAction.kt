@@ -6,7 +6,6 @@ import de.fh.erfurt.moviemate.domain.model.CategoryType
 sealed interface CategoriesUiAction {
     data object SearchClicked : CategoriesUiAction
     data class SearchChanged(val query: String) : CategoriesUiAction
-    data object FilterClicked : CategoriesUiAction
     data class CategoryClicked(val type: CategoryType) : CategoriesUiAction
     data object RetryClicked : CategoriesUiAction
 }

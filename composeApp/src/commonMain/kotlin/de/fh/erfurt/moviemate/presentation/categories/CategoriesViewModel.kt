@@ -21,7 +21,6 @@ class CategoriesViewModel(
         when (action) {
             CategoriesUiAction.SearchClicked -> updateState(isSearchVisible = !state.isSearchVisible)
             is CategoriesUiAction.SearchChanged -> updateState(searchQuery = action.query)
-            CategoriesUiAction.FilterClicked -> Unit
             is CategoriesUiAction.CategoryClicked -> Unit
             CategoriesUiAction.RetryClicked -> updateState()
         }
