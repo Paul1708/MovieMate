@@ -10,6 +10,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
@@ -40,6 +42,7 @@ fun HomeTopBar(
                 fontWeight = if (selectedTab == tab) FontWeight.Bold else FontWeight.Normal,
                 modifier = Modifier
                     .clickable { onTabSelected(tab) }
+                    .semantics { contentDescription = "Tab ${tab.label}" }
                     .padding(horizontal = 4.dp, vertical = 8.dp)
             )
         }
@@ -53,6 +56,7 @@ fun HomeTopBar(
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier
                     .clickable(onClick = onSearchClicked)
+                    .semantics { contentDescription = "Suche öffnen" }
                     .padding(4.dp)
             )
             Text(
@@ -60,6 +64,7 @@ fun HomeTopBar(
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier
                     .clickable(onClick = onFilterClicked)
+                    .semantics { contentDescription = "Filter öffnen" }
                     .padding(4.dp)
             )
         }
