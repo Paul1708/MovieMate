@@ -15,76 +15,28 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import de.fh.erfurt.moviemate.domain.model.CategoryType
-import de.fh.erfurt.moviemate.domain.model.SortCriterion
 import de.fh.erfurt.moviemate.presentation.BottomBar
 import de.fh.erfurt.moviemate.presentation.MovieCard
 
 /**
  * Einstieg für den Homescreen während der UI-Entwicklung.
  *
- * Diese Funktion ersetzt vorübergehend ein echtes ViewModel. Sie merkt sich,
- * welcher Tab aktiv ist, ob die Suche sichtbar ist und welcher Suchtext
- * eingegeben wurde. Dadurch kann man den Homescreen schon ausprobieren,
- * obwohl Backend und Datenbank noch nicht angebunden sind.
+ * Diese Funktion erzeugt aktuell ein einfaches `HomeViewModel` mit Mockdaten.
+ * Später kann hier ein echtes ViewModel mit UseCases und Repository eingesetzt
+ * werden, ohne die sichtbare UI stark umzubauen.
  */
 @Composable
 fun HomeRouteMock() {
-    var selectedTab by remember { mutableStateOf(HomeTab.All) }
-    var searchQuery by remember { mutableStateOf("") }
-    var isSearchVisible by remember { mutableStateOf(false) }
-    var selectedCategory by remember { mutableStateOf<CategoryType?>(null) }
-    var selectedSortCriterion by remember { mutableStateOf(SortCriterion.RECENTLY_ADDED) }
-    var isFilterDialogVisible by remember { mutableStateOf(false) }
-    val movies = remember { previewHomeMovies() }
-
-    // Filtert die Beispiel-Filme so, wie es später der GetMoviesUseCase machen soll.
-    val filteredMovies = movies
-        .filter { movie ->
-            when (selectedTab) {
-                HomeTab.All -> true
-                HomeTab.Watched -> movie.isWatched
-                HomeTab.WatchLater -> !movie.isWatched
-            }
-        }
-        .filter { movie ->
-            searchQuery.isBlank() || movie.title.contains(searchQuery, ignoreCase = true)
-        }
-        .filter { movie ->
-            selectedCategory == null || movie.categoryText == selectedCategory?.displayName()
-        }
-        .sortForHome(selectedSortCriterion)
+    val viewModel = remember { HomeViewModel() }
 
     HomeScreen(
-        state = HomeUiState(
-            movies = filteredMovies,
-            selectedTab = selectedTab,
-            searchQuery = searchQuery,
-            isSearchVisible = isSearchVisible,
-            selectedCategory = selectedCategory,
-            selectedSortCriterion = selectedSortCriterion,
-            isFilterDialogVisible = isFilterDialogVisible
-        ),
-        onTabSelected = { selectedTab = it },
-        onSearchQueryChanged = { searchQuery = it },
-        onSearchClicked = { isSearchVisible = !isSearchVisible },
-        onFilterClicked = { isFilterDialogVisible = true },
-        onMovieClicked = {},
-        onCategorySelected = { selectedCategory = it },
-        onSortSelected = { selectedSortCriterion = it },
-        onClearFiltersClicked = {
-            selectedCategory = null
-            selectedSortCriterion = SortCriterion.RECENTLY_ADDED
-        },
-        onFilterDismissed = { isFilterDialogVisible = false }
+        state = viewModel.state,
+        onAction = viewModel::onAction
     )
 }
 
@@ -99,15 +51,7 @@ fun HomeRouteMock() {
 @Composable
 fun HomeScreen(
     state: HomeUiState,
-    onTabSelected: (HomeTab) -> Unit,
-    onSearchQueryChanged: (String) -> Unit,
-    onSearchClicked: () -> Unit,
-    onFilterClicked: () -> Unit,
-    onMovieClicked: (String) -> Unit,
-    onCategorySelected: (CategoryType?) -> Unit,
-    onSortSelected: (SortCriterion) -> Unit,
-    onClearFiltersClicked: () -> Unit,
-    onFilterDismissed: () -> Unit
+    onAction: (HomeUiAction) -> Unit
 ) {
     Scaffold(
         bottomBar = {
@@ -130,9 +74,9 @@ fun HomeScreen(
 
             HomeTopBar(
                 selectedTab = state.selectedTab,
-                onTabSelected = onTabSelected,
-                onSearchClicked = onSearchClicked,
-                onFilterClicked = onFilterClicked
+                onTabSelected = { onAction(HomeUiAction.TabSelected(it)) },
+                onSearchClicked = { onAction(HomeUiAction.SearchClicked) },
+                onFilterClicked = { onAction(HomeUiAction.FilterClicked) }
             )
 
             HorizontalDivider(modifier = Modifier.fillMaxWidth())
@@ -141,7 +85,7 @@ fun HomeScreen(
                 Spacer(modifier = Modifier.height(12.dp))
                 OutlinedTextField(
                     value = state.searchQuery,
-                    onValueChange = onSearchQueryChanged,
+                    onValueChange = { onAction(HomeUiAction.SearchChanged(it)) },
                     placeholder = { Text("Find your movie") },
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -170,7 +114,7 @@ fun HomeScreen(
                             category = movie.categoryText,
                             rating = movie.ratingText,
                             isWatched = movie.isWatched,
-                            onClick = { onMovieClicked(movie.id) },
+                            onClick = { onAction(HomeUiAction.MovieClicked(movie.id)) },
                             modifier = Modifier.fillMaxWidth()
                         )
                     }
@@ -183,10 +127,10 @@ fun HomeScreen(
         HomeFilterDialog(
             selectedCategory = state.selectedCategory,
             selectedSortCriterion = state.selectedSortCriterion,
-            onCategorySelected = onCategorySelected,
-            onSortSelected = onSortSelected,
-            onClearClicked = onClearFiltersClicked,
-            onDismiss = onFilterDismissed
+            onCategorySelected = { onAction(HomeUiAction.CategorySelected(it)) },
+            onSortSelected = { onAction(HomeUiAction.SortSelected(it)) },
+            onClearClicked = { onAction(HomeUiAction.ClearFiltersClicked) },
+            onDismiss = { onAction(HomeUiAction.FilterDismissed) }
         )
     }
 }
@@ -196,30 +140,6 @@ fun HomeScreen(
 private fun HomeScreenPreview() {
     HomeScreen(
         state = previewHomeUiState(),
-        onTabSelected = {},
-        onSearchQueryChanged = {},
-        onSearchClicked = {},
-        onFilterClicked = {},
-        onMovieClicked = {},
-        onCategorySelected = {},
-        onSortSelected = {},
-        onClearFiltersClicked = {},
-        onFilterDismissed = {}
+        onAction = {}
     )
-}
-
-// Sortiert die Mockdaten lokal, bis später Repository oder UseCase diese Aufgabe übernehmen.
-private fun List<MovieUiModel>.sortForHome(sortCriterion: SortCriterion): List<MovieUiModel> {
-    return when (sortCriterion) {
-        SortCriterion.TITLE_ASC -> sortedBy { it.title.lowercase() }
-        SortCriterion.TITLE_DESC -> sortedByDescending { it.title.lowercase() }
-        SortCriterion.PUBLISHING_YEAR_DESC -> sortedByDescending { it.yearText.toIntOrNull() ?: 0 }
-        SortCriterion.RATING_DESC -> sortedByDescending { it.ratingValue() }
-        SortCriterion.RECENTLY_ADDED -> this
-    }
-}
-
-// Macht aus dem angezeigten Bewertungstext einen Zahlenwert für die lokale Mock-Sortierung.
-private fun MovieUiModel.ratingValue(): Double {
-    return ratingText.replace(',', '.').toDoubleOrNull() ?: 0.0
 }
