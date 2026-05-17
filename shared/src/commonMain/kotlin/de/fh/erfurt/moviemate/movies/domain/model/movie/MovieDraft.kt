@@ -12,5 +12,6 @@ data class MovieDraft(
     val userRating: Int? = null,
     val imdbRating: Double? = null,
     val externalIds: Map<String, String>? = null,
-    val watchProviders: List<String>? = null
-)
+    val watchProviders: List<String>? = null,
+    val updatedAtEpochMillis: Long
+    )
