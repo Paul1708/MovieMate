@@ -4,15 +4,18 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class UpdateMovieRequestDto(
-    val id: String,
     val title: String,
-    val poster_url: String,
-    val release_year: Int,
-    val runtime_mins: Int,
-    val rating_score: Int,
-    val watched: Boolean,
-    val category_id: String,
-    val desc: String,
-    val created_at: Long,
-    val updated_at: Long
+    val description: String,
+    val releaseYear: Int? = null,
+    val categoryId: String? = null,
+    val posterUrl: String? = null,
+    val runtimeMinutes: Int? = null,
+    val isWatched: Boolean = false,
+    val comment: String? = null,
+    val userRating: Int? = null,
+    val imdbRating: Double? = null,
+    val externalIds: Map<String, String>? = null,
+    val watchProviders: List<String>? = null,
+    val updatedAtEpochMillis: Long,
+    val version: Long? = null,
 )

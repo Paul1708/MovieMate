@@ -3,6 +3,7 @@ package de.fh.erfurt.moviemate.movies.data.remote.dto
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class UpdateRatingRequestDto(
-    val rating_score: Int
+data class CategoryDto(
+    val id: String,
+    val name: String
 )
