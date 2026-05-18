@@ -14,6 +14,11 @@ import de.fh.erfurt.moviemate.movies.domain.usecase.movie.SearchMoviesUseCase
 import de.fh.erfurt.moviemate.movies.domain.usecase.movie.UpdateMovieWatchedStatusUseCase
 import de.fh.erfurt.moviemate.movies.domain.usecase.movie.UpdateMovieUseCase
 import de.fh.erfurt.moviemate.movies.domain.usecase.movie.UpdateMovieUserRatingUseCase
+import de.fh.erfurt.moviemate.movies.presentation.detail.CategoryDetailViewModel
+import de.fh.erfurt.moviemate.movies.presentation.detail.MovieDetailViewModel
+import de.fh.erfurt.moviemate.movies.presentation.edit.MovieEditViewModel
+import de.fh.erfurt.moviemate.movies.presentation.list.CategoriesListViewModel
+import de.fh.erfurt.moviemate.movies.presentation.list.MoviesListViewModel
 
 class AppContainer(
     movieRepository: MovieRepository,
@@ -31,11 +36,35 @@ class AppContainer(
     val updateMovieWatchedStatusUseCase = UpdateMovieWatchedStatusUseCase(movieRepository)
     val updateMovieUserRatingUseCase = UpdateMovieUserRatingUseCase(movieRepository)
 
-    //val moviesListViewModel = MoviesListViewModel(getMoviesUseCase)
-    //val movieDetailViewModel = MovieDetailViewModel(getMoviesUseCase)
-    //val movieEditViewModel = MovieEditViewModel(addMovieUseCase)
+    val moviesListViewModel = MoviesListViewModel(
+        getMoviesUseCase = getMoviesUseCase,
+        addMovieUseCase = addMovieUseCase,
+        updateMovieUseCase = updateMovieUseCase,
+        deleteMovieUseCase = deleteMovieUseCase,
+        searchMoviesUseCase = searchMoviesUseCase,
+        getMoviesByCategoryUseCase = getMoviesByCategoryUseCase,
+        getMoviesSortedUseCase = getMoviesSortedUseCase,
+    )
+
+    val movieDetailViewModel = MovieDetailViewModel(
+        getMovieUseCase = getMovieUseCase,
+        updateMovieWatchedStatusUseCase = updateMovieWatchedStatusUseCase,
+        updateMovieUserRatingUseCase = updateMovieUserRatingUseCase,
+    )
+
+    val movieEditViewModel = MovieEditViewModel(
+        addMovieUseCase = addMovieUseCase,
+        updateMovieUseCase = updateMovieUseCase,
+    )
 
     // Categories layer
     val getCategoriesUseCase = GetCategoriesUseCase(categoryRepository)
     val getCategoryUseCase = GetCategoryUseCase(categoryRepository)
+
+    val categoriesListViewModel = CategoriesListViewModel(
+        getCategoriesUseCase = getCategoriesUseCase,
+    )
+    val categoryDetailViewModel = CategoryDetailViewModel(
+        getCategoryUseCase = getCategoryUseCase,
+    )
 }
