@@ -1,7 +1,7 @@
 package de.fh.erfurt.moviemate.presentation.home
 
-import de.fh.erfurt.moviemate.domain.model.CategoryType
-import de.fh.erfurt.moviemate.domain.model.SortCriterion
+import de.fh.erfurt.moviemate.movies.domain.model.category.CategoryType
+import de.fh.erfurt.moviemate.movies.domain.repository.movie.SortBy
 
 // Aktionen, die der Homescreen an ein späteres ViewModel melden kann.
 sealed interface HomeUiAction {
@@ -11,7 +11,7 @@ sealed interface HomeUiAction {
     data object FilterClicked : HomeUiAction
     data object SortClicked : HomeUiAction
     data class CategorySelected(val category: CategoryType?) : HomeUiAction
-    data class SortSelected(val sortCriterion: SortCriterion) : HomeUiAction
+    data class SortSelected(val sortCriterion: SortBy) : HomeUiAction
     data object ClearCategoryFilterClicked : HomeUiAction
     data object ClearSortClicked : HomeUiAction
     data object FilterDismissed : HomeUiAction

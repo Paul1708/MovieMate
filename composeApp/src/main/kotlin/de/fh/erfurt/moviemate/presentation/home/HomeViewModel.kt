@@ -1,9 +1,9 @@
 package de.fh.erfurt.moviemate.presentation.home
 
 import androidx.lifecycle.ViewModel
-import de.fh.erfurt.moviemate.domain.model.CategoryType
-import de.fh.erfurt.moviemate.domain.model.Movie
-import de.fh.erfurt.moviemate.domain.model.SortCriterion
+import de.fh.erfurt.moviemate.movies.domain.model.category.CategoryType
+import de.fh.erfurt.moviemate.movies.domain.model.movie.Movie
+import de.fh.erfurt.moviemate.movies.domain.repository.movie.SortBy
 import de.fh.erfurt.moviemate.presentation.mock.sampleMovies
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -36,7 +36,7 @@ class HomeViewModel(
             HomeUiAction.FilterClicked -> updateState(isFilterDialogVisible = true)
             HomeUiAction.SortClicked -> updateState(isSortDialogVisible = true)
             is HomeUiAction.CategorySelected -> updateState(selectedCategory = action.category)
-            is HomeUiAction.SortSelected -> updateState(selectedSortCriterion = action.sortCriterion)
+            is HomeUiAction.SortSelected -> updateState(selectedSortBy = action.sortCriterion)
             HomeUiAction.ClearCategoryFilterClicked -> clearCategoryFilter()
             HomeUiAction.ClearSortClicked -> clearSort()
             HomeUiAction.FilterDismissed -> updateState(isFilterDialogVisible = false)
@@ -51,7 +51,7 @@ class HomeViewModel(
         searchQuery: String = state.value.searchQuery,
         isSearchVisible: Boolean = state.value.isSearchVisible,
         selectedCategory: CategoryType? = state.value.selectedCategory,
-        selectedSortCriterion: SortCriterion = state.value.selectedSortCriterion,
+        selectedSortBy: SortBy = state.value.selectedSortBy,
         isFilterDialogVisible: Boolean = state.value.isFilterDialogVisible,
         isSortDialogVisible: Boolean = state.value.isSortDialogVisible
     ) {
@@ -60,13 +60,13 @@ class HomeViewModel(
                 selectedTab = selectedTab,
                 searchQuery = searchQuery,
                 selectedCategory = selectedCategory,
-                selectedSortCriterion = selectedSortCriterion
+                selectedSortBy = selectedSortBy
             ),
             selectedTab = selectedTab,
             searchQuery = searchQuery,
             isSearchVisible = isSearchVisible,
             selectedCategory = selectedCategory,
-            selectedSortCriterion = selectedSortCriterion,
+            selectedSortBy = selectedSortBy,
             isFilterDialogVisible = isFilterDialogVisible,
             isSortDialogVisible = isSortDialogVisible,
             isLoading = false,
@@ -83,7 +83,7 @@ class HomeViewModel(
 
     private fun clearSort() {
         updateState(
-            selectedSortCriterion = SortCriterion.RECENTLY_ADDED,
+            selectedSortBy = SortBy.UPDATED_AT,
             isSortDialogVisible = false
         )
     }
@@ -97,7 +97,7 @@ class HomeViewModel(
         selectedTab: HomeTab = HomeTab.All,
         searchQuery: String = "",
         selectedCategory: CategoryType? = null,
-        selectedSortCriterion: SortCriterion = SortCriterion.RECENTLY_ADDED
+        selectedSortBy: SortBy = SortBy.UPDATED_AT
     ): List<MovieUiModel> {
         return this
             .filter { movie ->
@@ -111,20 +111,20 @@ class HomeViewModel(
                 searchQuery.isBlank() || movie.title.contains(searchQuery, ignoreCase = true)
             }
             .filter { movie ->
-                selectedCategory == null || movie.category.type == selectedCategory
+                selectedCategory == null || movie.categoryId == selectedCategory.storageKey
             }
-            .sortForHome(selectedSortCriterion)
+            .sortForHome(selectedSortBy)
             .map { movie -> movie.toUiModel() }
     }
 }
 
 // Sortiert die Mockdaten lokal, bis später Repository oder UseCase diese Aufgabe übernehmen.
-private fun List<Movie>.sortForHome(sortCriterion: SortCriterion): List<Movie> {
+private fun List<Movie>.sortForHome(sortCriterion: SortBy): List<Movie> {
     return when (sortCriterion) {
-        SortCriterion.TITLE_ASC -> sortedBy { it.title.lowercase() }
-        SortCriterion.TITLE_DESC -> sortedByDescending { it.title.lowercase() }
-        SortCriterion.PUBLISHING_YEAR_DESC -> sortedByDescending { it.publishingYear }
-        SortCriterion.RATING_DESC -> sortedByDescending { it.rating }
-        SortCriterion.RECENTLY_ADDED -> this
+        SortBy.TITLE -> sortedBy { it.title.lowercase() }
+        SortBy.RELEASE_YEAR -> sortedByDescending { it.releaseYear ?: 0 }
+        SortBy.UPDATED_AT -> sortedByDescending { it.updatedAtEpochMillis }
+        SortBy.RATING -> sortedByDescending { it.userRating ?: it.imdbRating?.toInt() ?: 0 }
+        SortBy.RUNTIME -> sortedByDescending { it.runtimeMinutes ?: 0 }
     }
 }

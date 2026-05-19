@@ -1,6 +1,7 @@
 package de.fh.erfurt.moviemate.presentation.categories
 
-import de.fh.erfurt.moviemate.domain.model.Movie
+import de.fh.erfurt.moviemate.movies.domain.model.movie.Movie
+import de.fh.erfurt.moviemate.movies.domain.model.category.CategoryType
 import de.fh.erfurt.moviemate.presentation.MovieCategoryTypes
 import de.fh.erfurt.moviemate.presentation.displayName
 import de.fh.erfurt.moviemate.presentation.mock.sampleMovies
@@ -11,7 +12,7 @@ fun previewCategories(
     movies: List<Movie> = sampleMovies()
 ): List<CategoryUiModel> {
     val movieCountByCategory = movies
-        .groupingBy { movie -> movie.category.type }
+        .groupingBy { movie -> CategoryType.fromString(movie.categoryId) }
         .eachCount()
 
     return MovieCategoryTypes.map { type ->

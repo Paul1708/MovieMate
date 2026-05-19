@@ -14,7 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import de.fh.erfurt.moviemate.domain.model.SortCriterion
+import de.fh.erfurt.moviemate.movies.domain.repository.movie.SortBy
 
 /**
  * Eigener Dialog für die Sortierung der Homescreen-Liste.
@@ -24,8 +24,8 @@ import de.fh.erfurt.moviemate.domain.model.SortCriterion
  */
 @Composable
 fun HomeSortDialog(
-    selectedSortCriterion: SortCriterion,
-    onSortSelected: (SortCriterion) -> Unit,
+    selectedSortBy: SortBy,
+    onSortSelected: (SortBy) -> Unit,
     onClearClicked: () -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -36,10 +36,10 @@ fun HomeSortDialog(
         },
         text = {
             LazyColumn {
-                items(SortCriterion.entries) { sortCriterion ->
+                items(SortBy.entries) { sortCriterion ->
                     SortOptionRow(
                         label = sortCriterion.displayName(),
-                        selected = selectedSortCriterion == sortCriterion,
+                        selected = selectedSortBy == sortCriterion,
                         onClick = { onSortSelected(sortCriterion) }
                     )
                 }
@@ -88,12 +88,12 @@ private fun SortOptionRow(
 /**
  * Wandelt das interne Sortierkriterium in einen gut lesbaren UI-Text um.
  */
-fun SortCriterion.displayName(): String {
+fun SortBy.displayName(): String {
     return when (this) {
-        SortCriterion.TITLE_ASC -> "Title A-Z"
-        SortCriterion.TITLE_DESC -> "Title Z-A"
-        SortCriterion.PUBLISHING_YEAR_DESC -> "Newest year"
-        SortCriterion.RATING_DESC -> "Best rating"
-        SortCriterion.RECENTLY_ADDED -> "Recently added"
+        SortBy.TITLE -> "Title"
+        SortBy.RELEASE_YEAR -> "Newest year"
+        SortBy.UPDATED_AT -> "Recently updated"
+        SortBy.RATING -> "Best rating"
+        SortBy.RUNTIME -> "Runtime"
     }
 }

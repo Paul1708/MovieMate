@@ -1,7 +1,7 @@
 package de.fh.erfurt.moviemate.presentation.home
 
-import de.fh.erfurt.moviemate.domain.model.CategoryType
-import de.fh.erfurt.moviemate.domain.model.SortCriterion
+import de.fh.erfurt.moviemate.movies.domain.model.category.CategoryType
+import de.fh.erfurt.moviemate.movies.domain.repository.movie.SortBy
 
 // Gesamter Anzeigezustand für den Homescreen.
 // Später kann dieser State direkt von einem ViewModel geliefert werden.
@@ -11,7 +11,7 @@ data class HomeUiState(
     val searchQuery: String = "",
     val isSearchVisible: Boolean = false,
     val selectedCategory: CategoryType? = null,
-    val selectedSortCriterion: SortCriterion = SortCriterion.RECENTLY_ADDED,
+    val selectedSortBy: SortBy = SortBy.UPDATED_AT,
     val isFilterDialogVisible: Boolean = false,
     val isSortDialogVisible: Boolean = false,
     val isLoading: Boolean = false,

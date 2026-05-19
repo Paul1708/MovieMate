@@ -1,6 +1,6 @@
 package de.fh.erfurt.moviemate.presentation.home
 
-import de.fh.erfurt.moviemate.domain.model.CategoryType
+import de.fh.erfurt.moviemate.movies.domain.model.category.CategoryType
 
 // Datenmodell für die Anzeige eines Films im Homescreen.
 // Es enthält Rohwerte für Logik und fertig formatierte Texte für die UI.

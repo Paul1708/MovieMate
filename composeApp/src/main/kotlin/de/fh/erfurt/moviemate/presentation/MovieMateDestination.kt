@@ -1,6 +1,6 @@
 package de.fh.erfurt.moviemate.presentation
 
-import de.fh.erfurt.moviemate.domain.model.CategoryType
+import de.fh.erfurt.moviemate.movies.domain.model.category.CategoryType
 
 /**
  * Zentrale Routen der Android-App.

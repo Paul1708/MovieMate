@@ -1,8 +1,7 @@
 package de.fh.erfurt.moviemate.presentation.mock
 
-import de.fh.erfurt.moviemate.domain.model.Category
-import de.fh.erfurt.moviemate.domain.model.CategoryType
-import de.fh.erfurt.moviemate.domain.model.Movie
+import de.fh.erfurt.moviemate.movies.domain.model.category.CategoryType
+import de.fh.erfurt.moviemate.movies.domain.model.movie.Movie
 
 /**
  * Gemeinsame Sample-Daten für die Presentation-Schicht.
@@ -15,67 +14,82 @@ fun sampleMovies(): List<Movie> {
         Movie(
             id = "movie-1",
             title = "Star Wars",
-            posterUri = "",
-            publishingYear = 2019,
-            runtime = 130,
-            rating = 10,
+            posterUrl = "",
+            releaseYear = 2019,
+            runtimeMinutes = 130,
+            userRating = 10,
+            imdbRating = 8.6,
             isWatched = true,
-            category = Category(id = "action", type = CategoryType.ACTION),
+            categoryId = CategoryType.ACTION.storageKey,
             description = "A space adventure used as sample data for the homescreen.",
-            creationTimeEpochMillis = 5,
-            updateTimeEpochMillis = 5
+            comment = null,
+            externalIds = null,
+            watchProviders = null,
+            updatedAtEpochMillis = 5
         ),
         Movie(
             id = "movie-2",
             title = "Harry Potter",
-            posterUri = "",
-            publishingYear = 2001,
-            runtime = 152,
-            rating = 8,
+            posterUrl = "",
+            releaseYear = 2001,
+            runtimeMinutes = 152,
+            userRating = 8,
+            imdbRating = 7.6,
             isWatched = false,
-            category = Category(id = "fantasy", type = CategoryType.FANTASY),
+            categoryId = CategoryType.FANTASY.storageKey,
             description = "A fantasy movie used as sample data for the homescreen.",
-            creationTimeEpochMillis = 4,
-            updateTimeEpochMillis = 4
+            comment = null,
+            externalIds = null,
+            watchProviders = null,
+            updatedAtEpochMillis = 4
         ),
         Movie(
             id = "movie-3",
             title = "The Matrix",
-            posterUri = "",
-            publishingYear = 1999,
-            runtime = 136,
-            rating = 9,
+            posterUrl = "",
+            releaseYear = 1999,
+            runtimeMinutes = 136,
+            userRating = 9,
+            imdbRating = 8.7,
             isWatched = true,
-            category = Category(id = "science_fiction", type = CategoryType.SCIENCE_FICTION),
+            categoryId = CategoryType.SCI_FI.storageKey,
             description = "A science fiction movie used as sample data for the homescreen.",
-            creationTimeEpochMillis = 3,
-            updateTimeEpochMillis = 3
+            comment = null,
+            externalIds = null,
+            watchProviders = null,
+            updatedAtEpochMillis = 3
         ),
         Movie(
             id = "movie-4",
             title = "Inception",
-            posterUri = "",
-            publishingYear = 2010,
-            runtime = 148,
-            rating = 9,
+            posterUrl = "",
+            releaseYear = 2010,
+            runtimeMinutes = 148,
+            userRating = 9,
+            imdbRating = 8.8,
             isWatched = false,
-            category = Category(id = "action", type = CategoryType.ACTION),
+            categoryId = CategoryType.ACTION.storageKey,
             description = "A dream thriller used as sample data for the homescreen.",
-            creationTimeEpochMillis = 2,
-            updateTimeEpochMillis = 2
+            comment = null,
+            externalIds = null,
+            watchProviders = null,
+            updatedAtEpochMillis = 2
         ),
         Movie(
             id = "movie-5",
             title = "The Godfather",
-            posterUri = "",
-            publishingYear = 1972,
-            runtime = 175,
-            rating = 9,
+            posterUrl = "",
+            releaseYear = 1972,
+            runtimeMinutes = 175,
+            userRating = 9,
+            imdbRating = 9.2,
             isWatched = true,
-            category = Category(id = "drama", type = CategoryType.DRAMA),
+            categoryId = CategoryType.DRAMA.storageKey,
             description = "A drama movie used as sample data for the homescreen.",
-            creationTimeEpochMillis = 1,
-            updateTimeEpochMillis = 1
+            comment = null,
+            externalIds = null,
+            watchProviders = null,
+            updatedAtEpochMillis = 1
         )
     )
 }

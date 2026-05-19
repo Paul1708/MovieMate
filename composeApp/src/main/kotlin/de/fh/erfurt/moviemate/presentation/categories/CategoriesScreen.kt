@@ -32,7 +32,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import de.fh.erfurt.moviemate.domain.model.CategoryType
+import de.fh.erfurt.moviemate.movies.domain.model.category.CategoryType
 import de.fh.erfurt.moviemate.presentation.MovieMateColors
 import de.fh.erfurt.moviemate.presentation.ScreenEmptyState
 import de.fh.erfurt.moviemate.presentation.ScreenErrorState

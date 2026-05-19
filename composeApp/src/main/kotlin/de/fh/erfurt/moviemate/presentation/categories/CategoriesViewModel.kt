@@ -1,7 +1,7 @@
 package de.fh.erfurt.moviemate.presentation.categories
 
 import androidx.lifecycle.ViewModel
-import de.fh.erfurt.moviemate.domain.model.Movie
+import de.fh.erfurt.moviemate.movies.domain.model.movie.Movie
 import de.fh.erfurt.moviemate.presentation.mock.sampleMovies
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

@@ -16,7 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import de.fh.erfurt.moviemate.domain.model.CategoryType
+import de.fh.erfurt.moviemate.movies.domain.model.category.CategoryType
 import de.fh.erfurt.moviemate.presentation.MovieCategoryTypes
 import de.fh.erfurt.moviemate.presentation.displayName
 
