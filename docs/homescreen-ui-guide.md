@@ -24,14 +24,14 @@ Aktuell vorhanden:
 
 Enthält Route und sichtbare Oberfläche des Homescreens.
 
-- `HomeRouteMock(...)` erzeugt aktuell ein `HomeViewModel` mit Sample-Daten.
+- `HomeRoute(...)` sammelt `HomeViewModel.state` mit `collectAsStateWithLifecycle()`.
 - `HomeScreen(...)` ist die reine Compose-UI.
 - `onMovieSelected` ist vorbereitet, damit später der Detail-Screen geöffnet werden kann.
 - Die UI kennt keine Repository- oder Backend-Details.
 
 ### `HomeViewModel.kt`
 
-Ein einfaches ViewModel-Skelett für Mockdaten. Es nutzt noch kein Lifecycle-ViewModel, ist aber bewusst so benannt, weil es später in diese Richtung migrieren soll.
+Ein AndroidX-`ViewModel` für Mockdaten. Es hält den Screen-State als `StateFlow<HomeUiState>`.
 
 Er verarbeitet:
 
@@ -43,7 +43,7 @@ Er verarbeitet:
 - Clear Filter
 - Retry als Platzhalter
 
-Später kann diese Klasse durch ein echtes ViewModel ersetzt werden, das `GetMoviesUseCase` nutzt.
+Später kann die Mockdatenquelle durch `GetMoviesUseCase` ersetzt werden.
 
 ### `HomeUiState.kt` und `HomeUiAction.kt`
 
@@ -87,10 +87,9 @@ Runtime-Mockdaten kommen aus:
 
 ```text
 presentation/mock/MockMovieData.kt
-presentation/mock/MovieMateMockStore.kt
 ```
 
-Der Homescreen bekommt die Filme über `HomeRouteMock(movies = ...)`. In der App kommt diese Liste aktuell aus `MovieMateMockStore`.
+Der Homescreen bekommt seine Sample-Filme aktuell im `HomeViewModel` über `sampleMovies()`.
 
 ## Was später bleiben soll
 
@@ -111,8 +110,7 @@ Diese Teile sind auch für die echte App sinnvoll:
 
 Diese Teile sind hauptsächlich für Mockbetrieb oder Previews gedacht:
 
-- `HomeRouteMock()` als Runtime-Einstieg
-- `HomeViewModel` in der aktuellen Form
+- lokale Mockdatenquelle in `HomeViewModel`
 - lokale Filterlogik in `HomeViewModel`
 - lokale Sortierlogik in `HomeViewModel`
 - `sampleMovies()` für Runtime-Daten
@@ -127,7 +125,7 @@ Der spätere Datenfluss sollte ungefähr so aussehen:
 ```text
 HomeScreen
   -> HomeUiAction
-  -> echtes ViewModel
+  -> HomeViewModel
   -> GetMoviesUseCase
   -> MovieRepository
   -> List<Movie>

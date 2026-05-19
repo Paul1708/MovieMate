@@ -14,7 +14,7 @@ Aktuell vorhanden:
 - Kategorie-Grid mit zwei Spalten
 - Movie-Zähler pro Kategorie
 - Loading-, Empty- und Error-State über gemeinsame UI-Bausteine
-- Kategorie-Klick navigiert zurück zum Home-Platzhalter mit aktivem Kategorie-Filter
+- Kategorie-Klick navigiert zum Homescreen mit aktivem Kategorie-Filter
 
 ## Wichtige Dateien
 
@@ -22,13 +22,13 @@ Aktuell vorhanden:
 
 Enthält Route und sichtbare Oberfläche des Kategorie-Screens.
 
-- `CategoriesRouteMock(...)` erzeugt aktuell ein `CategoriesViewModel`.
+- `CategoriesRoute(...)` sammelt `CategoriesViewModel.state` mit `collectAsStateWithLifecycle()`.
 - `CategoriesScreen(...)` zeigt Header, Suche, State-Inhalte und Grid.
 - `onCategorySelected` ist der vorbereitete Navigationspunkt zum Homescreen.
 
 ### `CategoriesViewModel.kt`
 
-Ein einfaches ViewModel-Skelett für Mockdaten. Es filtert Kategorien lokal nach Suchtext.
+Ein AndroidX-`ViewModel` für Mockdaten. Es hält den Screen-State als `StateFlow<CategoriesUiState>` und filtert Kategorien lokal nach Suchtext.
 
 Die Filmzahlen werden nicht fest gepflegt, sondern aus `sourceMovies` berechnet. Dadurch bleiben Home und Kategorien konsistent.
 
@@ -65,8 +65,7 @@ Es enthält:
 
 ## Was später ersetzt werden kann
 
-- `CategoriesRouteMock()` als Runtime-Einstieg
-- `CategoriesViewModel` in der aktuellen Form
+- lokale Mockdatenquelle in `CategoriesViewModel`
 - Sample-Daten aus `sampleMovies()`
 - lokale Suche, falls die Suche später im Repository oder UseCase passieren soll
 

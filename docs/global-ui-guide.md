@@ -49,19 +49,6 @@ Enthält `sampleMovies()`.
 
 Diese Funktion liefert Domain-`Movie`-Objekte und simuliert damit schon den späteren Backend-Datenfluss.
 
-### `MovieMateMockStore.kt`
-
-App-weiter Mock-Speicher für Runtime-Testdaten.
-
-Aktuell vorbereitet:
-
-- `addMovie(movie)`
-- `updateMovie(movie)`
-- `deleteMovie(movieId)`
-- `toggleWatched(movieId)`
-
-Diese Methoden erlauben später UI-Flows mit Add, Edit oder Watch-Status zu testen, ohne Backend-Code anzufassen.
-
 ## Navigation
 
 ### `BottomNavItem.kt`
@@ -75,7 +62,7 @@ Beschreibt nur die Einträge der BottomBar:
 
 ### `MovieMateDestination.kt`
 
-Beschreibt interne Navigationsziele der Mock-App:
+Kapselt die zentralen Android-Navigationsrouten:
 
 - Home
 - Categories
@@ -83,7 +70,7 @@ Beschreibt interne Navigationsziele der Mock-App:
 - Add
 - Backup
 
-Detail ist kein BottomBar-Item, sondern wird über MovieCard-Klicks geöffnet. Das bereitet die spätere Navigation sauberer vor.
+Detail ist kein BottomBar-Item, sondern wird über MovieCard-Klicks geöffnet.
 
 ### `PlaceholderScreen.kt`
 
@@ -97,9 +84,9 @@ Aktuell genutzt für:
 
 ## Namenskonvention
 
-`ViewModel` bedeutet aktuell noch: einfache UI-State-Klasse für Mockbetrieb.
-
-Die Klassen sind bewusst schon als ViewModels benannt, weil sie später in echte Lifecycle-ViewModels mit Coroutines und UseCases migrieren sollen. In der aktuellen UI-Phase arbeiten sie aber noch direkt mit Sample-Daten.
+`ViewModel` bedeutet AndroidX-`ViewModel`. Screen-Container sammeln `StateFlow`
+mit `collectAsStateWithLifecycle()` und geben State plus Events an stateless
+Content-Composables weiter.
 
 ## Sprache der UI
 
@@ -110,7 +97,7 @@ Die sichtbaren UI-Texte sind aktuell auf Englisch vereinheitlicht. Kommentare un
 Bei echter Backend-Anbindung können Runtime-Sample-Daten ersetzt werden:
 
 - `sampleMovies()` als Runtime-Datenquelle
-- lokale Filter- und Sortierlogik in StateHoldern
+- lokale Filter- und Sortierlogik in ViewModels
 - Platzhalter-Screens für Detail, Add und Backup
 
 Für Compose Previews sollten Sample-Daten weiter behalten werden.

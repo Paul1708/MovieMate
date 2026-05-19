@@ -71,7 +71,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = C5B7B699EDC33079FDE38BC5 /* Build configuration list for PBXNativeTarget "iosApp" */;
 			buildPhases = (
-				AB5E73B6D60D6C2742D85551 /* Compile Kotlin Framework */,
 				E6C41975961FDB8DB9EFB792 /* Sources */,
 				6C41EACC210EDE8B5E6E83F0 /* Frameworks */,
 				5F3492CF2CF45D405FF1FC9B /* Resources */,
@@ -133,28 +132,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
-
-/* Begin PBXShellScriptBuildPhase section */
-		AB5E73B6D60D6C2742D85551 /* Compile Kotlin Framework */ = {
-			isa = PBXShellScriptBuildPhase;
-			alwaysOutOfDate = 1;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			name = "Compile Kotlin Framework";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "if [ \"YES\" = \"$OVERRIDE_KOTLIN_BUILD_IDE_SUPPORTED\" ]; then\n  echo \"Skipping Gradle build task invocation due to OVERRIDE_KOTLIN_BUILD_IDE_SUPPORTED environment variable set to \\\"YES\\\"\"\n  exit 0\nfi\ncd \"$SRCROOT/..\"\n./gradlew :composeApp:embedAndSignAppleFrameworkForXcode\n";
-		};
-/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		E6C41975961FDB8DB9EFB792 /* Sources */ = {
