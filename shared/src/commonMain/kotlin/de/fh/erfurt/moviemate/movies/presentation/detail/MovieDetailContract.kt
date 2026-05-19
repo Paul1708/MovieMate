@@ -12,12 +12,14 @@ data class MovieDetailUiModel(
     val title: String,
     val description: String,
     val releaseYear: Int? = null,
+    val categoryId: String? = null,
     val posterUrl: String? = null,
     val runtimeMinutes: Int? = null,
     val isWatched: Boolean = false,
     val comment: String? = null,
     val userRating: Int? = null,
     val imdbRating: Double? = null,
+    val watchProviders: List<String>? = null,
     val updatedAtLabel: String,
 )
 

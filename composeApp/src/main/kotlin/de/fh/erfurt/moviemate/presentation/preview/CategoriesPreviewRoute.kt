@@ -7,6 +7,9 @@ import de.fh.erfurt.moviemate.movies.domain.model.category.CategoryType
 import de.fh.erfurt.moviemate.presentation.movies.categories.CategoriesScreen
 import de.fh.erfurt.moviemate.presentation.movies.categories.CategoriesUiAction
 
+/**
+ * Preview-Route für Kategorien mit lokalem UI-State.
+ */
 @Composable
 fun CategoriesPreviewRoute(
     modifier: Modifier = Modifier,

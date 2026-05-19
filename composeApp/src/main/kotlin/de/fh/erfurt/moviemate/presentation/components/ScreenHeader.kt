@@ -10,18 +10,18 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateColors
+import de.fh.erfurt.moviemate.presentation.theme.MovieMateSpacing
 
 // Gemeinsame Maße für die oberen Bereiche aller Screens.
 // Dadurch sitzen Titel, Topbar-Icons und Divider beim Screenwechsel gleich.
 object ScreenHeaderDefaults {
-    val HorizontalPadding = 18.dp
-    val VerticalPadding = 18.dp
-    val TitleHeight = 44.dp
-    val TopBarHeight = 44.dp
-    val DividerThickness = 2.dp
-    val ContentTopSpacing = 18.dp
+    val HorizontalPadding = MovieMateSpacing.screenHorizontalPadding
+    val VerticalPadding = MovieMateSpacing.screenVerticalPadding
+    val TitleHeight = MovieMateSpacing.titleHeight
+    val TopBarHeight = MovieMateSpacing.topBarHeight
+    val DividerThickness = MovieMateSpacing.dividerThickness
+    val ContentTopSpacing = MovieMateSpacing.contentTopSpacing
 }
 
 /**

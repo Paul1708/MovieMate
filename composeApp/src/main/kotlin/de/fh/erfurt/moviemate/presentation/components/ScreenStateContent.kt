@@ -12,14 +12,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
+import de.fh.erfurt.moviemate.presentation.theme.MovieMateSpacing
 
 /**
- * Gemeinsame Zustände für Screens, die Daten laden.
- *
- * Die Bausteine sind bewusst allgemein gehalten, damit Home, Kategorien,
- * Detail und Backup dieselbe Darstellung für Laden, Leerstand und Fehler
- * verwenden können.
+ * Ladezustand für Screens, die Daten abrufen.
  */
 @Composable
 fun ScreenLoadingState(
@@ -29,18 +25,21 @@ fun ScreenLoadingState(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(top = 48.dp),
+            .padding(top = MovieMateSpacing.stateTopSpacing),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         CircularProgressIndicator()
         Text(
             text = message,
             style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.padding(top = 12.dp)
+            modifier = Modifier.padding(top = MovieMateSpacing.titleSpacing)
         )
     }
 }
 
+/**
+ * Leerzustand für Screens ohne anzeigbare Daten.
+ */
 @Composable
 fun ScreenEmptyState(
     message: String,
@@ -52,10 +51,13 @@ fun ScreenEmptyState(
         textAlign = TextAlign.Center,
         modifier = modifier
             .fillMaxWidth()
-            .padding(top = 48.dp)
+            .padding(top = MovieMateSpacing.stateTopSpacing)
     )
 }
 
+/**
+ * Fehlerzustand mit Retry-Aktion für erneut ladbare Inhalte.
+ */
 @Composable
 fun ScreenErrorState(
     message: String,
@@ -65,9 +67,9 @@ fun ScreenErrorState(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(top = 48.dp),
+            .padding(top = MovieMateSpacing.stateTopSpacing),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        verticalArrangement = Arrangement.spacedBy(MovieMateSpacing.titleSpacing)
     ) {
         Text(
             text = message,

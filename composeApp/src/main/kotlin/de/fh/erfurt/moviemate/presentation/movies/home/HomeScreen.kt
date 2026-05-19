@@ -14,7 +14,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateColors
 import de.fh.erfurt.moviemate.presentation.components.ScreenEmptyState
 import de.fh.erfurt.moviemate.presentation.components.ScreenErrorState
@@ -24,6 +23,7 @@ import de.fh.erfurt.moviemate.presentation.components.ScreenLoadingState
 import de.fh.erfurt.moviemate.presentation.components.SearchField
 import de.fh.erfurt.moviemate.presentation.movies.components.MovieCard
 import de.fh.erfurt.moviemate.presentation.preview.previewHomeUiState
+import de.fh.erfurt.moviemate.presentation.theme.MovieMateSpacing
 
 /**
  * Sichtbare Oberfläche des Homescreens.
@@ -63,7 +63,7 @@ fun HomeScreen(
         )
 
         if (state.isSearchVisible) {
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(MovieMateSpacing.fieldSpacing))
             SearchField(
                 value = state.searchQuery,
                 onValueChange = { onAction(HomeUiAction.SearchChanged(it)) },
@@ -85,10 +85,10 @@ fun HomeScreen(
             ScreenEmptyState(message = "No movies found")
         } else {
             LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(14.dp),
+                verticalArrangement = Arrangement.spacedBy(MovieMateSpacing.itemSpacing),
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(top = 2.dp)
+                    .padding(top = MovieMateSpacing.listTopPadding)
             ) {
                 items(state.movies, key = { it.id }) { movie ->
                     MovieCard(
@@ -120,6 +120,9 @@ fun HomeScreen(
     }
 }
 
+/**
+ * Preview des Homescreens mit Beispieldaten.
+ */
 @Preview
 @Composable
 private fun HomeScreenPreview() {
@@ -129,6 +132,9 @@ private fun HomeScreenPreview() {
     )
 }
 
+/**
+ * Preview des Homescreens ohne Filme.
+ */
 @Preview
 @Composable
 private fun HomeScreenEmptyPreview() {
@@ -138,6 +144,9 @@ private fun HomeScreenEmptyPreview() {
     )
 }
 
+/**
+ * Preview des Homescreens im Ladezustand.
+ */
 @Preview
 @Composable
 private fun HomeScreenLoadingPreview() {
@@ -147,6 +156,9 @@ private fun HomeScreenLoadingPreview() {
     )
 }
 
+/**
+ * Preview des Homescreens mit Fehlermeldung.
+ */
 @Preview
 @Composable
 private fun HomeScreenErrorPreview() {

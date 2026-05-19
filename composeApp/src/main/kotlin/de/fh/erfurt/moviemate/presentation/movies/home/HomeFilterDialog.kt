@@ -1,22 +1,18 @@
 package de.fh.erfurt.moviemate.presentation.movies.home
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import de.fh.erfurt.moviemate.movies.domain.model.category.CategoryType
+import de.fh.erfurt.moviemate.presentation.components.SelectionOptionRow
 import de.fh.erfurt.moviemate.presentation.movies.components.MovieCategoryTypes
 import de.fh.erfurt.moviemate.presentation.movies.components.displayName
 
@@ -51,7 +47,7 @@ fun HomeFilterDialog(
                 }
 
                 item {
-                    FilterOptionRow(
+                    SelectionOptionRow(
                         label = "All categories",
                         selected = selectedCategory == null,
                         onClick = { onCategorySelected(null) }
@@ -59,7 +55,7 @@ fun HomeFilterDialog(
                 }
 
                 items(MovieCategoryTypes) { category ->
-                    FilterOptionRow(
+                    SelectionOptionRow(
                         label = category.displayName(),
                         selected = selectedCategory == category,
                         onClick = { onCategorySelected(category) }
@@ -79,34 +75,4 @@ fun HomeFilterDialog(
             }
         }
     )
-}
-
-/**
- * Eine auswählbare Zeile im Filter-Dialog.
- *
- * Sie wird für jede Kategorie genutzt, damit die Auswahl gleichmäßig aufgebaut
- * bleibt.
- */
-@Composable
-private fun FilterOptionRow(
-    label: String,
-    selected: Boolean,
-    onClick: () -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .padding(vertical = 2.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        RadioButton(
-            selected = selected,
-            onClick = onClick
-        )
-        Text(
-            text = label,
-            modifier = Modifier.padding(start = 8.dp)
-        )
-    }
 }

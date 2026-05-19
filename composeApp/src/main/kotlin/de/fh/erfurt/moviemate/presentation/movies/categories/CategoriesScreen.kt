@@ -22,13 +22,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateColors
 import de.fh.erfurt.moviemate.presentation.components.ScreenEmptyState
 import de.fh.erfurt.moviemate.presentation.components.ScreenErrorState
@@ -38,6 +36,9 @@ import de.fh.erfurt.moviemate.presentation.components.ScreenLoadingState
 import de.fh.erfurt.moviemate.presentation.components.SearchField
 import de.fh.erfurt.moviemate.presentation.components.TopBarIconButton
 import de.fh.erfurt.moviemate.presentation.preview.previewCategoriesUiState
+import de.fh.erfurt.moviemate.presentation.theme.MovieMateIcons
+import de.fh.erfurt.moviemate.presentation.theme.MovieMateShapes
+import de.fh.erfurt.moviemate.presentation.theme.MovieMateSpacing
 
 /**
  * Sichtbare Oberfläche des Kategorie-Screens.
@@ -72,7 +73,7 @@ fun CategoriesScreen(
         )
 
         if (state.isSearchVisible) {
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(MovieMateSpacing.fieldSpacing))
             SearchField(
                 value = state.searchQuery,
                 onValueChange = { onAction(CategoriesUiAction.SearchChanged(it)) },
@@ -99,6 +100,9 @@ fun CategoriesScreen(
     }
 }
 
+/**
+ * Topbar des Kategorie-Screens mit Suchaktion.
+ */
 @Composable
 private fun CategoriesTopBar(
     onSearchClicked: () -> Unit
@@ -111,7 +115,7 @@ private fun CategoriesTopBar(
         Spacer(modifier = Modifier.weight(1f))
 
         TopBarIconButton(
-            text = "⌕",
+            text = MovieMateIcons.search,
             contentDescription = "Search categories",
             onClick = onSearchClicked
         )
@@ -131,8 +135,8 @@ private fun CategoriesGrid(
 ) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
-        verticalArrangement = Arrangement.spacedBy(28.dp),
-        horizontalArrangement = Arrangement.spacedBy(28.dp),
+        verticalArrangement = Arrangement.spacedBy(MovieMateSpacing.categoryGridSpacing),
+        horizontalArrangement = Arrangement.spacedBy(MovieMateSpacing.categoryGridSpacing),
         modifier = Modifier.fillMaxSize()
     ) {
         items(categories, key = { it.type.name }) { category ->
@@ -163,30 +167,41 @@ private fun CategoryFolderCard(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Box(
-            modifier = Modifier.size(width = 82.dp, height = 58.dp)
+            modifier = Modifier.size(
+                width = MovieMateSpacing.categoryFolderWidth,
+                height = MovieMateSpacing.categoryFolderHeight
+            )
         ) {
             Box(
                 modifier = Modifier
-                    .size(width = 40.dp, height = 14.dp)
-                    .clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp))
-                    .background(Color.Black)
+                    .size(
+                        width = MovieMateSpacing.categoryFolderTabWidth,
+                        height = MovieMateSpacing.categoryFolderTabHeight
+                    )
+                    .clip(
+                        RoundedCornerShape(
+                            topStart = MovieMateShapes.folderRadius,
+                            topEnd = MovieMateShapes.folderRadius
+                        )
+                    )
+                    .background(MovieMateColors.FolderBackground)
             )
             Box(
                 modifier = Modifier
-                    .padding(top = 8.dp)
+                    .padding(top = MovieMateSpacing.categoryFolderTabOffset)
                     .fillMaxSize()
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(Color.Black),
+                    .clip(RoundedCornerShape(MovieMateShapes.folderRadius))
+                    .background(MovieMateColors.FolderBackground),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = category.label,
                     style = MaterialTheme.typography.labelMedium,
-                    color = Color.White,
+                    color = MovieMateColors.FolderText,
                     fontWeight = FontWeight.Bold,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.padding(horizontal = 8.dp)
+                    modifier = Modifier.padding(horizontal = MovieMateSpacing.categoryFolderLabelPadding)
                 )
             }
         }
@@ -196,12 +211,15 @@ private fun CategoryFolderCard(
                 text = category.movieCountText,
                 style = MaterialTheme.typography.labelSmall,
                 color = MovieMateColors.SecondaryText,
-                modifier = Modifier.padding(top = 6.dp)
+                modifier = Modifier.padding(top = MovieMateSpacing.categoryCountTopPadding)
             )
         }
     }
 }
 
+/**
+ * Preview der Kategorieübersicht mit Beispieldaten.
+ */
 @Preview
 @Composable
 private fun CategoriesScreenPreview() {
@@ -211,6 +229,9 @@ private fun CategoriesScreenPreview() {
     )
 }
 
+/**
+ * Preview der Kategorieübersicht ohne Treffer.
+ */
 @Preview
 @Composable
 private fun CategoriesScreenEmptyPreview() {

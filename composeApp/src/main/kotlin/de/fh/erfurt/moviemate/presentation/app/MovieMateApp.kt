@@ -21,8 +21,12 @@ import de.fh.erfurt.moviemate.presentation.app.navigation.toRoute
 import de.fh.erfurt.moviemate.presentation.components.PlaceholderScreen
 import de.fh.erfurt.moviemate.presentation.preview.CategoriesPreviewRoute
 import de.fh.erfurt.moviemate.presentation.preview.HomePreviewRoute
+import de.fh.erfurt.moviemate.presentation.preview.MovieDetailPreviewRoute
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateColors
 
+/**
+ * App-Gerüst mit Navigation, Bottom Bar und den aktuell angebundenen Screens.
+ */
 @Composable
 fun MovieMateApp() {
     val navController = rememberNavController()
@@ -99,9 +103,11 @@ fun MovieMateApp() {
                     ?.getString(MovieMateDestination.MovieIdArg)
                     .orEmpty()
 
-                PlaceholderScreen(
-                    title = "Details",
-                    message = "Detail screen for $movieId"
+                MovieDetailPreviewRoute(
+                    movieId = movieId,
+                    onBackClicked = {
+                        navController.popBackStack()
+                    }
                 )
             }
 

@@ -5,8 +5,8 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.unit.dp
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateColors
+import de.fh.erfurt.moviemate.presentation.theme.MovieMateSpacing
 
 /**
  * Untere Navigation der App.
@@ -22,7 +22,7 @@ fun BottomBar(
 ) {
     NavigationBar(
         containerColor = MovieMateColors.ScreenBackground,
-        tonalElevation = 0.dp
+        tonalElevation = MovieMateSpacing.noElevation
     ) {
         BottomNavItem.entries.forEach { item ->
             NavigationBarItem(

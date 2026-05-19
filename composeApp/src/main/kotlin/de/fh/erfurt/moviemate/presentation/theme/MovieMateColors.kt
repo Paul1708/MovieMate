@@ -12,4 +12,6 @@ object MovieMateColors {
     val PrimaryText = Color(0xFF333333)
     val SecondaryText = Color(0xFF5E5E5E)
     val SoftControl = Color(0xFFEDEBE6)
+    val FolderBackground = Color(0xFF000000)
+    val FolderText = Color(0xFFFFFFFF)
 }

@@ -22,10 +22,11 @@ fun sampleMovies(): List<Movie> {
             isWatched = true,
             categoryId = CategoryType.ACTION.storageKey,
             description = "A space adventure used as sample data for the homescreen.",
-            comment = null,
-            externalIds = null,
-            watchProviders = null,
-            updatedAtEpochMillis = 5
+            comment = "Rewatch with the original trilogy.",
+            externalIds = mapOf("imdb" to "tt2527338", "tmdb" to "181812"),
+            watchProviders = listOf("Disney+", "Apple TV"),
+            updatedAtEpochMillis = 5,
+            version = 1
         ),
         Movie(
             id = "movie-2",
@@ -39,9 +40,10 @@ fun sampleMovies(): List<Movie> {
             categoryId = CategoryType.FANTASY.storageKey,
             description = "A fantasy movie used as sample data for the homescreen.",
             comment = null,
-            externalIds = null,
-            watchProviders = null,
-            updatedAtEpochMillis = 4
+            externalIds = mapOf("imdb" to "tt0241527"),
+            watchProviders = listOf("Max", "Prime Video"),
+            updatedAtEpochMillis = 4,
+            version = 1
         ),
         Movie(
             id = "movie-3",
@@ -55,9 +57,10 @@ fun sampleMovies(): List<Movie> {
             categoryId = CategoryType.SCI_FI.storageKey,
             description = "A science fiction movie used as sample data for the homescreen.",
             comment = null,
-            externalIds = null,
-            watchProviders = null,
-            updatedAtEpochMillis = 3
+            externalIds = mapOf("imdb" to "tt0133093", "tmdb" to "603"),
+            watchProviders = listOf("Netflix"),
+            updatedAtEpochMillis = 3,
+            version = 2
         ),
         Movie(
             id = "movie-4",
@@ -71,9 +74,10 @@ fun sampleMovies(): List<Movie> {
             categoryId = CategoryType.ACTION.storageKey,
             description = "A dream thriller used as sample data for the homescreen.",
             comment = null,
-            externalIds = null,
+            externalIds = mapOf("imdb" to "tt1375666"),
             watchProviders = null,
-            updatedAtEpochMillis = 2
+            updatedAtEpochMillis = 2,
+            version = 1
         ),
         Movie(
             id = "movie-5",
@@ -87,9 +91,10 @@ fun sampleMovies(): List<Movie> {
             categoryId = CategoryType.DRAMA.storageKey,
             description = "A drama movie used as sample data for the homescreen.",
             comment = null,
-            externalIds = null,
-            watchProviders = null,
-            updatedAtEpochMillis = 1
+            externalIds = mapOf("imdb" to "tt0068646"),
+            watchProviders = listOf("Paramount+"),
+            updatedAtEpochMillis = 1,
+            version = 1
         )
     )
 }

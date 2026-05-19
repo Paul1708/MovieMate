@@ -12,8 +12,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.unit.dp
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateColors
+import de.fh.erfurt.moviemate.presentation.theme.MovieMateSpacing
 
 /**
  * Einheitliche Icon-Schaltfläche für Topbars.
@@ -30,7 +30,7 @@ fun TopBarIconButton(
 ) {
     Box(
         modifier = modifier
-            .size(28.dp)
+            .size(MovieMateSpacing.topBarIconSize)
             .background(MovieMateColors.SoftControl, CircleShape)
             .clickable(onClick = onClick)
             .semantics { this.contentDescription = contentDescription },

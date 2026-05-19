@@ -12,9 +12,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateColors
 import de.fh.erfurt.moviemate.presentation.components.TopBarIconButton
+import de.fh.erfurt.moviemate.presentation.theme.MovieMateIcons
+import de.fh.erfurt.moviemate.presentation.theme.MovieMateSpacing
 
 /**
  * Obere Bedienleiste des Homescreens.
@@ -39,7 +40,7 @@ fun HomeTopBar(
     ) {
         Row(
             modifier = Modifier.weight(1f),
-            horizontalArrangement = Arrangement.spacedBy(22.dp),
+            horizontalArrangement = Arrangement.spacedBy(MovieMateSpacing.sectionSpacing),
             verticalAlignment = Alignment.CenterVertically
         ) {
             HomeTab.entries.forEach { tab ->
@@ -56,21 +57,21 @@ fun HomeTopBar(
         }
 
         Row(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(MovieMateSpacing.compactSpacing),
             verticalAlignment = Alignment.CenterVertically
         ) {
             TopBarIconButton(
-                text = "⌕",
+                text = MovieMateIcons.search,
                 contentDescription = "Open search",
                 onClick = onSearchClicked
             )
             TopBarIconButton(
-                text = "▾",
+                text = MovieMateIcons.filter,
                 contentDescription = "Open filter",
                 onClick = onFilterClicked
             )
             TopBarIconButton(
-                text = "↕",
+                text = MovieMateIcons.sort,
                 contentDescription = "Open sort",
                 onClick = onSortClicked
             )

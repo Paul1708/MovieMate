@@ -8,6 +8,9 @@ import de.fh.erfurt.moviemate.movies.domain.model.category.CategoryType
 import de.fh.erfurt.moviemate.presentation.movies.home.HomeScreen
 import de.fh.erfurt.moviemate.presentation.movies.home.HomeUiAction
 
+/**
+ * Preview-Route für den Homescreen, bis echte Backend-Anbindung verwendet wird.
+ */
 @Composable
 fun HomePreviewRoute(
     initialCategory: CategoryType? = null,
