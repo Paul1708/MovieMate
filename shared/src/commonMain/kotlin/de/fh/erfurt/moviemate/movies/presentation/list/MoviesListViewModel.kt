@@ -7,6 +7,7 @@ import de.fh.erfurt.moviemate.movies.domain.usecase.movie.GetMoviesSortedUseCase
 import de.fh.erfurt.moviemate.movies.domain.usecase.movie.GetMoviesUseCase
 import de.fh.erfurt.moviemate.movies.domain.usecase.movie.SearchMoviesUseCase
 import de.fh.erfurt.moviemate.movies.domain.usecase.movie.UpdateMovieUseCase
+import de.fh.erfurt.moviemate.movies.domain.usecase.movie.UpdateMovieWatchedStatusUseCase
 
 class MoviesListViewModel(
     private val getMoviesUseCase: GetMoviesUseCase,
@@ -28,6 +29,7 @@ class MoviesListViewModel(
             is MoviesListEvent.SearchRequested -> Unit
             is MoviesListEvent.UpdateRequested -> Unit
             is MoviesListEvent.SortRequested -> Unit
+            is MoviesListEvent.FilterWatchedStatusRequested -> Unit
         }
     }
 }

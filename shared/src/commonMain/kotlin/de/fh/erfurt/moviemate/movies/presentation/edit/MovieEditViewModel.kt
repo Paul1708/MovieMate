@@ -12,6 +12,11 @@ class MovieEditViewModel(
     fun onEvent(event: MovieEditEvent) {
         when (event) {
             is MovieEditEvent.SaveRequested -> Unit
+            is MovieEditEvent.AddWatchProviderRequested -> Unit
+            is MovieEditEvent.BackClicked -> Unit
+            is MovieEditEvent.KeepEditingRequested -> Unit
+            is MovieEditEvent.DiscardChangesConfirmed -> Unit
+            is MovieEditEvent.RemoveWatchProviderRequested -> Unit
         }
     }
 }
