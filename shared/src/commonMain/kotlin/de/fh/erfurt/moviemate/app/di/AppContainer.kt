@@ -50,6 +50,8 @@ class AppContainer(
         getMovieUseCase = getMovieUseCase,
         updateMovieWatchedStatusUseCase = updateMovieWatchedStatusUseCase,
         updateMovieUserRatingUseCase = updateMovieUserRatingUseCase,
+        deleteMovieUseCase = deleteMovieUseCase,
+        updateMovieUseCase = updateMovieUseCase,
     )
 
     val movieEditViewModel = MovieEditViewModel(
