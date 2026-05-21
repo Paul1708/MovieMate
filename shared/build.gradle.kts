@@ -51,6 +51,9 @@ kotlin {
             implementation(libs.kotlin.test)
             implementation(libs.ktor.client.mock)
             implementation(libs.coroutines.test)
+            implementation(libs.sqldelight.sqlite.driver)
+
+
         }
 
         androidUnitTest.dependencies {
@@ -79,7 +82,7 @@ android {
 
 sqldelight {
     databases {
-        create("MovieDatabase") {
+        create("MovieMateDatabase") {
             packageName.set("de.fh.erfurt.moviemate.movies.data.local.db")
         }
     }
