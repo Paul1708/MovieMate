@@ -9,6 +9,7 @@ import de.fh.erfurt.moviemate.movies.domain.repository.movie.SortBy
 import de.fh.erfurt.moviemate.presentation.movies.home.HomeTab
 import de.fh.erfurt.moviemate.presentation.movies.home.HomeUiAction
 import de.fh.erfurt.moviemate.presentation.movies.home.HomeUiState
+import de.fh.erfurt.moviemate.presentation.movies.mapper.toHomeUiModel
 import de.fh.erfurt.moviemate.presentation.movies.model.MovieUiModel
 
 /**
@@ -103,7 +104,7 @@ class HomePreviewStateHolder(
                 selectedCategory == null || movie.categoryId == selectedCategory.storageKey
             }
             .sortForHome(selectedSortBy)
-            .map { movie -> movie.toPreviewUiModel() }
+            .map { movie -> movie.toHomeUiModel() }
     }
 }
 
