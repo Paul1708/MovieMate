@@ -2,6 +2,7 @@ package de.fh.erfurt.moviemate
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
+import de.fh.erfurt.moviemate.app.di.AppContainer
 import de.fh.erfurt.moviemate.presentation.app.MovieMateApp
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateTheme
 
@@ -10,8 +11,10 @@ import de.fh.erfurt.moviemate.presentation.theme.MovieMateTheme
  */
 @Composable
 @Preview
-fun App() {
+fun App(
+    appContainer: AppContainer? = null
+) {
     MovieMateTheme {
-        MovieMateApp()
+        MovieMateApp(appContainer = appContainer)
     }
 }

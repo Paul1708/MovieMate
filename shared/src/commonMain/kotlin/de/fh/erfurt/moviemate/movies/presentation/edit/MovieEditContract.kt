@@ -6,6 +6,9 @@ data class MovieEditUiState(
     val isSaving: Boolean = false,
     val errorMessage: String? = null,
     val savedMovieId: String? = null,
+    val initialMovieId: String? = null, // Unterscheidung zwischen Neuanlage und Bearbeitung
+    val showDiscardDialog: Boolean = false,
+    val currentWatchProviders: List<String> = emptyList(),
 )
 
 sealed interface MovieEditEvent {
@@ -13,11 +16,25 @@ sealed interface MovieEditEvent {
         val title: String,
         val description: String,
         val releaseYear: Int? = null,
-        val categoryId: String? = null,
+        val categoryName: String? = null,
         val posterUrl: String? = null,
         val runtimeMinutes: Int? = null,
+        val userRating: Int? = null,
+        val imdbRating: Double? = null,
+        val isWatched: Boolean = false,
+        val watchProviders: List<String> = emptyList(),
+        val comment: String? = null,
         val updatedAtEpochMillis: Long,
     ) : MovieEditEvent
+
+    // Steuerung des Discard-Dialogs
+    data object BackClicked : MovieEditEvent
+    data object KeepEditingRequested : MovieEditEvent
+    data object DiscardChangesConfirmed : MovieEditEvent
+
+    // Dynamische Listenverwaltung für Watch-Provider
+    data class AddWatchProviderRequested(val provider: String) : MovieEditEvent
+    data class RemoveWatchProviderRequested(val provider: String) : MovieEditEvent
 }
 
 sealed interface MovieEditEffect {
@@ -26,4 +43,5 @@ sealed interface MovieEditEffect {
     ) : MovieEditEffect
 
     data object SavedSuccess : MovieEditEffect
+    data object NavigateBack : MovieEditEffect // Auslösung der Navigation nach DiscardConfirmed
 }

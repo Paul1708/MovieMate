@@ -38,7 +38,7 @@ internal fun MovieDetailUiModel.metaItems(): List<MovieDetailMetaItem> {
  * Formatiert die Kategorie für die lesende Detailansicht.
  */
 private fun MovieDetailUiModel.categoryLabel(): String {
-    val rawCategory = categoryId?.takeIf { it.isNotBlank() } ?: return "Unknown"
+    val rawCategory = categoryName.takeIf { it.isNotBlank() } ?: return "Unknown"
     val categoryType = CategoryType.fromString(rawCategory)
 
     return if (categoryType == CategoryType.UNKNOWN && rawCategory != CategoryType.UNKNOWN.storageKey) {

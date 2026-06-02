@@ -87,7 +87,7 @@ internal fun MovieDetailReadContent(
         Spacer(modifier = Modifier.height(MovieMateSpacing.sectionSpacing))
 
         WatchProviderReadSection(
-            providers = movie.watchProviders.orEmpty()
+            providers = movie.watchProviders
         )
 
         Spacer(modifier = Modifier.height(MovieMateSpacing.sectionSpacing))

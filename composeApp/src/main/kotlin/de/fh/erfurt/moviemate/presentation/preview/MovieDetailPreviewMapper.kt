@@ -9,14 +9,14 @@ fun Movie.toPreviewDetailUiModel(): MovieDetailUiModel {
         title = title,
         description = description,
         releaseYear = releaseYear,
-        categoryId = categoryId,
+        categoryName = categoryId.orEmpty(),
         posterUrl = posterUrl?.ifBlank { null },
         runtimeMinutes = runtimeMinutes,
         isWatched = isWatched,
         comment = comment,
         userRating = userRating,
         imdbRating = imdbRating,
-        watchProviders = watchProviders,
+        watchProviders = watchProviders.orEmpty(),
         updatedAtLabel = "Preview update $updatedAtEpochMillis"
     )
 }

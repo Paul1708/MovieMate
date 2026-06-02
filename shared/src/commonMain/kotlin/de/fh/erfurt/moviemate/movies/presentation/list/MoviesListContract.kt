@@ -16,6 +16,11 @@ sealed interface MoviesListEvent {
         val categoryId: String? = null,
         val posterUrl: String? = null,
         val runtimeMinutes: Int? = null,
+        val userRating: Int? = null,
+        val imdbRating: Double? = null,
+        val isWatched: Boolean = false,
+        val watchProviders: List<String>? = null,
+        val comment: String? = null,
     ) : MoviesListEvent
 
     data class UpdateRequested(
@@ -38,6 +43,11 @@ sealed interface MoviesListEvent {
         val sortBy: String,  // e.g., "releaseYear", "title", "rating"
         val ascending: Boolean = false,
     ) : MoviesListEvent
+
+    data class FilterWatchedStatusRequested(
+        val isWatched: Boolean,
+    ) : MoviesListEvent
+
 }
 
 sealed interface MoviesListEffect {

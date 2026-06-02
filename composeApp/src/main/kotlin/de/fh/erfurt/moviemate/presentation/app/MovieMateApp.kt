@@ -12,6 +12,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import de.fh.erfurt.moviemate.app.di.AppContainer
 import de.fh.erfurt.moviemate.presentation.app.navigation.BottomBar
 import de.fh.erfurt.moviemate.presentation.app.navigation.BottomNavItem
 import de.fh.erfurt.moviemate.presentation.app.navigation.MovieMateDestination
@@ -27,8 +28,15 @@ import de.fh.erfurt.moviemate.presentation.theme.MovieMateColors
 /**
  * App-Gerüst mit Navigation, Bottom Bar und den aktuell angebundenen Screens.
  */
+@Suppress("UNUSED_PARAMETER")
 @Composable
-fun MovieMateApp() {
+fun MovieMateApp(
+    appContainer: AppContainer? = null
+) {
+    // Der Container wird hier bereits angenommen, auch wenn die aktuellen
+    // Routen noch mit Preview-State arbeiten. So kann später pro Route auf
+    // echte Shared-ViewModels umgestellt werden, ohne den App-Einstieg erneut
+    // umzubauen.
     val navController = rememberNavController()
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = currentBackStackEntry?.destination?.route

@@ -11,15 +11,15 @@ data class MovieDetailUiModel(
     val id: String,
     val title: String,
     val description: String,
+    val categoryName: String,
     val releaseYear: Int? = null,
-    val categoryId: String? = null,
     val posterUrl: String? = null,
     val runtimeMinutes: Int? = null,
     val isWatched: Boolean = false,
     val comment: String? = null,
     val userRating: Int? = null,
     val imdbRating: Double? = null,
-    val watchProviders: List<String>? = null,
+    val watchProviders: List<String> = emptyList(),
     val updatedAtLabel: String,
 )
 
@@ -38,14 +38,21 @@ sealed interface MovieDetailEvent {
         val rating: Int?,
     ) : MovieDetailEvent
 
-    data class UpdateCommentRequested(
+    data class DeleteRequested(
         val movieId: String,
-        val comment: String?,
+    ) : MovieDetailEvent
+
+    data class EditRequested(
+        val movieId: String,
     ) : MovieDetailEvent
 }
 
 sealed interface MovieDetailEffect {
     data class ShowMessage(
         val message: String,
+    ) : MovieDetailEffect
+
+    data class NavigateToEdit(
+        val movieId: String,
     ) : MovieDetailEffect
 }

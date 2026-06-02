@@ -21,13 +21,13 @@ data class MovieDetailEditState(
                 title = movie.title,
                 description = movie.description,
                 releaseYear = movie.releaseYear?.toString().orEmpty(),
-                categoryId = movie.categoryId.orEmpty(),
+                categoryId = movie.categoryName,
                 runtimeMinutes = movie.runtimeMinutes?.toString().orEmpty(),
                 isWatched = movie.isWatched,
                 comment = movie.comment.orEmpty(),
                 userRating = movie.userRating?.toString().orEmpty(),
                 imdbRating = movie.imdbRating?.toString().orEmpty(),
-                watchProviders = movie.watchProviders.orEmpty()
+                watchProviders = movie.watchProviders
             )
         }
     }
@@ -37,13 +37,13 @@ data class MovieDetailEditState(
             title = title.trim(),
             description = description.trim(),
             releaseYear = releaseYear.trim().toIntOrNull(),
-            categoryId = categoryId.trim().ifBlank { null },
+            categoryName = categoryId.trim(),
             runtimeMinutes = runtimeMinutes.trim().toIntOrNull(),
             isWatched = isWatched,
             comment = comment.trim().ifBlank { null },
             userRating = userRating.trim().toIntOrNull()?.coerceIn(0, 10),
             imdbRating = imdbRating.trim().toDoubleOrNull()?.coerceIn(0.0, 10.0),
-            watchProviders = normalizedWatchProviders().takeIf { it.isNotEmpty() }
+            watchProviders = normalizedWatchProviders()
         )
     }
 
