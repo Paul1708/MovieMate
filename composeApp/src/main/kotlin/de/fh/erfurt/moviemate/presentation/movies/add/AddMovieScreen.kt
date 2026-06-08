@@ -19,7 +19,6 @@ import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,7 +29,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import de.fh.erfurt.moviemate.presentation.components.MovieMateScreenBackground
 import de.fh.erfurt.moviemate.presentation.components.MovieMateScreenDefaults
-import de.fh.erfurt.moviemate.presentation.components.TopBarIconButton
+import de.fh.erfurt.moviemate.presentation.movies.components.MovieFormTopBar
 import de.fh.erfurt.moviemate.presentation.movies.detail.CategorySelector
 import de.fh.erfurt.moviemate.presentation.movies.detail.DetailTextField
 import de.fh.erfurt.moviemate.presentation.movies.detail.WatchProvidersEditor
@@ -57,10 +56,14 @@ fun AddMovieScreen(
                     .padding(horizontal = MovieMateScreenDefaults.HorizontalPadding)
                     .padding(top = MovieMateScreenDefaults.VerticalPadding)
             ) {
-                AddMovieTopBar(
-                    canSave = state.canSave,
-                    onCancelClicked = { onAction(AddMovieAction.CancelClicked) },
-                    onSaveClicked = { onAction(AddMovieAction.SaveClicked) }
+                MovieFormTopBar(
+                    title = "Add movie",
+                    navigationIcon = MovieMateIcons.remove,
+                    navigationContentDescription = "Cancel add movie",
+                    onNavigationClicked = { onAction(AddMovieAction.CancelClicked) },
+                    actionLabel = "Save",
+                    actionEnabled = state.canSave,
+                    onActionClicked = { onAction(AddMovieAction.SaveClicked) }
                 )
 
                 Spacer(modifier = Modifier.height(MovieMateScreenDefaults.ContentTopSpacing))
@@ -99,42 +102,6 @@ fun AddMovieScreen(
                     )
                 }
             }
-        }
-    }
-}
-
-@Composable
-private fun AddMovieTopBar(
-    canSave: Boolean,
-    onCancelClicked: () -> Unit,
-    onSaveClicked: () -> Unit
-) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(MovieMateScreenDefaults.TopBarHeight),
-        contentAlignment = Alignment.Center
-    ) {
-        TopBarIconButton(
-            text = MovieMateIcons.remove,
-            contentDescription = "Cancel add movie",
-            onClick = onCancelClicked,
-            modifier = Modifier.align(Alignment.CenterStart)
-        )
-
-        Text(
-            text = "Add movie",
-            style = MaterialTheme.typography.titleMedium,
-            color = MovieMateColors.PrimaryText,
-            fontWeight = FontWeight.Bold
-        )
-
-        TextButton(
-            onClick = onSaveClicked,
-            enabled = canSave,
-            modifier = Modifier.align(Alignment.CenterEnd)
-        ) {
-            Text("Save")
         }
     }
 }

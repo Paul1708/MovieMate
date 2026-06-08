@@ -4,7 +4,9 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
@@ -23,7 +25,9 @@ import de.fh.erfurt.moviemate.presentation.components.ScreenEmptyState
 import de.fh.erfurt.moviemate.presentation.components.ScreenErrorState
 import de.fh.erfurt.moviemate.presentation.components.MovieMateScreenDefaults
 import de.fh.erfurt.moviemate.presentation.components.ScreenLoadingState
+import de.fh.erfurt.moviemate.presentation.movies.components.MovieFormTopBar
 import de.fh.erfurt.moviemate.presentation.preview.previewMovieDetailUiState
+import de.fh.erfurt.moviemate.presentation.theme.MovieMateIcons
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateSpacing
 
 /**
@@ -88,14 +92,20 @@ fun MovieDetailScreen(
             }
 
             isEditMode -> {
-                Column(modifier = Modifier.fillMaxSize()) {
-                    MovieDetailTopBar(
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = MovieMateScreenDefaults.HorizontalPadding)
+                        .padding(top = MovieMateScreenDefaults.VerticalPadding)
+                ) {
+                    MovieFormTopBar(
                         title = "Edit movie",
-                        onBackClicked = { leaveEditMode() },
-                        actionLabel = "Cancel",
-                        onActionClicked = { leaveEditMode() },
-                        modifier = Modifier.padding(top = MovieMateSpacing.detailTopBarOverlayPadding)
+                        navigationIcon = MovieMateIcons.back,
+                        navigationContentDescription = "Go back",
+                        onNavigationClicked = { leaveEditMode() }
                     )
+
+                    Spacer(modifier = Modifier.height(MovieMateScreenDefaults.ContentTopSpacing))
 
                     MovieDetailEditContent(
                         movie = movie,

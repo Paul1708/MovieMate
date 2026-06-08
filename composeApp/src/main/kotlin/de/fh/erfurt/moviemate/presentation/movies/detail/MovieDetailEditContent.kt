@@ -16,7 +16,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import de.fh.erfurt.moviemate.movies.presentation.detail.MovieDetailUiModel
-import de.fh.erfurt.moviemate.presentation.components.MovieMateScreenDefaults
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateIcons
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateSpacing
 
@@ -33,12 +32,7 @@ internal fun MovieDetailEditContent(
     Column(
         modifier = modifier
             .verticalScroll(rememberScrollState())
-            .padding(
-                start = MovieMateScreenDefaults.HorizontalPadding,
-                top = MovieMateScreenDefaults.ContentTopSpacing,
-                end = MovieMateScreenDefaults.HorizontalPadding,
-                bottom = MovieMateScreenDefaults.VerticalPadding
-            ),
+            .padding(bottom = MovieMateSpacing.addFormBottomPadding),
         verticalArrangement = Arrangement.spacedBy(MovieMateSpacing.titleSpacing)
     ) {
         MovieDetailPoster(
@@ -59,13 +53,6 @@ internal fun MovieDetailEditContent(
             onCustomCategoryChanged = { onAction(MovieDetailAction.CategoryChanged(it)) }
         )
 
-        DetailTextField(
-            value = editState.description,
-            label = "About the movie",
-            onValueChange = { onAction(MovieDetailAction.DescriptionChanged(it)) },
-            minLines = 4
-        )
-
         Row(horizontalArrangement = Arrangement.spacedBy(MovieMateSpacing.fieldSpacing)) {
             DetailTextField(
                 value = editState.releaseYear,
@@ -83,13 +70,6 @@ internal fun MovieDetailEditContent(
             )
         }
 
-        WatchedControl(
-            isWatched = editState.isWatched,
-            onWatchedChanged = {
-                onAction(MovieDetailAction.WatchedChanged(it))
-            }
-        )
-
         Row(horizontalArrangement = Arrangement.spacedBy(MovieMateSpacing.fieldSpacing)) {
             DetailTextField(
                 value = editState.userRating,
@@ -106,6 +86,20 @@ internal fun MovieDetailEditContent(
                 modifier = Modifier.weight(1f)
             )
         }
+
+        WatchedControl(
+            isWatched = editState.isWatched,
+            onWatchedChanged = {
+                onAction(MovieDetailAction.WatchedChanged(it))
+            }
+        )
+
+        DetailTextField(
+            value = editState.description,
+            label = "About the movie",
+            onValueChange = { onAction(MovieDetailAction.DescriptionChanged(it)) },
+            minLines = 4
+        )
 
         DetailTextField(
             value = editState.comment,
