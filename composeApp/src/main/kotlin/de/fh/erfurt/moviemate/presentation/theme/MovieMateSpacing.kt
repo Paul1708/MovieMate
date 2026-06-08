@@ -38,12 +38,12 @@ object MovieMateSpacing {
     val moviePosterWidth = 84.dp
     val moviePosterHeight = 112.dp
 
-    val categoryGridSpacing = 28.dp
-    val categoryFolderWidth = 82.dp
-    val categoryFolderHeight = 58.dp
-    val categoryFolderTabWidth = 40.dp
-    val categoryFolderTabHeight = 14.dp
-    val categoryFolderTabOffset = 8.dp
-    val categoryFolderLabelPadding = 8.dp
-    val categoryCountTopPadding = 6.dp
+    val categoryGridSpacing = 12.dp
+    val categoryTileHeight = 92.dp
+    val categoryTilePadding = 10.dp
+    val categoryIconSize = 28.dp
+    val categoryIconBottomSpacing = 6.dp
+    val categoryHeaderIndicatorWidth = 42.dp
+    val categoryHeaderIndicatorHeight = 2.dp
+    val categoryHeaderDividerHeight = 1.dp
 }
