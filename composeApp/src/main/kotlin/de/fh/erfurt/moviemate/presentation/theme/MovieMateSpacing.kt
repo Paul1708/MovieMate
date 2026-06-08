@@ -17,6 +17,8 @@ object MovieMateSpacing {
     val stateTopSpacing = 48.dp
     val dialogRowVerticalPadding = 2.dp
     val dialogTextStartPadding = 8.dp
+    val dialogSectionBottomPadding = 4.dp
+    val dialogMaxHeight = 420.dp
     val listTopPadding = 2.dp
     val cardPadding = 10.dp
     val sectionSpacing = 16.dp
@@ -48,6 +50,15 @@ object MovieMateSpacing {
     val movieCardHeight = 132.dp
     val moviePosterWidth = 84.dp
     val moviePosterHeight = 112.dp
+    val movieCardPosterSpacing = 14.dp
+    val movieCardTextSpacing = 8.dp
+    val movieCardRatingMetaSpacing = 7.dp
+    val movieCardMetaSpacing = 5.dp
+    val movieCardTrailingIconStartPadding = 8.dp
+    val movieCardMetadataIconSpacing = 6.dp
+
+    val homeTabHorizontalPadding = 16.dp
+    val homeTabVerticalPadding = 10.dp
 
     val categoryGridSpacing = 12.dp
     val categoryTileHeight = 92.dp

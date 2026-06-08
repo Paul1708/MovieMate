@@ -21,7 +21,7 @@ import de.fh.erfurt.moviemate.movies.presentation.detail.MovieDetailUiState
 import de.fh.erfurt.moviemate.presentation.components.MovieMateScreenBackground
 import de.fh.erfurt.moviemate.presentation.components.ScreenEmptyState
 import de.fh.erfurt.moviemate.presentation.components.ScreenErrorState
-import de.fh.erfurt.moviemate.presentation.components.ScreenHeaderDefaults
+import de.fh.erfurt.moviemate.presentation.components.MovieMateScreenDefaults
 import de.fh.erfurt.moviemate.presentation.components.ScreenLoadingState
 import de.fh.erfurt.moviemate.presentation.preview.previewMovieDetailUiState
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateSpacing
@@ -65,7 +65,7 @@ fun MovieDetailScreen(
                 ScreenErrorState(
                     message = errorMessage,
                     onRetryClicked = onRetryClicked,
-                    modifier = Modifier.padding(horizontal = ScreenHeaderDefaults.HorizontalPadding)
+                    modifier = Modifier.padding(horizontal = MovieMateScreenDefaults.HorizontalPadding)
                 )
             }
 
@@ -74,7 +74,7 @@ fun MovieDetailScreen(
             ) {
                 ScreenLoadingState(
                     message = "Loading movie...",
-                    modifier = Modifier.padding(horizontal = ScreenHeaderDefaults.HorizontalPadding)
+                    modifier = Modifier.padding(horizontal = MovieMateScreenDefaults.HorizontalPadding)
                 )
             }
 
@@ -83,7 +83,7 @@ fun MovieDetailScreen(
             ) {
                 ScreenEmptyState(
                     message = "Movie not found",
-                    modifier = Modifier.padding(horizontal = ScreenHeaderDefaults.HorizontalPadding)
+                    modifier = Modifier.padding(horizontal = MovieMateScreenDefaults.HorizontalPadding)
                 )
             }
 
@@ -151,7 +151,7 @@ private fun MovieDetailStateScaffold(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = ScreenHeaderDefaults.ContentTopSpacing),
+                .padding(top = MovieMateScreenDefaults.ContentTopSpacing),
             content = content
         )
     }

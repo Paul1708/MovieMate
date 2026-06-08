@@ -15,6 +15,12 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import de.fh.erfurt.moviemate.movies.domain.model.category.CategoryType
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateColors
 
+/**
+ * Lightweight vector icon for a category tile.
+ *
+ * Keeping the drawings local avoids adding an icon dependency while the UI is
+ * still mock-driven. The mapping can be replaced with real assets later.
+ */
 @Composable
 internal fun CategoryGenreIcon(
     type: CategoryType,

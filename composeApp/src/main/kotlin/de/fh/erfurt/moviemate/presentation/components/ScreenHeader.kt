@@ -13,9 +13,9 @@ import androidx.compose.ui.Modifier
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateColors
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateSpacing
 
-// Gemeinsame Maße für die oberen Bereiche aller Screens.
-// Dadurch sitzen Titel, Topbar-Icons und Divider beim Screenwechsel gleich.
-object ScreenHeaderDefaults {
+// Shared screen-level layout values used by top bars, placeholders and content padding.
+// They live outside the theme tokens so screen scaffolds can depend on one stable API.
+object MovieMateScreenDefaults {
     val HorizontalPadding = MovieMateSpacing.screenHorizontalPadding
     val VerticalPadding = MovieMateSpacing.screenVerticalPadding
     val TitleHeight = MovieMateSpacing.titleHeight
@@ -25,11 +25,10 @@ object ScreenHeaderDefaults {
 }
 
 /**
- * Einheitlicher oberer Screen-Bereich.
+ * Simple placeholder header for screens that do not yet have a custom top bar.
  *
- * Diese Composable legt die Höhe des Titels, der Topbar und des Dividers fest.
- * Home und Kategorien nutzen sie gemeinsam, damit die Elemente beim Wechsel
- * nicht optisch springen.
+ * Fully designed screens currently build their own top bars but reuse
+ * [MovieMateScreenDefaults] for consistent spacing.
  */
 @Composable
 fun ScreenHeader(
@@ -42,7 +41,7 @@ fun ScreenHeader(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(ScreenHeaderDefaults.TitleHeight),
+                .height(MovieMateScreenDefaults.TitleHeight),
             contentAlignment = Alignment.Center
         ) {
             Text(
@@ -55,7 +54,7 @@ fun ScreenHeader(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(ScreenHeaderDefaults.TopBarHeight),
+                .height(MovieMateScreenDefaults.TopBarHeight),
             contentAlignment = Alignment.Center
         ) {
             topBar()
@@ -63,7 +62,7 @@ fun ScreenHeader(
 
         HorizontalDivider(
             modifier = Modifier.fillMaxWidth(),
-            thickness = ScreenHeaderDefaults.DividerThickness,
+            thickness = MovieMateScreenDefaults.DividerThickness,
             color = MovieMateColors.Divider
         )
     }

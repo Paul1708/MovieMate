@@ -26,7 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import de.fh.erfurt.moviemate.movies.presentation.detail.MovieDetailUiModel
-import de.fh.erfurt.moviemate.presentation.components.ScreenHeaderDefaults
+import de.fh.erfurt.moviemate.presentation.components.MovieMateScreenDefaults
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateColors
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateShapes
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateSpacing
@@ -57,7 +57,7 @@ internal fun MovieDetailReadContent(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(
-                        horizontal = ScreenHeaderDefaults.HorizontalPadding,
+                        horizontal = MovieMateScreenDefaults.HorizontalPadding,
                         vertical = MovieMateSpacing.detailMediumSpacing
                     )
             ) {
@@ -108,7 +108,7 @@ internal fun MovieDetailReadContent(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(
-                    end = ScreenHeaderDefaults.HorizontalPadding,
+                    end = MovieMateScreenDefaults.HorizontalPadding,
                     bottom = MovieMateSpacing.detailFloatingButtonBottomPadding
                 ),
             shape = CircleShape,

@@ -34,7 +34,7 @@ import androidx.compose.ui.unit.dp
 import de.fh.erfurt.moviemate.presentation.components.MovieMateScreenBackground
 import de.fh.erfurt.moviemate.presentation.components.ScreenEmptyState
 import de.fh.erfurt.moviemate.presentation.components.ScreenErrorState
-import de.fh.erfurt.moviemate.presentation.components.ScreenHeaderDefaults
+import de.fh.erfurt.moviemate.presentation.components.MovieMateScreenDefaults
 import de.fh.erfurt.moviemate.presentation.components.ScreenLoadingState
 import de.fh.erfurt.moviemate.presentation.components.SearchField
 import de.fh.erfurt.moviemate.presentation.components.TopBarIconButton
@@ -44,6 +44,13 @@ import de.fh.erfurt.moviemate.presentation.theme.MovieMateIcons
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateShapes
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateSpacing
 
+/**
+ * Category overview screen.
+ *
+ * The screen is stateless from the UI perspective: it renders the given state
+ * and reports user interactions as actions so the current preview holder can
+ * later be replaced by a real shared ViewModel.
+ */
 @Composable
 fun CategoriesScreen(
     state: CategoriesUiState,
@@ -55,9 +62,9 @@ fun CategoriesScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(
-                    horizontal = ScreenHeaderDefaults.HorizontalPadding
+                    horizontal = MovieMateScreenDefaults.HorizontalPadding
                 )
-                .padding(top = ScreenHeaderDefaults.VerticalPadding),
+                .padding(top = MovieMateScreenDefaults.VerticalPadding),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             CategoriesTopBar(
@@ -74,7 +81,7 @@ fun CategoriesScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.height(ScreenHeaderDefaults.ContentTopSpacing))
+            Spacer(modifier = Modifier.height(MovieMateScreenDefaults.ContentTopSpacing))
 
             when {
                 state.errorMessage != null -> ScreenErrorState(

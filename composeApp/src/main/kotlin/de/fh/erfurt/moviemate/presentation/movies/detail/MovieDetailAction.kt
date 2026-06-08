@@ -1,5 +1,11 @@
 package de.fh.erfurt.moviemate.presentation.movies.detail
 
+/**
+ * User intents emitted by the detail UI.
+ *
+ * The preview state holder handles these actions locally for now. The same
+ * contract can later be translated to shared presentation events.
+ */
 sealed interface MovieDetailAction {
     data object EditClicked : MovieDetailAction
     data object SaveEditClicked : MovieDetailAction

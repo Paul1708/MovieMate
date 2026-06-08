@@ -18,7 +18,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateColors
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateShapes
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateSpacing
@@ -40,7 +39,7 @@ fun MovieDetailMetaRow(
     LazyRow(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(MovieMateSpacing.compactSpacing),
-        contentPadding = PaddingValues(horizontal = 0.dp)
+        contentPadding = PaddingValues()
     ) {
         items(items) { item ->
             MovieDetailMetaChip(item = item)

@@ -26,6 +26,4 @@ object MovieMateColors {
 
     val SoftControl = Color(0xFF1B2433)
     val SoftControlBorder = Color(0xFF2B374A)
-    val FolderBackground = Color(0xFF151C29)
-    val FolderText = PrimaryText
 }

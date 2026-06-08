@@ -22,7 +22,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import de.fh.erfurt.moviemate.presentation.components.MovieMateScreenBackground
 import de.fh.erfurt.moviemate.presentation.components.ScreenEmptyState
 import de.fh.erfurt.moviemate.presentation.components.ScreenErrorState
-import de.fh.erfurt.moviemate.presentation.components.ScreenHeaderDefaults
+import de.fh.erfurt.moviemate.presentation.components.MovieMateScreenDefaults
 import de.fh.erfurt.moviemate.presentation.components.ScreenLoadingState
 import de.fh.erfurt.moviemate.presentation.components.SearchField
 import de.fh.erfurt.moviemate.presentation.movies.components.MovieCard
@@ -48,8 +48,8 @@ fun HomeScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = ScreenHeaderDefaults.HorizontalPadding)
-                .padding(top = ScreenHeaderDefaults.VerticalPadding),
+                .padding(horizontal = MovieMateScreenDefaults.HorizontalPadding)
+                .padding(top = MovieMateScreenDefaults.VerticalPadding),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             HomeTopBar(
@@ -69,7 +69,7 @@ fun HomeScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.height(ScreenHeaderDefaults.ContentTopSpacing))
+            Spacer(modifier = Modifier.height(MovieMateScreenDefaults.ContentTopSpacing))
 
             if (state.errorMessage != null) {
                 ScreenErrorState(
@@ -106,7 +106,7 @@ fun HomeScreen(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(
-                    end = ScreenHeaderDefaults.HorizontalPadding,
+                    end = MovieMateScreenDefaults.HorizontalPadding,
                     bottom = MovieMateSpacing.detailLargeSpacing
                 ),
             shape = CircleShape,
@@ -133,14 +133,6 @@ fun HomeScreen(
         )
     }
 
-    if (state.isSortDialogVisible) {
-        HomeSortDialog(
-            selectedSortBy = state.selectedSortBy,
-            onSortSelected = { onAction(HomeUiAction.SortSelected(it)) },
-            onClearClicked = { onAction(HomeUiAction.ClearSortClicked) },
-            onDismiss = { onAction(HomeUiAction.SortDismissed) }
-        )
-    }
 }
 
 /**

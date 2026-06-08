@@ -9,6 +9,12 @@ import de.fh.erfurt.moviemate.presentation.movies.detail.MovieDetailAction
 import de.fh.erfurt.moviemate.presentation.movies.detail.MovieDetailEditState
 import de.fh.erfurt.moviemate.presentation.movies.detail.MovieDetailMode
 
+/**
+ * Temporary state holder for the detail screen while shared ViewModels are not wired yet.
+ *
+ * It intentionally keeps mock edits in memory so the UI can be tested end to
+ * end before the backend flow is complete.
+ */
 class MovieDetailPreviewStateHolder(
     private val sourceMovies: List<Movie> = sampleMovies(),
     movieId: String

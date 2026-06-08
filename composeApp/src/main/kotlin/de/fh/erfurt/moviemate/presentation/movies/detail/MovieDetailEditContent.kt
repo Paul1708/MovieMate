@@ -16,7 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import de.fh.erfurt.moviemate.movies.presentation.detail.MovieDetailUiModel
-import de.fh.erfurt.moviemate.presentation.components.ScreenHeaderDefaults
+import de.fh.erfurt.moviemate.presentation.components.MovieMateScreenDefaults
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateIcons
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateSpacing
 
@@ -34,10 +34,10 @@ internal fun MovieDetailEditContent(
         modifier = modifier
             .verticalScroll(rememberScrollState())
             .padding(
-                start = ScreenHeaderDefaults.HorizontalPadding,
-                top = ScreenHeaderDefaults.ContentTopSpacing,
-                end = ScreenHeaderDefaults.HorizontalPadding,
-                bottom = ScreenHeaderDefaults.VerticalPadding
+                start = MovieMateScreenDefaults.HorizontalPadding,
+                top = MovieMateScreenDefaults.ContentTopSpacing,
+                end = MovieMateScreenDefaults.HorizontalPadding,
+                bottom = MovieMateScreenDefaults.VerticalPadding
             ),
         verticalArrangement = Arrangement.spacedBy(MovieMateSpacing.titleSpacing)
     ) {

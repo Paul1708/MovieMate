@@ -37,7 +37,6 @@ class HomePreviewStateHolder(
             HomeUiAction.SearchClicked -> updateState(isSearchVisible = !state.isSearchVisible)
             is HomeUiAction.SearchChanged -> updateState(searchQuery = action.query)
             HomeUiAction.FilterClicked -> updateState(isFilterDialogVisible = true)
-            HomeUiAction.SortClicked -> updateState(isSortDialogVisible = true)
             is HomeUiAction.CategorySelected -> updateState(selectedCategory = action.category)
             is HomeUiAction.SortSelected -> updateState(selectedSortBy = action.sortCriterion)
             HomeUiAction.ClearCategoryFilterClicked -> updateState(
@@ -46,10 +45,9 @@ class HomePreviewStateHolder(
             )
             HomeUiAction.ClearSortClicked -> updateState(
                 selectedSortBy = SortBy.UPDATED_AT,
-                isSortDialogVisible = false
+                isFilterDialogVisible = false
             )
             HomeUiAction.FilterDismissed -> updateState(isFilterDialogVisible = false)
-            HomeUiAction.SortDismissed -> updateState(isSortDialogVisible = false)
             is HomeUiAction.MovieClicked -> Unit
             HomeUiAction.AddClicked -> Unit
             HomeUiAction.RetryClicked -> updateState()
@@ -62,8 +60,7 @@ class HomePreviewStateHolder(
         isSearchVisible: Boolean = state.isSearchVisible,
         selectedCategory: CategoryType? = state.selectedCategory,
         selectedSortBy: SortBy = state.selectedSortBy,
-        isFilterDialogVisible: Boolean = state.isFilterDialogVisible,
-        isSortDialogVisible: Boolean = state.isSortDialogVisible
+        isFilterDialogVisible: Boolean = state.isFilterDialogVisible
     ) {
         state = state.copy(
             movies = sourceMovies.filterMovies(
@@ -78,7 +75,6 @@ class HomePreviewStateHolder(
             selectedCategory = selectedCategory,
             selectedSortBy = selectedSortBy,
             isFilterDialogVisible = isFilterDialogVisible,
-            isSortDialogVisible = isSortDialogVisible,
             isLoading = false,
             errorMessage = null
         )

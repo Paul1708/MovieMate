@@ -12,7 +12,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import de.fh.erfurt.moviemate.movies.domain.model.category.CategoryType
 import de.fh.erfurt.moviemate.movies.domain.repository.movie.SortBy
 import de.fh.erfurt.moviemate.presentation.components.SelectionOptionRow
@@ -47,14 +46,14 @@ fun HomeFilterDialog(
         },
         text = {
             LazyColumn(
-                modifier = Modifier.heightIn(max = 420.dp)
+                modifier = Modifier.heightIn(max = MovieMateSpacing.dialogMaxHeight)
             ) {
                 item {
                     Text(
                         text = "Category",
                         style = MaterialTheme.typography.titleSmall,
                         color = MovieMateColors.PrimaryText,
-                        modifier = Modifier.padding(bottom = 4.dp)
+                        modifier = Modifier.padding(bottom = MovieMateSpacing.dialogSectionBottomPadding)
                     )
                 }
 
@@ -80,7 +79,7 @@ fun HomeFilterDialog(
                         text = "Sort",
                         style = MaterialTheme.typography.titleSmall,
                         color = MovieMateColors.PrimaryText,
-                        modifier = Modifier.padding(bottom = 4.dp)
+                        modifier = Modifier.padding(bottom = MovieMateSpacing.dialogSectionBottomPadding)
                     )
                 }
 
@@ -109,4 +108,17 @@ fun HomeFilterDialog(
             }
         }
     )
+}
+
+/**
+ * Converts the internal sort criterion into the label shown in the filter dialog.
+ */
+fun SortBy.displayName(): String {
+    return when (this) {
+        SortBy.TITLE -> "Title"
+        SortBy.RELEASE_YEAR -> "Newest year"
+        SortBy.UPDATED_AT -> "Recently updated"
+        SortBy.RATING -> "Best rating"
+        SortBy.RUNTIME -> "Runtime"
+    }
 }

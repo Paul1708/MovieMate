@@ -28,7 +28,6 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
 import de.fh.erfurt.moviemate.presentation.movies.model.MovieUiModel
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateColors
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateIcons
@@ -58,7 +57,7 @@ fun MovieCard(
         },
         shape = RoundedCornerShape(MovieMateShapes.cardRadius),
         colors = CardDefaults.cardColors(containerColor = MovieMateColors.CardBackground),
-        border = BorderStroke(1.dp, MovieMateColors.CardBorder),
+        border = BorderStroke(MovieMateSpacing.dividerThickness, MovieMateColors.CardBorder),
         elevation = CardDefaults.cardElevation(defaultElevation = MovieMateSpacing.noElevation)
     ) {
         Row(
@@ -70,7 +69,7 @@ fun MovieCard(
         ) {
             PosterPlaceholder(title = movie.title)
 
-            Spacer(modifier = Modifier.width(14.dp))
+            Spacer(modifier = Modifier.width(MovieMateSpacing.movieCardPosterSpacing))
 
             Column(
                 modifier = Modifier
@@ -87,12 +86,12 @@ fun MovieCard(
                     overflow = TextOverflow.Ellipsis
                 )
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(MovieMateSpacing.movieCardTextSpacing))
 
                 MovieRatingRow(text = movie.ratingText)
-                Spacer(modifier = Modifier.height(7.dp))
+                Spacer(modifier = Modifier.height(MovieMateSpacing.movieCardRatingMetaSpacing))
                 MovieMetaRow(icon = MovieMateIcons.category, text = movie.categoryYearText())
-                Spacer(modifier = Modifier.height(5.dp))
+                Spacer(modifier = Modifier.height(MovieMateSpacing.movieCardMetaSpacing))
                 MovieMetaRow(icon = MovieMateIcons.runtime, text = movie.runtimeText)
             }
 
@@ -100,7 +99,7 @@ fun MovieCard(
                 text = MovieMateIcons.more,
                 style = MaterialTheme.typography.titleMedium,
                 color = MovieMateColors.SecondaryText,
-                modifier = Modifier.padding(start = 8.dp)
+                modifier = Modifier.padding(start = MovieMateSpacing.movieCardTrailingIconStartPadding)
             )
         }
     }
@@ -144,7 +143,7 @@ private fun PosterPlaceholder(title: String) {
 private fun MovieRatingRow(text: String) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(6.dp)
+        horizontalArrangement = Arrangement.spacedBy(MovieMateSpacing.movieCardMetadataIconSpacing)
     ) {
         Text(
             text = MovieMateIcons.rating,
@@ -175,7 +174,7 @@ private fun MovieMetaRow(
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(6.dp)
+        horizontalArrangement = Arrangement.spacedBy(MovieMateSpacing.movieCardMetadataIconSpacing)
     ) {
         Text(
             text = icon,

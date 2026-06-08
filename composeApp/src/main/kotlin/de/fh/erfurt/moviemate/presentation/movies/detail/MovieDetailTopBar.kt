@@ -10,7 +10,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import de.fh.erfurt.moviemate.presentation.components.ScreenHeaderDefaults
+import de.fh.erfurt.moviemate.presentation.components.MovieMateScreenDefaults
 import de.fh.erfurt.moviemate.presentation.components.TopBarIconButton
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateColors
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateIcons
@@ -29,7 +29,7 @@ fun MovieDetailTopBar(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(ScreenHeaderDefaults.TopBarHeight),
+            .height(MovieMateScreenDefaults.TopBarHeight),
         contentAlignment = Alignment.Center
     ) {
         TopBarIconButton(
@@ -38,7 +38,7 @@ fun MovieDetailTopBar(
             onClick = onBackClicked,
             modifier = Modifier
                 .align(Alignment.CenterStart)
-                .padding(start = ScreenHeaderDefaults.HorizontalPadding)
+                .padding(start = MovieMateScreenDefaults.HorizontalPadding)
         )
 
         if (title.isNotBlank()) {
@@ -54,7 +54,7 @@ fun MovieDetailTopBar(
                 onClick = onActionClicked,
                 modifier = Modifier
                     .align(Alignment.CenterEnd)
-                    .padding(end = ScreenHeaderDefaults.HorizontalPadding)
+                    .padding(end = MovieMateScreenDefaults.HorizontalPadding)
             ) {
                 Text(actionLabel)
             }

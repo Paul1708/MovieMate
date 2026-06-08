@@ -2,6 +2,12 @@ package de.fh.erfurt.moviemate.presentation.movies.detail
 
 import de.fh.erfurt.moviemate.movies.presentation.detail.MovieDetailUiModel
 
+/**
+ * Local form state for the detail edit mode.
+ *
+ * String fields keep user input lossless while editing; conversion and bounds
+ * checks happen only when the form is applied to the UI model.
+ */
 data class MovieDetailEditState(
     val title: String = "",
     val description: String = "",

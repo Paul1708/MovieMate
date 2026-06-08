@@ -14,7 +14,6 @@ data class HomeUiState(
     val selectedCategory: CategoryType? = null,
     val selectedSortBy: SortBy = SortBy.UPDATED_AT,
     val isFilterDialogVisible: Boolean = false,
-    val isSortDialogVisible: Boolean = false,
     val isLoading: Boolean = false,
     val errorMessage: String? = null
 )

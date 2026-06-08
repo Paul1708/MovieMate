@@ -1,6 +1,5 @@
 package de.fh.erfurt.moviemate.presentation.components
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,33 +20,34 @@ fun PlaceholderScreen(
     message: String,
     modifier: Modifier = Modifier
 ) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .background(MovieMateColors.ScreenBackground)
-            .padding(
-                horizontal = ScreenHeaderDefaults.HorizontalPadding,
-                vertical = ScreenHeaderDefaults.VerticalPadding
-            ),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        ScreenHeader(
-            title = title,
-            topBar = {}
-        )
-
+    MovieMateScreenBackground(modifier = modifier) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = ScreenHeaderDefaults.ContentTopSpacing),
-            verticalArrangement = Arrangement.Center,
+                .padding(
+                    horizontal = MovieMateScreenDefaults.HorizontalPadding,
+                    vertical = MovieMateScreenDefaults.VerticalPadding
+                ),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                text = message,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MovieMateColors.SecondaryText
+            ScreenHeader(
+                title = title,
+                topBar = {}
             )
+
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = MovieMateScreenDefaults.ContentTopSpacing),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = message,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MovieMateColors.SecondaryText
+                )
+            }
         }
     }
 }
