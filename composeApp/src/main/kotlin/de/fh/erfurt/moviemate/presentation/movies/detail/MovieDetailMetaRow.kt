@@ -1,5 +1,6 @@
 package de.fh.erfurt.moviemate.presentation.movies.detail
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -59,12 +60,19 @@ private fun MovieDetailMetaChip(
         modifier = modifier.semantics {
             contentDescription = "${item.label}: ${item.value}"
         },
-        shape = RoundedCornerShape(MovieMateShapes.cardRadius),
-        color = MovieMateColors.SoftControl
+        shape = RoundedCornerShape(MovieMateShapes.chipRadius),
+        color = MovieMateColors.SoftControl,
+        border = BorderStroke(
+            width = MovieMateSpacing.dividerThickness,
+            color = MovieMateColors.SoftControlBorder
+        )
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 10.dp, vertical = 7.dp),
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            modifier = Modifier.padding(
+                horizontal = MovieMateSpacing.detailChipHorizontalPadding,
+                vertical = MovieMateSpacing.detailChipVerticalPadding
+            ),
+            horizontalArrangement = Arrangement.spacedBy(MovieMateSpacing.detailMicroSpacing),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(

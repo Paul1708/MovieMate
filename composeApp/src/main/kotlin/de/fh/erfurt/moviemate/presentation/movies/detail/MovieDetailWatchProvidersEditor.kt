@@ -41,7 +41,7 @@ internal fun WatchProvidersEditor(
         verticalArrangement = Arrangement.spacedBy(MovieMateSpacing.compactSpacing)
     ) {
         Text(
-            text = "Watch Providers",
+            text = "Providers",
             style = MaterialTheme.typography.titleSmall,
             color = MovieMateColors.PrimaryText,
             fontWeight = FontWeight.SemiBold

@@ -20,7 +20,7 @@ import de.fh.erfurt.moviemate.presentation.theme.MovieMateIcons
  */
 @Composable
 fun MovieDetailTopBar(
-    title: String,
+    title: String = "",
     onBackClicked: () -> Unit,
     actionLabel: String? = null,
     onActionClicked: (() -> Unit)? = null,
@@ -41,11 +41,13 @@ fun MovieDetailTopBar(
                 .padding(start = ScreenHeaderDefaults.HorizontalPadding)
         )
 
-        Text(
-            text = title,
-            style = MaterialTheme.typography.titleMedium,
-            color = MovieMateColors.PrimaryText
-        )
+        if (title.isNotBlank()) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleMedium,
+                color = MovieMateColors.PrimaryText
+            )
+        }
 
         if (actionLabel != null && onActionClicked != null) {
             TextButton(

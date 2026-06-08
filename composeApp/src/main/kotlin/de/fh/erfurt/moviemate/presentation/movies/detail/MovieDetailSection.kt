@@ -8,8 +8,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateColors
+import de.fh.erfurt.moviemate.presentation.theme.MovieMateSpacing
 
 /**
  * Textabschnitt der Detailansicht, zum Beispiel Beschreibung oder Kommentar.
@@ -32,8 +32,8 @@ fun MovieDetailSection(
         Text(
             text = body,
             style = MaterialTheme.typography.bodyMedium,
-            color = MovieMateColors.PrimaryText,
-            modifier = Modifier.padding(top = 8.dp)
+            color = MovieMateColors.SecondaryText,
+            modifier = Modifier.padding(top = MovieMateSpacing.compactSpacing)
         )
     }
 }

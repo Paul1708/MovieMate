@@ -25,11 +25,6 @@ internal fun MovieDetailUiModel.metaItems(): List<MovieDetailMetaItem> {
             icon = MovieMateIcons.year,
             label = "Year",
             value = releaseYear?.toString() ?: "Unknown"
-        ),
-        MovieDetailMetaItem(
-            icon = MovieMateIcons.watched,
-            label = "Status",
-            value = if (isWatched) "Watched" else "Watch later"
         )
     )
 }

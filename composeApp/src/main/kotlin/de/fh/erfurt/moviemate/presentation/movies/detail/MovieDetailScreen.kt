@@ -1,13 +1,12 @@
 package de.fh.erfurt.moviemate.presentation.movies.detail
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -15,15 +14,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import de.fh.erfurt.moviemate.movies.presentation.detail.MovieDetailUiState
+import de.fh.erfurt.moviemate.presentation.components.MovieMateScreenBackground
 import de.fh.erfurt.moviemate.presentation.components.ScreenEmptyState
 import de.fh.erfurt.moviemate.presentation.components.ScreenErrorState
 import de.fh.erfurt.moviemate.presentation.components.ScreenHeaderDefaults
 import de.fh.erfurt.moviemate.presentation.components.ScreenLoadingState
 import de.fh.erfurt.moviemate.presentation.preview.previewMovieDetailUiState
-import de.fh.erfurt.moviemate.presentation.theme.MovieMateColors
+import de.fh.erfurt.moviemate.presentation.theme.MovieMateSpacing
 
 /**
  * Oberster Detail-Screen für Anzeige, Bearbeitung und Ladezustände eines Films.
@@ -56,65 +57,69 @@ fun MovieDetailScreen(
         leaveEditMode()
     }
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .background(MovieMateColors.ScreenBackground)
-    ) {
-        MovieDetailTopBar(
-            title = "Detail",
-            onBackClicked = {
-                if (isEditMode) {
-                    leaveEditMode()
-                } else {
-                    onBackClicked()
-                }
-            },
-            actionLabel = movie?.let { if (isEditMode) "Cancel" else "Edit" },
-            onActionClicked = {
-                if (isEditMode) {
-                    leaveEditMode()
-                } else {
-                    onAction(MovieDetailAction.EditClicked)
+    MovieMateScreenBackground(modifier = modifier) {
+        when {
+            errorMessage != null -> MovieDetailStateScaffold(
+                onBackClicked = onBackClicked
+            ) {
+                ScreenErrorState(
+                    message = errorMessage,
+                    onRetryClicked = onRetryClicked,
+                    modifier = Modifier.padding(horizontal = ScreenHeaderDefaults.HorizontalPadding)
+                )
+            }
+
+            state.isLoading -> MovieDetailStateScaffold(
+                onBackClicked = onBackClicked
+            ) {
+                ScreenLoadingState(
+                    message = "Loading movie...",
+                    modifier = Modifier.padding(horizontal = ScreenHeaderDefaults.HorizontalPadding)
+                )
+            }
+
+            movie == null -> MovieDetailStateScaffold(
+                onBackClicked = onBackClicked
+            ) {
+                ScreenEmptyState(
+                    message = "Movie not found",
+                    modifier = Modifier.padding(horizontal = ScreenHeaderDefaults.HorizontalPadding)
+                )
+            }
+
+            isEditMode -> {
+                Column(modifier = Modifier.fillMaxSize()) {
+                    MovieDetailTopBar(
+                        title = "Edit movie",
+                        onBackClicked = { leaveEditMode() },
+                        actionLabel = "Cancel",
+                        onActionClicked = { leaveEditMode() },
+                        modifier = Modifier.padding(top = MovieMateSpacing.detailTopBarOverlayPadding)
+                    )
+
+                    MovieDetailEditContent(
+                        movie = movie,
+                        editState = editState,
+                        onAction = onAction,
+                        modifier = Modifier.fillMaxSize()
+                    )
                 }
             }
-        )
 
-        HorizontalDivider(
-            modifier = Modifier.fillMaxWidth(),
-            thickness = ScreenHeaderDefaults.DividerThickness,
-            color = MovieMateColors.Divider
-        )
+            else -> {
+                MovieDetailReadContent(
+                    movie = movie,
+                    onAction = onAction,
+                    modifier = Modifier.fillMaxSize()
+                )
 
-        when {
-            errorMessage != null -> ScreenErrorState(
-                message = errorMessage,
-                onRetryClicked = onRetryClicked,
-                modifier = Modifier.padding(horizontal = ScreenHeaderDefaults.HorizontalPadding)
-            )
-
-            state.isLoading -> ScreenLoadingState(
-                message = "Loading movie...",
-                modifier = Modifier.padding(horizontal = ScreenHeaderDefaults.HorizontalPadding)
-            )
-
-            movie == null -> ScreenEmptyState(
-                message = "Movie not found",
-                modifier = Modifier.padding(horizontal = ScreenHeaderDefaults.HorizontalPadding)
-            )
-
-            isEditMode -> MovieDetailEditContent(
-                movie = movie,
-                editState = editState,
-                onAction = onAction,
-                modifier = Modifier.fillMaxSize()
-            )
-
-            else -> MovieDetailReadContent(
-                movie = movie,
-                onAction = onAction,
-                modifier = Modifier.fillMaxSize()
-            )
+                MovieDetailTopBar(
+                    onBackClicked = onBackClicked,
+                    modifier = Modifier
+                        .align(Alignment.TopCenter)
+                        .padding(top = MovieMateSpacing.detailTopBarOverlayPadding)
+                )
+            }
         }
     }
 
@@ -127,6 +132,27 @@ fun MovieDetailScreen(
             onKeepEditing = {
                 showDiscardDialog = false
             }
+        )
+    }
+}
+
+@Composable
+private fun MovieDetailStateScaffold(
+    onBackClicked: () -> Unit,
+    content: @Composable BoxScope.() -> Unit
+) {
+    Column(modifier = Modifier.fillMaxSize()) {
+        MovieDetailTopBar(
+            title = "Movie details",
+            onBackClicked = onBackClicked,
+            modifier = Modifier.padding(top = MovieMateSpacing.detailTopBarOverlayPadding)
+        )
+
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = ScreenHeaderDefaults.ContentTopSpacing),
+            content = content
         )
     }
 }

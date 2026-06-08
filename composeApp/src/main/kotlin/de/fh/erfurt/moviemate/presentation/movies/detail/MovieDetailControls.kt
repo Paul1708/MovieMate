@@ -1,5 +1,10 @@
 package de.fh.erfurt.moviemate.presentation.movies.detail
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -8,12 +13,15 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateColors
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateIcons
@@ -57,6 +65,56 @@ internal fun WatchedControl(
             Switch(
                 checked = isWatched,
                 onCheckedChange = onWatchedChanged
+            )
+        }
+    }
+}
+
+/**
+ * Kompakter Status-Chip fuer die lesende Detailansicht.
+ */
+@Composable
+internal fun WatchedStatusChip(
+    isWatched: Boolean,
+    onWatchedChanged: (Boolean) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val label = if (isWatched) "Watched" else "Watch later"
+    val shape = RoundedCornerShape(MovieMateShapes.chipRadius)
+
+    Box(
+        modifier = modifier
+            .background(
+                color = if (isWatched) MovieMateColors.AccentContainer else MovieMateColors.SoftControl,
+                shape = shape
+            )
+            .border(
+                width = MovieMateSpacing.dividerThickness,
+                color = if (isWatched) MovieMateColors.AccentLight else MovieMateColors.SoftControlBorder,
+                shape = shape
+            )
+            .clickable { onWatchedChanged(!isWatched) }
+            .semantics { contentDescription = "Watch status: $label" }
+            .padding(
+                horizontal = MovieMateSpacing.detailChipHorizontalPadding,
+                vertical = MovieMateSpacing.detailChipVerticalPadding
+            ),
+        contentAlignment = Alignment.Center
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(MovieMateSpacing.detailMicroSpacing),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = MovieMateIcons.watched,
+                style = MaterialTheme.typography.labelSmall,
+                color = if (isWatched) MovieMateColors.AccentLight else MovieMateColors.SecondaryText
+            )
+            Text(
+                text = label,
+                style = MaterialTheme.typography.bodySmall,
+                color = MovieMateColors.PrimaryText,
+                fontWeight = FontWeight.SemiBold
             )
         }
     }
@@ -116,6 +174,17 @@ internal fun DetailTextField(
         minLines = minLines,
         singleLine = minLines == 1,
         keyboardOptions = keyboardOptions,
+        shape = RoundedCornerShape(MovieMateShapes.controlRadius),
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedContainerColor = MovieMateColors.SoftControl,
+            unfocusedContainerColor = MovieMateColors.SoftControl,
+            disabledContainerColor = MovieMateColors.SoftControl,
+            focusedBorderColor = MovieMateColors.AccentLight,
+            unfocusedBorderColor = MovieMateColors.SoftControlBorder,
+            focusedLabelColor = MovieMateColors.AccentLight,
+            unfocusedLabelColor = MovieMateColors.SecondaryText,
+            cursorColor = MovieMateColors.AccentLight
+        ),
         modifier = modifier.fillMaxWidth()
     )
 }

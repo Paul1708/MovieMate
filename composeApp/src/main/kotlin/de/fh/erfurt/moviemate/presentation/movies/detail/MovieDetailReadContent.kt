@@ -1,20 +1,29 @@
 package de.fh.erfurt.moviemate.presentation.movies.detail
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import de.fh.erfurt.moviemate.movies.presentation.detail.MovieDetailUiModel
 import de.fh.erfurt.moviemate.presentation.components.ScreenHeaderDefaults
@@ -24,7 +33,7 @@ import de.fh.erfurt.moviemate.presentation.theme.MovieMateShapes
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateSpacing
 
 /**
- * Lesende Detailansicht mit Poster, Metadaten, Bewertungen und Zusatzinfos.
+ * Read-only movie detail view in the dark mockup style.
  */
 @Composable
 internal fun MovieDetailReadContent(
@@ -32,75 +41,124 @@ internal fun MovieDetailReadContent(
     onAction: (MovieDetailAction) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Column(
-        modifier = modifier
-            .verticalScroll(rememberScrollState())
-            .padding(
-                start = ScreenHeaderDefaults.HorizontalPadding,
-                top = ScreenHeaderDefaults.ContentTopSpacing,
-                end = ScreenHeaderDefaults.HorizontalPadding,
-                bottom = ScreenHeaderDefaults.VerticalPadding
+    Box(modifier = modifier) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(bottom = MovieMateSpacing.detailReadBottomPadding)
+        ) {
+            MovieDetailPoster(
+                posterUrl = movie.posterUrl,
+                showPlayButton = true,
+                modifier = Modifier.height(MovieMateSpacing.detailHeroHeight)
             )
-    ) {
-        MovieDetailPoster(posterUrl = movie.posterUrl)
 
-        Spacer(modifier = Modifier.height(MovieMateSpacing.detailMediumSpacing))
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        horizontal = ScreenHeaderDefaults.HorizontalPadding,
+                        vertical = MovieMateSpacing.detailMediumSpacing
+                    )
+            ) {
+                Text(
+                    text = movie.title,
+                    style = MaterialTheme.typography.headlineSmall,
+                    color = MovieMateColors.PrimaryText,
+                    fontWeight = FontWeight.Bold
+                )
 
-        Text(
-            text = movie.title,
-            style = MaterialTheme.typography.headlineSmall,
-            color = MovieMateColors.PrimaryText,
-            fontWeight = FontWeight.Bold
-        )
+                Spacer(modifier = Modifier.height(MovieMateSpacing.compactSpacing))
 
-        Spacer(modifier = Modifier.height(MovieMateSpacing.titleSpacing))
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(MovieMateSpacing.fieldSpacing),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    RatingValue(
+                        value = movie.userRating?.let { "$it/10" } ?: "No rating"
+                    )
+                    WatchedStatusChip(
+                        isWatched = movie.isWatched,
+                        onWatchedChanged = { onAction(MovieDetailAction.WatchedChanged(it)) }
+                    )
+                }
 
-        MovieDetailMetaRow(items = movie.metaItems())
+                Spacer(modifier = Modifier.height(MovieMateSpacing.titleSpacing))
 
-        Spacer(modifier = Modifier.height(MovieMateSpacing.detailContentSpacing))
+                MovieDetailMetaRow(items = movie.metaItems())
 
-        RatingSummary(movie = movie)
+                Spacer(modifier = Modifier.height(MovieMateSpacing.detailContentSpacing))
 
-        Spacer(modifier = Modifier.height(MovieMateSpacing.detailContentSpacing))
+                RatingSummary(movie = movie)
 
-        WatchedControl(
-            isWatched = movie.isWatched,
-            onWatchedChanged = {
-                onAction(MovieDetailAction.WatchedChanged(it))
+                Spacer(modifier = Modifier.height(MovieMateSpacing.detailLargeSpacing))
+
+                MovieDetailSection(
+                    title = "About the movie",
+                    body = movie.description.ifBlank { "No description available." }
+                )
+
+                Spacer(modifier = Modifier.height(MovieMateSpacing.sectionSpacing))
+
+                MovieDetailSection(
+                    title = "Comment",
+                    body = movie.comment?.ifBlank { null } ?: "No comment available."
+                )
+
+                Spacer(modifier = Modifier.height(MovieMateSpacing.sectionSpacing))
+
+                WatchProviderReadSection(providers = movie.watchProviders)
             }
+        }
+
+        FloatingActionButton(
+            onClick = { onAction(MovieDetailAction.EditClicked) },
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(
+                    end = ScreenHeaderDefaults.HorizontalPadding,
+                    bottom = MovieMateSpacing.detailFloatingButtonBottomPadding
+                ),
+            shape = CircleShape,
+            containerColor = MovieMateColors.Accent,
+            contentColor = MovieMateColors.PrimaryText
+        ) {
+            Text(
+                text = "Edit",
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.Bold
+            )
+        }
+    }
+}
+
+@Composable
+private fun RatingValue(
+    value: String,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(MovieMateSpacing.detailMicroSpacing),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = MovieMateIcons.rating,
+            style = MaterialTheme.typography.titleMedium,
+            color = MovieMateColors.Rating
         )
-
-        Spacer(modifier = Modifier.height(MovieMateSpacing.detailLargeSpacing))
-
-        MovieDetailSection(
-            title = "About Movie",
-            body = movie.description.ifBlank { "No description available." }
-        )
-
-        Spacer(modifier = Modifier.height(MovieMateSpacing.sectionSpacing))
-
-        MovieDetailSection(
-            title = "Comment",
-            body = movie.comment?.ifBlank { null } ?: "No comment available."
-        )
-
-        Spacer(modifier = Modifier.height(MovieMateSpacing.sectionSpacing))
-
-        WatchProviderReadSection(
-            providers = movie.watchProviders
-        )
-
-        Spacer(modifier = Modifier.height(MovieMateSpacing.sectionSpacing))
-
-        DetailReadOnlyInfo(
-            label = "${MovieMateIcons.updated} Last edited",
-            value = movie.updatedAtLabel.ifBlank { "Unknown" }
+        Text(
+            text = value,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MovieMateColors.PrimaryText,
+            fontWeight = FontWeight.SemiBold
         )
     }
 }
 
 /**
- * Zeigt Benutzerbewertung und IMDb-Bewertung getrennt nebeneinander.
+ * Shows user rating and IMDb rating as separate cards.
  */
 @Composable
 private fun RatingSummary(
@@ -115,60 +173,69 @@ private fun RatingSummary(
             label = "User rating",
             value = movie.userRating?.let { "$it/10" } ?: "None",
             visual = movie.userRating?.toDouble()?.starText() ?: emptyStarText(),
+            visualColor = MovieMateColors.Rating,
             modifier = Modifier.weight(1f)
         )
         RatingCard(
-            label = "IMDb",
+            label = "IMDb rating",
             value = movie.imdbRating?.let { "$it/10" } ?: "None",
-            visual = movie.imdbRating?.starText() ?: emptyStarText(),
+            visual = "IMDb",
+            visualColor = MovieMateColors.Rating,
             modifier = Modifier.weight(1f)
         )
     }
 }
 
-/**
- * Kompakte Bewertungskarte mit Label, Sternanzeige und numerischem Wert.
- */
 @Composable
 private fun RatingCard(
     label: String,
     value: String,
     visual: String,
+    visualColor: Color,
     modifier: Modifier = Modifier
 ) {
     Surface(
         modifier = modifier,
         shape = RoundedCornerShape(MovieMateShapes.cardRadius),
-        color = MovieMateColors.CardBackground
+        color = MovieMateColors.CardBackgroundElevated,
+        border = BorderStroke(
+            width = MovieMateSpacing.dividerThickness,
+            color = MovieMateColors.CardBorder
+        )
     ) {
         Column(
             modifier = Modifier.padding(MovieMateSpacing.detailCardPadding)
         ) {
             Text(
                 text = label,
-                style = MaterialTheme.typography.labelMedium,
-                color = MovieMateColors.SecondaryText
+                style = MaterialTheme.typography.labelSmall,
+                color = MovieMateColors.SecondaryText,
+                fontWeight = FontWeight.SemiBold
             )
-            Text(
-                text = visual,
-                style = MaterialTheme.typography.titleSmall,
-                color = MovieMateColors.PrimaryText,
-                fontWeight = FontWeight.SemiBold,
-                modifier = Modifier.padding(top = MovieMateSpacing.detailTinySpacing)
-            )
-            Text(
-                text = value,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MovieMateColors.PrimaryText,
-                modifier = Modifier.padding(top = MovieMateSpacing.detailMicroSpacing)
-            )
+
+            Spacer(modifier = Modifier.height(MovieMateSpacing.detailTinySpacing))
+
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(MovieMateSpacing.compactSpacing),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = visual,
+                    style = MaterialTheme.typography.labelMedium,
+                    color = visualColor,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = value,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MovieMateColors.PrimaryText,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
         }
     }
 }
 
-/**
- * Lesende Liste der verfügbaren Anbieter für den Film.
- */
 @Composable
 private fun WatchProviderReadSection(
     providers: List<String>,
@@ -176,7 +243,7 @@ private fun WatchProviderReadSection(
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
         Text(
-            text = "Watch Providers",
+            text = "Providers",
             style = MaterialTheme.typography.titleMedium,
             color = MovieMateColors.PrimaryText,
             fontWeight = FontWeight.Bold
@@ -190,17 +257,43 @@ private fun WatchProviderReadSection(
                 modifier = Modifier.padding(top = MovieMateSpacing.compactSpacing)
             )
         } else {
-            Column(
-                modifier = Modifier.padding(top = MovieMateSpacing.compactSpacing),
-                verticalArrangement = Arrangement.spacedBy(MovieMateSpacing.compactSpacing)
+            LazyRow(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = MovieMateSpacing.compactSpacing),
+                horizontalArrangement = Arrangement.spacedBy(MovieMateSpacing.compactSpacing)
             ) {
-                providers.forEach { provider ->
-                    DetailReadOnlyInfo(
-                        label = MovieMateIcons.provider,
-                        value = provider
-                    )
+                items(providers, key = { it }) { provider ->
+                    ProviderChip(provider = provider)
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun ProviderChip(
+    provider: String,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier,
+        shape = RoundedCornerShape(MovieMateShapes.chipRadius),
+        color = MovieMateColors.SoftControl,
+        border = BorderStroke(
+            width = MovieMateSpacing.dividerThickness,
+            color = MovieMateColors.SoftControlBorder
+        )
+    ) {
+        Text(
+            text = provider,
+            style = MaterialTheme.typography.bodySmall,
+            color = MovieMateColors.PrimaryText,
+            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier.padding(
+                horizontal = MovieMateSpacing.detailChipHorizontalPadding,
+                vertical = MovieMateSpacing.detailChipVerticalPadding
+            )
+        )
     }
 }

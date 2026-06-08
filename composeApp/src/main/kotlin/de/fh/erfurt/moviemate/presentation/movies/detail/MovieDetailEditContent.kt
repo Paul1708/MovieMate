@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
@@ -42,7 +43,8 @@ internal fun MovieDetailEditContent(
     ) {
         MovieDetailPoster(
             posterUrl = movie.posterUrl,
-            onClick = { onAction(MovieDetailAction.ImageClicked) }
+            onClick = { onAction(MovieDetailAction.ImageClicked) },
+            modifier = Modifier.height(MovieMateSpacing.detailEditPosterHeight)
         )
 
         DetailTextField(
@@ -59,7 +61,7 @@ internal fun MovieDetailEditContent(
 
         DetailTextField(
             value = editState.description,
-            label = "About Movie",
+            label = "About the movie",
             onValueChange = { onAction(MovieDetailAction.DescriptionChanged(it)) },
             minLines = 4
         )
@@ -67,7 +69,7 @@ internal fun MovieDetailEditContent(
         Row(horizontalArrangement = Arrangement.spacedBy(MovieMateSpacing.fieldSpacing)) {
             DetailTextField(
                 value = editState.releaseYear,
-                label = "Publishing year",
+                label = "Year",
                 onValueChange = { onAction(MovieDetailAction.ReleaseYearChanged(it)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier.weight(1f)
