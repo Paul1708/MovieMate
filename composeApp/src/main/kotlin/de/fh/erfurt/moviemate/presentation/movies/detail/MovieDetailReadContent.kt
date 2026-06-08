@@ -28,7 +28,6 @@ import androidx.compose.ui.text.font.FontWeight
 import de.fh.erfurt.moviemate.movies.presentation.detail.MovieDetailUiModel
 import de.fh.erfurt.moviemate.presentation.components.ScreenHeaderDefaults
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateColors
-import de.fh.erfurt.moviemate.presentation.theme.MovieMateIcons
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateShapes
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateSpacing
 
@@ -69,21 +68,6 @@ internal fun MovieDetailReadContent(
                     fontWeight = FontWeight.Bold
                 )
 
-                Spacer(modifier = Modifier.height(MovieMateSpacing.compactSpacing))
-
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(MovieMateSpacing.fieldSpacing),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    RatingValue(
-                        value = movie.userRating?.let { "$it/10" } ?: "No rating"
-                    )
-                    WatchedStatusChip(
-                        isWatched = movie.isWatched,
-                        onWatchedChanged = { onAction(MovieDetailAction.WatchedChanged(it)) }
-                    )
-                }
-
                 Spacer(modifier = Modifier.height(MovieMateSpacing.titleSpacing))
 
                 MovieDetailMetaRow(items = movie.metaItems())
@@ -91,6 +75,13 @@ internal fun MovieDetailReadContent(
                 Spacer(modifier = Modifier.height(MovieMateSpacing.detailContentSpacing))
 
                 RatingSummary(movie = movie)
+
+                Spacer(modifier = Modifier.height(MovieMateSpacing.titleSpacing))
+
+                WatchedStatusChip(
+                    isWatched = movie.isWatched,
+                    onWatchedChanged = { onAction(MovieDetailAction.WatchedChanged(it)) }
+                )
 
                 Spacer(modifier = Modifier.height(MovieMateSpacing.detailLargeSpacing))
 
@@ -130,30 +121,6 @@ internal fun MovieDetailReadContent(
                 fontWeight = FontWeight.Bold
             )
         }
-    }
-}
-
-@Composable
-private fun RatingValue(
-    value: String,
-    modifier: Modifier = Modifier
-) {
-    Row(
-        modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(MovieMateSpacing.detailMicroSpacing),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = MovieMateIcons.rating,
-            style = MaterialTheme.typography.titleMedium,
-            color = MovieMateColors.Rating
-        )
-        Text(
-            text = value,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MovieMateColors.PrimaryText,
-            fontWeight = FontWeight.SemiBold
-        )
     }
 }
 

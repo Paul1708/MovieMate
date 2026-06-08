@@ -27,12 +27,15 @@ object MovieMateSpacing {
     val dividerThickness = 1.dp
     val noElevation = 0.dp
     val topBarIconSize = 36.dp
+    val bottomBarHeight = 72.dp
+    val navigationContentBottomPadding = 72.dp
     val detailControlHorizontalPadding = 12.dp
     val detailControlVerticalPadding = 10.dp
     val detailCardPadding = 12.dp
     val detailChipHorizontalPadding = 12.dp
     val detailChipVerticalPadding = 8.dp
     val detailInfoVerticalPadding = 9.dp
+    val detailStatusButtonHeight = 50.dp
     val detailHeroHeight = 270.dp
     val detailHeroOverlayHeight = 118.dp
     val detailEditPosterHeight = 170.dp

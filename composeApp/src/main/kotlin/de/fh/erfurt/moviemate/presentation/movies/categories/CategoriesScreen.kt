@@ -55,9 +55,9 @@ fun CategoriesScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(
-                    horizontal = ScreenHeaderDefaults.HorizontalPadding,
-                    vertical = ScreenHeaderDefaults.VerticalPadding
-                ),
+                    horizontal = ScreenHeaderDefaults.HorizontalPadding
+                )
+                .padding(top = ScreenHeaderDefaults.VerticalPadding),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             CategoriesTopBar(
@@ -150,7 +150,7 @@ private fun CategoriesGrid(
         columns = GridCells.Fixed(2),
         verticalArrangement = Arrangement.spacedBy(MovieMateSpacing.categoryGridSpacing),
         horizontalArrangement = Arrangement.spacedBy(MovieMateSpacing.categoryGridSpacing),
-        contentPadding = PaddingValues(bottom = 92.dp),
+        contentPadding = PaddingValues(bottom = MovieMateSpacing.navigationContentBottomPadding),
         modifier = Modifier.fillMaxSize()
     ) {
         items(categories, key = { it.type.name }) { category ->

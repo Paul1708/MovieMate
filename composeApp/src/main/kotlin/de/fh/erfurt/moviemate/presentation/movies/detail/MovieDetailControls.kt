@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -84,6 +85,8 @@ internal fun WatchedStatusChip(
 
     Box(
         modifier = modifier
+            .fillMaxWidth()
+            .height(MovieMateSpacing.detailStatusButtonHeight)
             .background(
                 color = if (isWatched) MovieMateColors.AccentContainer else MovieMateColors.SoftControl,
                 shape = shape
@@ -112,9 +115,9 @@ internal fun WatchedStatusChip(
             )
             Text(
                 text = label,
-                style = MaterialTheme.typography.bodySmall,
+                style = MaterialTheme.typography.titleSmall,
                 color = MovieMateColors.PrimaryText,
-                fontWeight = FontWeight.SemiBold
+                fontWeight = FontWeight.Bold
             )
         }
     }
