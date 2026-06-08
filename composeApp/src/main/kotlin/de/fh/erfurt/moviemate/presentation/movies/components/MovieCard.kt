@@ -1,5 +1,6 @@
 package de.fh.erfurt.moviemate.presentation.movies.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -21,6 +22,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
@@ -52,23 +55,27 @@ fun MovieCard(
             .semantics {
                 contentDescription =
                     "Movie ${movie.title}, rating ${movie.ratingText}, category ${movie.categoryText}, year ${movie.yearText}"
-            },
+        },
         shape = RoundedCornerShape(MovieMateShapes.cardRadius),
         colors = CardDefaults.cardColors(containerColor = MovieMateColors.CardBackground),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+        border = BorderStroke(1.dp, MovieMateColors.CardBorder),
+        elevation = CardDefaults.cardElevation(defaultElevation = MovieMateSpacing.noElevation)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
+                .fillMaxHeight()
                 .padding(MovieMateSpacing.cardPadding),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.Top
         ) {
-            PosterPlaceholder()
+            PosterPlaceholder(title = movie.title)
 
             Spacer(modifier = Modifier.width(14.dp))
 
             Column(
-                modifier = Modifier.fillMaxHeight(),
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight(),
                 verticalArrangement = Arrangement.Center
             ) {
                 Text(
@@ -80,13 +87,21 @@ fun MovieCard(
                     overflow = TextOverflow.Ellipsis
                 )
 
-                Spacer(modifier = Modifier.height(7.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
-                MovieMetaRow(icon = MovieMateIcons.rating, text = movie.ratingText)
-                MovieMetaRow(icon = MovieMateIcons.category, text = movie.categoryText)
-                MovieMetaRow(icon = MovieMateIcons.year, text = movie.yearText)
+                MovieRatingRow(text = movie.ratingText)
+                Spacer(modifier = Modifier.height(7.dp))
+                MovieMetaRow(icon = MovieMateIcons.category, text = movie.categoryYearText())
+                Spacer(modifier = Modifier.height(5.dp))
                 MovieMetaRow(icon = MovieMateIcons.runtime, text = movie.runtimeText)
             }
+
+            Text(
+                text = MovieMateIcons.more,
+                style = MaterialTheme.typography.titleMedium,
+                color = MovieMateColors.SecondaryText,
+                modifier = Modifier.padding(start = 8.dp)
+            )
         }
     }
 }
@@ -99,17 +114,49 @@ fun MovieCard(
  * Mockup nachzubauen.
  */
 @Composable
-private fun PosterPlaceholder() {
+private fun PosterPlaceholder(title: String) {
+    val initial = title.firstOrNull()?.uppercaseChar()?.toString() ?: MovieMateIcons.image
     Box(
         modifier = Modifier
             .size(width = MovieMateSpacing.moviePosterWidth, height = MovieMateSpacing.moviePosterHeight)
-            .background(MovieMateColors.PosterPlaceholder, RoundedCornerShape(MovieMateShapes.posterRadius)),
+            .clip(RoundedCornerShape(MovieMateShapes.posterRadius))
+            .background(
+                Brush.linearGradient(
+                    colors = listOf(
+                        MovieMateColors.AccentContainer,
+                        MovieMateColors.PosterPlaceholder,
+                        MovieMateColors.CardBackgroundElevated
+                    )
+                )
+            ),
         contentAlignment = Alignment.Center
     ) {
         Text(
-            text = MovieMateIcons.image,
+            text = initial,
+            color = MovieMateColors.AccentLight,
+            style = MaterialTheme.typography.headlineMedium,
+            fontWeight = FontWeight.Bold
+        )
+    }
+}
+
+@Composable
+private fun MovieRatingRow(text: String) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(6.dp)
+    ) {
+        Text(
+            text = MovieMateIcons.rating,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MovieMateColors.Rating
+        )
+        Text(
+            text = text,
+            style = MaterialTheme.typography.bodyMedium,
             color = MovieMateColors.PrimaryText,
-            style = MaterialTheme.typography.headlineSmall
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
         )
     }
 }
@@ -133,14 +180,20 @@ private fun MovieMetaRow(
         Text(
             text = icon,
             style = MaterialTheme.typography.bodySmall,
-            color = MovieMateColors.SecondaryText
+            color = MovieMateColors.MutedText
         )
         Text(
             text = text,
             style = MaterialTheme.typography.bodySmall,
-            color = MovieMateColors.PrimaryText,
+            color = MovieMateColors.SecondaryText,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )
     }
+}
+
+private fun MovieUiModel.categoryYearText(): String {
+    return listOf(categoryText, yearText)
+        .filter { it.isNotBlank() }
+        .joinToString(separator = " - ")
 }

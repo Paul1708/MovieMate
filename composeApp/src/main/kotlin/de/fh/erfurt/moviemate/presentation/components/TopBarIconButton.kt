@@ -1,6 +1,7 @@
 package de.fh.erfurt.moviemate.presentation.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
@@ -32,14 +33,19 @@ fun TopBarIconButton(
         modifier = modifier
             .size(MovieMateSpacing.topBarIconSize)
             .background(MovieMateColors.SoftControl, CircleShape)
+            .border(
+                width = MovieMateSpacing.dividerThickness,
+                color = MovieMateColors.SoftControlBorder,
+                shape = CircleShape
+            )
             .clickable(onClick = onClick)
             .semantics { this.contentDescription = contentDescription },
         contentAlignment = Alignment.Center
     ) {
         Text(
             text = text,
-            style = MaterialTheme.typography.titleSmall,
-            color = MovieMateColors.SecondaryText
+            style = MaterialTheme.typography.titleMedium,
+            color = MovieMateColors.PrimaryText
         )
     }
 }

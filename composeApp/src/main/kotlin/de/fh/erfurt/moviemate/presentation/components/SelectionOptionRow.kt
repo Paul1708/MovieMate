@@ -5,10 +5,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import de.fh.erfurt.moviemate.presentation.theme.MovieMateColors
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateSpacing
 
 /**
@@ -30,10 +32,15 @@ fun SelectionOptionRow(
     ) {
         RadioButton(
             selected = selected,
-            onClick = onClick
+            onClick = onClick,
+            colors = RadioButtonDefaults.colors(
+                selectedColor = MovieMateColors.Accent,
+                unselectedColor = MovieMateColors.MutedText
+            )
         )
         Text(
             text = label,
+            color = if (selected) MovieMateColors.PrimaryText else MovieMateColors.SecondaryText,
             modifier = Modifier.padding(start = MovieMateSpacing.dialogTextStartPadding)
         )
     }

@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -12,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
+import de.fh.erfurt.moviemate.presentation.theme.MovieMateColors
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateSpacing
 
 /**
@@ -28,10 +30,11 @@ fun ScreenLoadingState(
             .padding(top = MovieMateSpacing.stateTopSpacing),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        CircularProgressIndicator()
+        CircularProgressIndicator(color = MovieMateColors.Accent)
         Text(
             text = message,
             style = MaterialTheme.typography.bodyMedium,
+            color = MovieMateColors.SecondaryText,
             modifier = Modifier.padding(top = MovieMateSpacing.titleSpacing)
         )
     }
@@ -48,6 +51,7 @@ fun ScreenEmptyState(
     Text(
         text = message,
         style = MaterialTheme.typography.bodyMedium,
+        color = MovieMateColors.SecondaryText,
         textAlign = TextAlign.Center,
         modifier = modifier
             .fillMaxWidth()
@@ -74,9 +78,16 @@ fun ScreenErrorState(
         Text(
             text = message,
             style = MaterialTheme.typography.bodyMedium,
+            color = MovieMateColors.SecondaryText,
             textAlign = TextAlign.Center
         )
-        Button(onClick = onRetryClicked) {
+        Button(
+            onClick = onRetryClicked,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MovieMateColors.Accent,
+                contentColor = MovieMateColors.PrimaryText
+            )
+        ) {
             Text("Retry")
         }
     }

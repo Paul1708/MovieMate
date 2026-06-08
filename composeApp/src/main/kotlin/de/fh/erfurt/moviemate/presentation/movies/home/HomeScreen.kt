@@ -1,28 +1,34 @@
 package de.fh.erfurt.moviemate.presentation.movies.home
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import de.fh.erfurt.moviemate.presentation.theme.MovieMateColors
+import androidx.compose.ui.unit.dp
+import de.fh.erfurt.moviemate.presentation.components.MovieMateScreenBackground
 import de.fh.erfurt.moviemate.presentation.components.ScreenEmptyState
 import de.fh.erfurt.moviemate.presentation.components.ScreenErrorState
-import de.fh.erfurt.moviemate.presentation.components.ScreenHeader
 import de.fh.erfurt.moviemate.presentation.components.ScreenHeaderDefaults
 import de.fh.erfurt.moviemate.presentation.components.ScreenLoadingState
 import de.fh.erfurt.moviemate.presentation.components.SearchField
 import de.fh.erfurt.moviemate.presentation.movies.components.MovieCard
 import de.fh.erfurt.moviemate.presentation.preview.previewHomeUiState
+import de.fh.erfurt.moviemate.presentation.theme.MovieMateColors
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateSpacing
 
 /**
@@ -39,73 +45,91 @@ fun HomeScreen(
     onAction: (HomeUiAction) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .background(MovieMateColors.ScreenBackground)
-            .padding(
-                horizontal = ScreenHeaderDefaults.HorizontalPadding,
-                vertical = ScreenHeaderDefaults.VerticalPadding
-            ),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        ScreenHeader(
-            title = "Home",
-            topBar = {
-                HomeTopBar(
-                    selectedTab = state.selectedTab,
-                    onTabSelected = { onAction(HomeUiAction.TabSelected(it)) },
-                    onSearchClicked = { onAction(HomeUiAction.SearchClicked) },
-                    onFilterClicked = { onAction(HomeUiAction.FilterClicked) },
-                    onSortClicked = { onAction(HomeUiAction.SortClicked) }
+    MovieMateScreenBackground(modifier = modifier) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(
+                    horizontal = ScreenHeaderDefaults.HorizontalPadding,
+                    vertical = ScreenHeaderDefaults.VerticalPadding
+                ),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            HomeTopBar(
+                selectedTab = state.selectedTab,
+                onTabSelected = { onAction(HomeUiAction.TabSelected(it)) },
+                onSearchClicked = { onAction(HomeUiAction.SearchClicked) },
+                onFilterClicked = { onAction(HomeUiAction.FilterClicked) }
+            )
+
+            if (state.isSearchVisible) {
+                Spacer(modifier = Modifier.height(MovieMateSpacing.fieldSpacing))
+                SearchField(
+                    value = state.searchQuery,
+                    onValueChange = { onAction(HomeUiAction.SearchChanged(it)) },
+                    placeholder = "Find a movie",
+                    modifier = Modifier.fillMaxWidth()
                 )
             }
-        )
 
-        if (state.isSearchVisible) {
-            Spacer(modifier = Modifier.height(MovieMateSpacing.fieldSpacing))
-            SearchField(
-                value = state.searchQuery,
-                onValueChange = { onAction(HomeUiAction.SearchChanged(it)) },
-                placeholder = "Find a movie",
-                modifier = Modifier.fillMaxWidth()
-            )
-        }
+            Spacer(modifier = Modifier.height(ScreenHeaderDefaults.ContentTopSpacing))
 
-        Spacer(modifier = Modifier.height(ScreenHeaderDefaults.ContentTopSpacing))
-
-        if (state.errorMessage != null) {
-            ScreenErrorState(
-                message = state.errorMessage,
-                onRetryClicked = { onAction(HomeUiAction.RetryClicked) }
-            )
-        } else if (state.isLoading) {
-            ScreenLoadingState(message = "Loading movies...")
-        } else if (state.movies.isEmpty()) {
-            ScreenEmptyState(message = "No movies found")
-        } else {
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(MovieMateSpacing.itemSpacing),
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(top = MovieMateSpacing.listTopPadding)
-            ) {
-                items(state.movies, key = { it.id }) { movie ->
-                    MovieCard(
-                        movie = movie,
-                        onClick = { onAction(HomeUiAction.MovieClicked(movie.id)) },
-                        modifier = Modifier.fillMaxWidth()
-                    )
+            if (state.errorMessage != null) {
+                ScreenErrorState(
+                    message = state.errorMessage,
+                    onRetryClicked = { onAction(HomeUiAction.RetryClicked) }
+                )
+            } else if (state.isLoading) {
+                ScreenLoadingState(message = "Loading movies...")
+            } else if (state.movies.isEmpty()) {
+                ScreenEmptyState(message = "No movies found")
+            } else {
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(MovieMateSpacing.itemSpacing),
+                    contentPadding = PaddingValues(bottom = 92.dp),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top = MovieMateSpacing.listTopPadding)
+                ) {
+                    items(state.movies, key = { it.id }) { movie ->
+                        MovieCard(
+                            movie = movie,
+                            onClick = { onAction(HomeUiAction.MovieClicked(movie.id)) },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
                 }
             }
+        }
+
+        FloatingActionButton(
+            onClick = { onAction(HomeUiAction.AddClicked) },
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(
+                    end = ScreenHeaderDefaults.HorizontalPadding,
+                    bottom = MovieMateSpacing.detailLargeSpacing
+                ),
+            shape = CircleShape,
+            containerColor = MovieMateColors.Accent,
+            contentColor = MovieMateColors.PrimaryText
+        ) {
+            Text(
+                text = "+",
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.Medium
+            )
         }
     }
 
     if (state.isFilterDialogVisible) {
         HomeFilterDialog(
             selectedCategory = state.selectedCategory,
+            selectedSortBy = state.selectedSortBy,
             onCategorySelected = { onAction(HomeUiAction.CategorySelected(it)) },
+            onSortSelected = { onAction(HomeUiAction.SortSelected(it)) },
             onClearClicked = { onAction(HomeUiAction.ClearCategoryFilterClicked) },
+            onClearSortClicked = { onAction(HomeUiAction.ClearSortClicked) },
             onDismiss = { onAction(HomeUiAction.FilterDismissed) }
         )
     }

@@ -9,6 +9,7 @@ object MovieMateIcons {
     const val search = "⌕"
     const val filter = "▾"
     const val sort = "↕"
+    const val more = "⋮"
     const val remove = "x"
 
     const val rating = "★"

@@ -81,6 +81,11 @@ fun MovieMateApp(
                     initialCategory = initialCategory,
                     onMovieSelected = { movieId ->
                         navController.navigate(MovieMateDestination.detailRoute(movieId))
+                    },
+                    onAddClicked = {
+                        navController.navigate(MovieMateDestination.Add) {
+                            launchSingleTop = true
+                        }
                     }
                 )
             }

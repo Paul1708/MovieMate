@@ -15,7 +15,8 @@ import de.fh.erfurt.moviemate.presentation.movies.home.HomeUiAction
 fun HomePreviewRoute(
     initialCategory: CategoryType? = null,
     modifier: Modifier = Modifier,
-    onMovieSelected: (String) -> Unit = {}
+    onMovieSelected: (String) -> Unit = {},
+    onAddClicked: () -> Unit = {}
 ) {
     val stateHolder = remember { HomePreviewStateHolder(initialCategory = initialCategory) }
 
@@ -31,6 +32,9 @@ fun HomePreviewRoute(
             stateHolder.onAction(action)
             if (action is HomeUiAction.MovieClicked) {
                 onMovieSelected(action.movieId)
+            }
+            if (action == HomeUiAction.AddClicked) {
+                onAddClicked()
             }
         },
         modifier = modifier

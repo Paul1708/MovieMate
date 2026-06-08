@@ -4,8 +4,8 @@ import androidx.compose.ui.unit.dp
 
 object MovieMateSpacing {
     val screenHorizontalPadding = 18.dp
-    val screenVerticalPadding = 18.dp
-    val contentTopSpacing = 18.dp
+    val screenVerticalPadding = 20.dp
+    val contentTopSpacing = 16.dp
     val itemSpacing = 14.dp
     val compactSpacing = 8.dp
     val fieldSpacing = 10.dp
@@ -18,15 +18,15 @@ object MovieMateSpacing {
     val dialogRowVerticalPadding = 2.dp
     val dialogTextStartPadding = 8.dp
     val listTopPadding = 2.dp
-    val cardPadding = 9.dp
-    val sectionSpacing = 18.dp
+    val cardPadding = 10.dp
+    val sectionSpacing = 16.dp
     val titleSpacing = 12.dp
 
-    val titleHeight = 44.dp
+    val titleHeight = 42.dp
     val topBarHeight = 44.dp
-    val dividerThickness = 2.dp
+    val dividerThickness = 1.dp
     val noElevation = 0.dp
-    val topBarIconSize = 28.dp
+    val topBarIconSize = 36.dp
     val detailControlHorizontalPadding = 12.dp
     val detailControlVerticalPadding = 10.dp
     val detailCardPadding = 12.dp
@@ -34,9 +34,9 @@ object MovieMateSpacing {
     val detailChipVerticalPadding = 8.dp
     val detailInfoVerticalPadding = 9.dp
 
-    val movieCardHeight = 126.dp
-    val moviePosterWidth = 96.dp
-    val moviePosterHeight = 108.dp
+    val movieCardHeight = 132.dp
+    val moviePosterWidth = 84.dp
+    val moviePosterHeight = 112.dp
 
     val categoryGridSpacing = 28.dp
     val categoryFolderWidth = 82.dp

@@ -1,10 +1,12 @@
 package de.fh.erfurt.moviemate.presentation.app.navigation
 
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateColors
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateSpacing
 
@@ -28,12 +30,22 @@ fun BottomBar(
             NavigationBarItem(
                 selected = selectedItem == item,
                 onClick = { onItemSelected(item) },
-                icon = { Text(item.iconText) },
-                label = { Text(item.label) },
+                icon = {
+                    Text(
+                        text = item.iconText,
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                },
+                label = {
+                    Text(
+                        text = item.label,
+                        style = MaterialTheme.typography.labelSmall
+                    )
+                },
                 colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = MovieMateColors.PrimaryText,
-                    selectedTextColor = MovieMateColors.PrimaryText,
-                    indicatorColor = MovieMateColors.SoftControl,
+                    selectedIconColor = MovieMateColors.AccentLight,
+                    selectedTextColor = MovieMateColors.AccentLight,
+                    indicatorColor = Color.Transparent,
                     unselectedIconColor = MovieMateColors.SecondaryText,
                     unselectedTextColor = MovieMateColors.SecondaryText
                 )

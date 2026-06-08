@@ -1,15 +1,15 @@
 package de.fh.erfurt.moviemate.presentation.theme
 
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.lightColorScheme
+import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 
-private val MovieMateColorScheme = lightColorScheme(
+private val MovieMateColorScheme = darkColorScheme(
     background = MovieMateColors.ScreenBackground,
     surface = MovieMateColors.CardBackground,
     onSurface = MovieMateColors.PrimaryText,
-    primary = MovieMateColors.PrimaryText,
-    onPrimary = MovieMateColors.CardBackground,
+    primary = MovieMateColors.Accent,
+    onPrimary = MovieMateColors.PrimaryText,
     secondary = MovieMateColors.SecondaryText,
     surfaceVariant = MovieMateColors.SoftControl,
     outline = MovieMateColors.Divider

@@ -51,6 +51,7 @@ class HomePreviewStateHolder(
             HomeUiAction.FilterDismissed -> updateState(isFilterDialogVisible = false)
             HomeUiAction.SortDismissed -> updateState(isSortDialogVisible = false)
             is HomeUiAction.MovieClicked -> Unit
+            HomeUiAction.AddClicked -> Unit
             HomeUiAction.RetryClicked -> updateState()
         }
     }

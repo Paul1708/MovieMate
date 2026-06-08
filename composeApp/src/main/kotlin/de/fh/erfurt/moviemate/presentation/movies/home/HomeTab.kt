@@ -6,5 +6,5 @@ enum class HomeTab(
 ) {
     All("All"),
     Watched("Watched"),
-    WatchLater("watch later")
+    WatchLater("Watchlist")
 }

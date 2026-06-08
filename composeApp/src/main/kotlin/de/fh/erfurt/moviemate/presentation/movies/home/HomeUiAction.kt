@@ -17,5 +17,6 @@ sealed interface HomeUiAction {
     data object FilterDismissed : HomeUiAction
     data object SortDismissed : HomeUiAction
     data class MovieClicked(val movieId: String) : HomeUiAction
+    data object AddClicked : HomeUiAction
     data object RetryClicked : HomeUiAction
 }

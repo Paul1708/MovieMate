@@ -8,6 +8,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import de.fh.erfurt.moviemate.movies.domain.repository.movie.SortBy
 import de.fh.erfurt.moviemate.presentation.components.SelectionOptionRow
+import de.fh.erfurt.moviemate.presentation.theme.MovieMateColors
 
 /**
  * Eigener Dialog für die Sortierung der Homescreen-Liste.
@@ -24,6 +25,9 @@ fun HomeSortDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
+        containerColor = MovieMateColors.CardBackground,
+        titleContentColor = MovieMateColors.PrimaryText,
+        textContentColor = MovieMateColors.SecondaryText,
         title = {
             Text("Sort")
         },
@@ -45,7 +49,7 @@ fun HomeSortDialog(
         },
         dismissButton = {
             TextButton(onClick = onClearClicked) {
-                Text("Clear")
+                Text("Reset")
             }
         }
     )
