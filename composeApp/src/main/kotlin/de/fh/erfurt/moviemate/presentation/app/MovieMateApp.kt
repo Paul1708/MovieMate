@@ -20,6 +20,7 @@ import de.fh.erfurt.moviemate.presentation.app.navigation.selectedBottomNavItem
 import de.fh.erfurt.moviemate.presentation.app.navigation.toCategoryTypeOrNull
 import de.fh.erfurt.moviemate.presentation.app.navigation.toRoute
 import de.fh.erfurt.moviemate.presentation.components.PlaceholderScreen
+import de.fh.erfurt.moviemate.presentation.preview.AddMoviePreviewRoute
 import de.fh.erfurt.moviemate.presentation.preview.CategoriesPreviewRoute
 import de.fh.erfurt.moviemate.presentation.preview.HomePreviewRoute
 import de.fh.erfurt.moviemate.presentation.preview.MovieDetailPreviewRoute
@@ -125,9 +126,10 @@ fun MovieMateApp(
             }
 
             composable(MovieMateDestination.Add) {
-                PlaceholderScreen(
-                    title = "Add",
-                    message = "Add screen is prepared."
+                AddMoviePreviewRoute(
+                    onCloseClicked = {
+                        navController.popBackStack()
+                    }
                 )
             }
 

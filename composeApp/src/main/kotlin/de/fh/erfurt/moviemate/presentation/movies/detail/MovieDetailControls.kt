@@ -168,12 +168,16 @@ internal fun DetailTextField(
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
     minLines: Int = 1,
-    keyboardOptions: KeyboardOptions = KeyboardOptions.Default
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    placeholder: String? = null
 ) {
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
         label = { Text(label) },
+        placeholder = placeholder?.let { placeholderText ->
+            { Text(placeholderText) }
+        },
         minLines = minLines,
         singleLine = minLines == 1,
         keyboardOptions = keyboardOptions,
