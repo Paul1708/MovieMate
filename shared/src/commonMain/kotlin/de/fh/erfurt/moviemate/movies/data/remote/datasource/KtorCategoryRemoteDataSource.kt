@@ -2,6 +2,8 @@ package de.fh.erfurt.moviemate.movies.data.remote.datasource
 
 import de.fh.erfurt.moviemate.movies.data.remote.client.MoviesApiConfiguration
 import de.fh.erfurt.moviemate.movies.data.remote.dto.CategoryDto
+import de.fh.erfurt.moviemate.movies.data.remote.dto.CreateCategoryRequestDto
+import de.fh.erfurt.moviemate.movies.data.remote.dto.UpdateCategoryRequestDto
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.delete
@@ -27,5 +29,23 @@ class KtorCategoryRemoteDataSource(
         val response = httpClient.get(apiConfiguration.categoryItemUrl(categoryId))
         if (response.status == HttpStatusCode.NotFound) return null
         return response.body()
+    }
+
+    override suspend fun createCategory(request: CreateCategoryRequestDto): CategoryDto {
+        return httpClient.post(apiConfiguration.categoriesCollectionUrl()) {
+            contentType(ContentType.Application.Json)
+            setBody(request)
+        }.body()
+    }
+
+    override suspend fun updateCategory(categoryId: String, request: UpdateCategoryRequestDto): CategoryDto {
+        return httpClient.put(apiConfiguration.categoryItemUrl(categoryId)) {
+            contentType(ContentType.Application.Json)
+            setBody(request)
+        }.body()
+    }
+
+    override suspend fun deleteCategory(categoryId: String) {
+        httpClient.delete(apiConfiguration.categoryItemUrl(categoryId))
     }
 }

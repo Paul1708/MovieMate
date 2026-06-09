@@ -10,7 +10,17 @@ data class CategoriesListUiState(
 sealed interface CategoriesListEvent {
     data object LoadRequested : CategoriesListEvent
 
+    data object AddRequested : CategoriesListEvent
+
     data class SelectRequested(
+        val categoryId: String,
+    ) : CategoriesListEvent
+
+    data class EditRequested(
+        val categoryId: String,
+    ) : CategoriesListEvent
+
+    data class DeleteRequested(
         val categoryId: String,
     ) : CategoriesListEvent
 }

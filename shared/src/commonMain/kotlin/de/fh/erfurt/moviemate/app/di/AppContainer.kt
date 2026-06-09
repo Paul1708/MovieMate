@@ -2,10 +2,13 @@ package de.fh.erfurt.moviemate.app.di
 
 import de.fh.erfurt.moviemate.movies.domain.repository.category.CategoryRepository
 import de.fh.erfurt.moviemate.movies.domain.repository.movie.MovieRepository
+import de.fh.erfurt.moviemate.movies.domain.usecase.category.AddCategoryUseCase
+import de.fh.erfurt.moviemate.movies.domain.usecase.category.DeleteCategoryUseCase
 import de.fh.erfurt.moviemate.movies.domain.usecase.movie.AddMovieUseCase
 import de.fh.erfurt.moviemate.movies.domain.usecase.movie.DeleteMovieUseCase
 import de.fh.erfurt.moviemate.movies.domain.usecase.category.GetCategoriesUseCase
 import de.fh.erfurt.moviemate.movies.domain.usecase.category.GetCategoryUseCase
+import de.fh.erfurt.moviemate.movies.domain.usecase.category.UpdateCategoryUseCase
 import de.fh.erfurt.moviemate.movies.domain.usecase.movie.GetMovieUseCase
 import de.fh.erfurt.moviemate.movies.domain.usecase.movie.GetMoviesByCategoryUseCase
 import de.fh.erfurt.moviemate.movies.domain.usecase.movie.GetMoviesSortedUseCase
@@ -16,6 +19,7 @@ import de.fh.erfurt.moviemate.movies.domain.usecase.movie.UpdateMovieUseCase
 import de.fh.erfurt.moviemate.movies.domain.usecase.movie.UpdateMovieUserRatingUseCase
 import de.fh.erfurt.moviemate.movies.presentation.detail.CategoryDetailViewModel
 import de.fh.erfurt.moviemate.movies.presentation.detail.MovieDetailViewModel
+import de.fh.erfurt.moviemate.movies.presentation.edit.CategoryEditViewModel
 import de.fh.erfurt.moviemate.movies.presentation.edit.MovieEditViewModel
 import de.fh.erfurt.moviemate.movies.presentation.list.CategoriesListViewModel
 import de.fh.erfurt.moviemate.movies.presentation.list.MoviesListViewModel
@@ -62,11 +66,20 @@ class AppContainer(
     // Categories layer
     val getCategoriesUseCase = GetCategoriesUseCase(categoryRepository)
     val getCategoryUseCase = GetCategoryUseCase(categoryRepository)
+    val addCategoryUseCase = AddCategoryUseCase(categoryRepository)
+    val updateCategoryUseCase = UpdateCategoryUseCase(categoryRepository)
+    val deleteCategoryUseCase = DeleteCategoryUseCase(categoryRepository)
 
     val categoriesListViewModel = CategoriesListViewModel(
         getCategoriesUseCase = getCategoriesUseCase,
+        deleteCategoryUseCase = deleteCategoryUseCase,
     )
     val categoryDetailViewModel = CategoryDetailViewModel(
         getCategoryUseCase = getCategoryUseCase,
+        deleteCategoryUseCase = deleteCategoryUseCase,
+    )
+    val categoryEditViewModel = CategoryEditViewModel(
+        addCategoryUseCase = addCategoryUseCase,
+        updateCategoryUseCase = updateCategoryUseCase,
     )
 }

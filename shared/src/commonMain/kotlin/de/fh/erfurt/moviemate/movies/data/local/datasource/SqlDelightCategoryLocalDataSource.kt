@@ -23,13 +23,18 @@ class SqlDelightCategoryLocalDataSource(
 
     override suspend fun insertCategory(category: LocalCategoryEntity): LocalCategoryEntity {
         val resolvedCategory = category.resolveIdIfNeeded()
-        queries.insertCategory(resolvedCategory.id, resolvedCategory.type)
+        queries.insertCategory(resolvedCategory.id, resolvedCategory.name,resolvedCategory.updatedAtEpochMillis, resolvedCategory.version)
         return resolvedCategory
     }
 
     override suspend fun updateCategory(category: LocalCategoryEntity): LocalCategoryEntity {
         require(category.id.isNotBlank()) { "Category id must not be blank when updating the local cache." }
-        queries.insertCategory(category.id, category.type)
+        queries.updateCategory(
+            category.name,
+            category.updatedAtEpochMillis,
+            category.version,
+            category.id,
+        )
         return category
     }
 

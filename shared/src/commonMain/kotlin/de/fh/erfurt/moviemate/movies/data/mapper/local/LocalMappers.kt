@@ -5,6 +5,7 @@ import de.fh.erfurt.moviemate.movies.data.local.db.MovieEntity
 import de.fh.erfurt.moviemate.movies.data.local.model.LocalCategoryEntity
 import de.fh.erfurt.moviemate.movies.data.local.model.LocalMovieEntity
 import de.fh.erfurt.moviemate.movies.domain.model.category.Category
+import de.fh.erfurt.moviemate.movies.domain.model.category.CategoryDraft
 import de.fh.erfurt.moviemate.movies.domain.model.category.CategoryType
 import de.fh.erfurt.moviemate.movies.domain.model.movie.Movie
 import de.fh.erfurt.moviemate.movies.domain.model.movie.MovieDraft
@@ -92,17 +93,30 @@ fun MovieEntity.toLocalModel(): LocalMovieEntity = LocalMovieEntity(
 
 fun LocalCategoryEntity.toDomainModel(): Category = Category(
     id = id,
-    type = CategoryType.fromString(type),
+    name = name,
+    updatedAtEpochMillis = updatedAtEpochMillis,
+    version = version,
 )
 
 fun Category.toLocalEntity(): LocalCategoryEntity = LocalCategoryEntity(
     id = id,
-    type = type.storageKey,
+    name = name,
+    updatedAtEpochMillis = updatedAtEpochMillis,
+    version = version,
+)
+
+fun CategoryDraft.toLocalEntity(id: String): LocalCategoryEntity = LocalCategoryEntity(
+    id = id,
+    name = name,
+    updatedAtEpochMillis = updatedAtEpochMillis,
+    version = null,
 )
 
 fun CategoryEntity.toLocalModel(): LocalCategoryEntity = LocalCategoryEntity(
     id = id,
-    type = type,
+    name = name,
+    updatedAtEpochMillis = updatedAtEpochMillis,
+    version = version,
 )
 
 private fun List<String>?.toJsonStringOrNull(): String? =
