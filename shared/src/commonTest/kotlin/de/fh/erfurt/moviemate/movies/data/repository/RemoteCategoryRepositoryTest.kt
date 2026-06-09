@@ -2,14 +2,14 @@ package de.fh.erfurt.moviemate.movies.data.repository
 
 import de.fh.erfurt.moviemate.movies.data.remote.datasource.CategoryRemoteDataSource
 import de.fh.erfurt.moviemate.movies.data.remote.dto.CategoryDto
+import de.fh.erfurt.moviemate.movies.data.remote.dto.CreateCategoryRequestDto
+import de.fh.erfurt.moviemate.movies.data.remote.dto.UpdateCategoryRequestDto
 import de.fh.erfurt.moviemate.movies.data.repository.remote.RemoteCategoryRepository
 import de.fh.erfurt.moviemate.movies.domain.model.category.Category
-import de.fh.erfurt.moviemate.movies.domain.model.category.CategoryType
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
-import kotlin.collections.listOf
 
 
 class RemoteCategoryRepositoryTest {
@@ -19,25 +19,25 @@ class RemoteCategoryRepositoryTest {
         val remoteCategoryRepository = RemoteCategoryRepository(
             remoteDataSource = FakeRemoteCategoryDataSource(
                 fetchedCategories = listOf(
-                    CategoryDto(id = "1", name = "Action"),
-                    CategoryDto(id = "2", name = "Adventure"),
-                    CategoryDto(id = "3", name = "Animation"),
-                    CategoryDto(id = "4", name = "Biography"),
-                    CategoryDto(id = "5", name = "Comedy"),
-                    CategoryDto(id = "6", name = "Crime"),
-                    CategoryDto(id = "7", name = "Documentary"),
-                    CategoryDto(id = "8", name = "Drama"),
-                    CategoryDto(id = "9", name = "Family"),
-                    CategoryDto(id = "10", name = "Fantasy"),
-                    CategoryDto(id = "11", name = "History"),
-                    CategoryDto(id = "12", name = "Horror"),
-                    CategoryDto(id = "13", name = "Mystery"),
-                    CategoryDto(id = "14", name = "Romance"),
-                    CategoryDto(id = "15", name = "Sci_Fi"),
-                    CategoryDto(id = "16", name = "Thriller"),
-                    CategoryDto(id = "17", name = "War"),
-                    CategoryDto(id = "18", name = "Western"),
-                    CategoryDto(id = "19", name = "Other")
+                    dto("1", "Action", 1L),
+                    dto("2", "Adventure", 2L),
+                    dto("3", "Animation", 3L),
+                    dto("4", "Biography", 4L),
+                    dto("5", "Comedy", 5L),
+                    dto("6", "Crime", 6L),
+                    dto("7", "Documentary", 7L),
+                    dto("8", "Drama", 8L),
+                    dto("9", "Family", 9L),
+                    dto("10", "Fantasy", 10L),
+                    dto("11", "History", 11L),
+                    dto("12", "Horror", 12L),
+                    dto("13", "Mystery", 13L),
+                    dto("14", "Romance", 14L),
+                    dto("15", "Sci_Fi", 15L),
+                    dto("16", "Thriller", 16L),
+                    dto("17", "War", 17L),
+                    dto("18", "Western", 18L),
+                    dto("19", "Other", 19L)
                 )
             )
         )
@@ -47,25 +47,25 @@ class RemoteCategoryRepositoryTest {
         assertTrue(categories.isNotEmpty())
         assertEquals(
             expected = listOf(
-                Category(id = "1", type = CategoryType.ACTION),
-                Category(id = "2", type = CategoryType.ADVENTURE),
-                Category(id = "3", type = CategoryType.ANIMATION),
-                Category(id = "4", type = CategoryType.BIOGRAPHY),
-                Category(id = "5", type = CategoryType.COMEDY),
-                Category(id = "6", type = CategoryType.CRIME),
-                Category(id = "7", type = CategoryType.DOCUMENTARY),
-                Category(id = "8", type = CategoryType.DRAMA),
-                Category(id = "9", type = CategoryType.FAMILY),
-                Category(id = "10", type = CategoryType.FANTASY),
-                Category(id = "11", type = CategoryType.HISTORY),
-                Category(id = "12", type = CategoryType.HORROR),
-                Category(id = "13", type = CategoryType.MYSTERY),
-                Category(id = "14", type = CategoryType.ROMANCE),
-                Category(id = "15", type = CategoryType.SCI_FI),
-                Category(id = "16", type = CategoryType.THRILLER),
-                Category(id = "17", type = CategoryType.WAR),
-                Category(id = "18", type = CategoryType.WESTERN),
-                Category(id = "19", type = CategoryType.UNKNOWN)
+                category("1", "Action", 1L),
+                category("2", "Adventure", 2L),
+                category("3", "Animation", 3L),
+                category("4", "Biography", 4L),
+                category("5", "Comedy", 5L),
+                category("6", "Crime", 6L),
+                category("7", "Documentary", 7L),
+                category("8", "Drama", 8L),
+                category("9", "Family", 9L),
+                category("10", "Fantasy", 10L),
+                category("11", "History", 11L),
+                category("12", "Horror", 12L),
+                category("13", "Mystery", 13L),
+                category("14", "Romance", 14L),
+                category("15", "Sci_Fi", 15L),
+                category("16", "Thriller", 16L),
+                category("17", "War", 17L),
+                category("18", "Western", 18L),
+                category("19", "Other", 19L)
             ),
             actual = categories
         )
@@ -76,9 +76,9 @@ class RemoteCategoryRepositoryTest {
         val remoteCategoryRepository = RemoteCategoryRepository(
             remoteDataSource = FakeRemoteCategoryDataSource(
                 fetchedCategories = listOf(
-                    CategoryDto(id = "1", name = "Action"),
-                    CategoryDto(id = "2", name = "Adventure"),
-                    CategoryDto(id = "3", name = "Animation")
+                    dto("1", "Action", 1L),
+                    dto("2", "Adventure", 2L),
+                    dto("3", "Animation", 3L)
                 )
             )
         )
@@ -86,7 +86,7 @@ class RemoteCategoryRepositoryTest {
         val category = remoteCategoryRepository.getCategory("2")
 
         assertEquals(
-            expected = Category(id = "2", type = CategoryType.ADVENTURE),
+            expected = category("2", "Adventure", 2L),
             actual = category
         )
 
@@ -106,5 +106,28 @@ private class FakeRemoteCategoryDataSource (
         return fetchedCategories.firstOrNull { it.id == categoryId }
     }
 
+    override suspend fun createCategory(request: CreateCategoryRequestDto): CategoryDto {
+        return dto("created", request.name, request.updatedAtEpochMillis)
+    }
+
+    override suspend fun updateCategory(categoryId: String, request: UpdateCategoryRequestDto): CategoryDto {
+        return dto(categoryId, request.name, request.updatedAtEpochMillis)
+    }
+
+    override suspend fun deleteCategory(categoryId: String) = Unit
+
 
 }
+
+private fun dto(id: String, name: String, updatedAtEpochMillis: Long) = CategoryDto(
+    id = id,
+    name = name,
+    updatedAtEpochMillis = updatedAtEpochMillis,
+)
+
+private fun category(id: String, name: String, updatedAtEpochMillis: Long) = Category(
+    id = id,
+    name = name,
+    updatedAtEpochMillis = updatedAtEpochMillis,
+)
+
