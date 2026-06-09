@@ -1,12 +1,15 @@
 package de.fh.erfurt.moviemate.movies.presentation.edit
 
+import de.fh.erfurt.moviemate.movies.domain.usecase.category.GetCategoriesUseCase
 import de.fh.erfurt.moviemate.movies.domain.usecase.movie.AddMovieUseCase
 import de.fh.erfurt.moviemate.movies.domain.usecase.movie.UpdateMovieUseCase
 
 class MovieEditViewModel(
     private val addMovieUseCase: AddMovieUseCase,
     private val updateMovieUseCase: UpdateMovieUseCase,
-) {
+    private val getCategoriesUseCase: GetCategoriesUseCase,
+
+    ) {
     val initialState = MovieEditUiState()
 
     fun onEvent(event: MovieEditEvent) {

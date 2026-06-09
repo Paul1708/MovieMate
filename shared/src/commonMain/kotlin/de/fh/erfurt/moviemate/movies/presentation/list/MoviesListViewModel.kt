@@ -1,5 +1,6 @@
 package de.fh.erfurt.moviemate.movies.presentation.list
 
+import de.fh.erfurt.moviemate.movies.domain.usecase.category.GetCategoriesUseCase
 import de.fh.erfurt.moviemate.movies.domain.usecase.movie.AddMovieUseCase
 import de.fh.erfurt.moviemate.movies.domain.usecase.movie.DeleteMovieUseCase
 import de.fh.erfurt.moviemate.movies.domain.usecase.movie.GetMoviesByCategoryUseCase
@@ -17,7 +18,9 @@ class MoviesListViewModel(
     private val searchMoviesUseCase: SearchMoviesUseCase,
     private val getMoviesByCategoryUseCase: GetMoviesByCategoryUseCase,
     private val getMoviesSortedUseCase: GetMoviesSortedUseCase,
-) {
+    private val getCategoriesUseCase: GetCategoriesUseCase,
+
+    ) {
     val initialState = MoviesListUiState()
 
     fun onEvent(event: MoviesListEvent) {

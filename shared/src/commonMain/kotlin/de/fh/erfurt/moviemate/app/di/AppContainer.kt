@@ -28,6 +28,25 @@ class AppContainer(
     movieRepository: MovieRepository,
     categoryRepository: CategoryRepository
 ) {
+    // Categories layer
+    val getCategoriesUseCase = GetCategoriesUseCase(categoryRepository)
+    val getCategoryUseCase = GetCategoryUseCase(categoryRepository)
+    val addCategoryUseCase = AddCategoryUseCase(categoryRepository)
+    val updateCategoryUseCase = UpdateCategoryUseCase(categoryRepository)
+    val deleteCategoryUseCase = DeleteCategoryUseCase(categoryRepository)
+
+    val categoriesListViewModel = CategoriesListViewModel(
+        getCategoriesUseCase = getCategoriesUseCase,
+        deleteCategoryUseCase = deleteCategoryUseCase,
+    )
+    val categoryDetailViewModel = CategoryDetailViewModel(
+        getCategoryUseCase = getCategoryUseCase,
+        deleteCategoryUseCase = deleteCategoryUseCase,
+    )
+    val categoryEditViewModel = CategoryEditViewModel(
+        addCategoryUseCase = addCategoryUseCase,
+        updateCategoryUseCase = updateCategoryUseCase,
+    )
     // Movies layer
     val getMoviesUseCase = GetMoviesUseCase(movieRepository)
     val getMovieUseCase = GetMovieUseCase(movieRepository)
@@ -48,7 +67,9 @@ class AppContainer(
         searchMoviesUseCase = searchMoviesUseCase,
         getMoviesByCategoryUseCase = getMoviesByCategoryUseCase,
         getMoviesSortedUseCase = getMoviesSortedUseCase,
+        getCategoriesUseCase = getCategoriesUseCase,
     )
+
 
     val movieDetailViewModel = MovieDetailViewModel(
         getMovieUseCase = getMovieUseCase,
@@ -56,30 +77,14 @@ class AppContainer(
         updateMovieUserRatingUseCase = updateMovieUserRatingUseCase,
         deleteMovieUseCase = deleteMovieUseCase,
         updateMovieUseCase = updateMovieUseCase,
+        getCategoryUseCase = getCategoryUseCase,
     )
 
     val movieEditViewModel = MovieEditViewModel(
         addMovieUseCase = addMovieUseCase,
         updateMovieUseCase = updateMovieUseCase,
-    )
-
-    // Categories layer
-    val getCategoriesUseCase = GetCategoriesUseCase(categoryRepository)
-    val getCategoryUseCase = GetCategoryUseCase(categoryRepository)
-    val addCategoryUseCase = AddCategoryUseCase(categoryRepository)
-    val updateCategoryUseCase = UpdateCategoryUseCase(categoryRepository)
-    val deleteCategoryUseCase = DeleteCategoryUseCase(categoryRepository)
-
-    val categoriesListViewModel = CategoriesListViewModel(
         getCategoriesUseCase = getCategoriesUseCase,
-        deleteCategoryUseCase = deleteCategoryUseCase,
     )
-    val categoryDetailViewModel = CategoryDetailViewModel(
-        getCategoryUseCase = getCategoryUseCase,
-        deleteCategoryUseCase = deleteCategoryUseCase,
-    )
-    val categoryEditViewModel = CategoryEditViewModel(
-        addCategoryUseCase = addCategoryUseCase,
-        updateCategoryUseCase = updateCategoryUseCase,
-    )
+
+
 }

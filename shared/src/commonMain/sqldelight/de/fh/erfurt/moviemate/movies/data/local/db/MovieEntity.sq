@@ -13,7 +13,8 @@ CREATE TABLE movieEntity (
     externalIds TEXT,
     watchProviders TEXT,
     updatedAtEpochMillis INTEGER NOT NULL,
-    version INTEGER
+    version INTEGER,
+    FOREIGN KEY (categoryId) REFERENCES categoryEntity(id) ON DELETE SET NULL
 );
 
 selectAll:

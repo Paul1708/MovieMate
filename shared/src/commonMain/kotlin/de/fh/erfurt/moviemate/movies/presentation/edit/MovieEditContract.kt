@@ -1,5 +1,7 @@
 package de.fh.erfurt.moviemate.movies.presentation.edit
 
+import de.fh.erfurt.moviemate.movies.presentation.list.CategoryListItemUiModel
+
 
 data class MovieEditUiState(
     val isLoading: Boolean = false,
@@ -9,14 +11,15 @@ data class MovieEditUiState(
     val initialMovieId: String? = null, // Unterscheidung zwischen Neuanlage und Bearbeitung
     val showDiscardDialog: Boolean = false,
     val currentWatchProviders: List<String> = emptyList(),
-)
+    val availableCategories: List<CategoryListItemUiModel> = emptyList(),
+    )
 
 sealed interface MovieEditEvent {
     data class SaveRequested(
         val title: String,
         val description: String,
         val releaseYear: Int? = null,
-        val categoryName: String? = null,
+        val categoryId: String? = null,
         val posterUrl: String? = null,
         val runtimeMinutes: Int? = null,
         val userRating: Int? = null,
