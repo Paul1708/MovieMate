@@ -56,3 +56,19 @@ fun Movie.toUpdateRequestDto(): UpdateMovieRequestDto = UpdateMovieRequestDto(
     updatedAtEpochMillis = updatedAtEpochMillis,
     version = version,
 )
+
+fun Movie.toCreateRequestDto(): CreateMovieRequestDto = CreateMovieRequestDto(
+    title = title,
+    description = description,
+    releaseYear = releaseYear,
+    categoryId = categoryId,
+    posterUrl = posterUrl,
+    runtimeMinutes = runtimeMinutes,
+    isWatched = isWatched,
+    comment = comment,
+    userRating = userRating,
+    imdbRating = imdbRating,
+    externalIds = externalIds,
+    watchProviders = watchProviders,
+    updatedAtEpochMillis = updatedAtEpochMillis,
+)

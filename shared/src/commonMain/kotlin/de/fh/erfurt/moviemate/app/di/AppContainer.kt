@@ -2,6 +2,8 @@ package de.fh.erfurt.moviemate.app.di
 
 import de.fh.erfurt.moviemate.movies.domain.repository.category.CategoryRepository
 import de.fh.erfurt.moviemate.movies.domain.repository.movie.MovieRepository
+import de.fh.erfurt.moviemate.movies.domain.usecase.backup.ExportBackupUseCase
+import de.fh.erfurt.moviemate.movies.domain.usecase.backup.ImportBackupUseCase
 import de.fh.erfurt.moviemate.movies.domain.usecase.category.AddCategoryUseCase
 import de.fh.erfurt.moviemate.movies.domain.usecase.category.DeleteCategoryUseCase
 import de.fh.erfurt.moviemate.movies.domain.usecase.movie.AddMovieUseCase
@@ -17,6 +19,7 @@ import de.fh.erfurt.moviemate.movies.domain.usecase.movie.SearchMoviesUseCase
 import de.fh.erfurt.moviemate.movies.domain.usecase.movie.UpdateMovieWatchedStatusUseCase
 import de.fh.erfurt.moviemate.movies.domain.usecase.movie.UpdateMovieUseCase
 import de.fh.erfurt.moviemate.movies.domain.usecase.movie.UpdateMovieUserRatingUseCase
+import de.fh.erfurt.moviemate.movies.presentation.backup.BackupViewModel
 import de.fh.erfurt.moviemate.movies.presentation.detail.CategoryDetailViewModel
 import de.fh.erfurt.moviemate.movies.presentation.detail.MovieDetailViewModel
 import de.fh.erfurt.moviemate.movies.presentation.edit.CategoryEditViewModel
@@ -84,6 +87,15 @@ class AppContainer(
         addMovieUseCase = addMovieUseCase,
         updateMovieUseCase = updateMovieUseCase,
         getCategoriesUseCase = getCategoriesUseCase,
+    )
+
+    // Backup layer
+    val exportBackupUseCase = ExportBackupUseCase(movieRepository)
+    val importBackupUseCase = ImportBackupUseCase(movieRepository)
+
+    val backupViewModel = BackupViewModel(
+        exportBackupUseCase = exportBackupUseCase,
+        importBackupUseCase = importBackupUseCase
     )
 
 

@@ -1,9 +1,13 @@
 package de.fh.erfurt.moviemate.movies.data.repository
 
 import de.fh.erfurt.moviemate.movies.data.remote.datasource.MovieRemoteDataSource
+import de.fh.erfurt.moviemate.movies.data.remote.datasource.CategoryRemoteDataSource
 import de.fh.erfurt.moviemate.movies.data.remote.dto.CreateMovieRequestDto
 import de.fh.erfurt.moviemate.movies.data.remote.dto.MovieDto
 import de.fh.erfurt.moviemate.movies.data.remote.dto.UpdateMovieRequestDto
+import de.fh.erfurt.moviemate.movies.data.remote.dto.CategoryDto
+import de.fh.erfurt.moviemate.movies.data.remote.dto.CreateCategoryRequestDto
+import de.fh.erfurt.moviemate.movies.data.remote.dto.UpdateCategoryRequestDto
 import de.fh.erfurt.moviemate.movies.data.repository.remote.RemoteMovieRepository
 import de.fh.erfurt.moviemate.movies.domain.model.movie.Movie
 import de.fh.erfurt.moviemate.movies.domain.model.movie.MovieDraft
@@ -13,7 +17,6 @@ import kotlin.collections.listOf
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
-
 
 class RemoteMovieRepositoryTest {
 
@@ -40,7 +43,8 @@ class RemoteMovieRepositoryTest {
                         version = 1L
                     )
                 )
-            )
+            ),
+            categoryRemoteDataSource = FakeCategoryRemoteDataSource()
         )
 
         val movies = remoteMovieRepository.getMovies()
@@ -92,7 +96,10 @@ class RemoteMovieRepositoryTest {
                 )
             )
         )
-        val repository = RemoteMovieRepository(remoteDataSource = remoteMovieRepository)
+        val repository = RemoteMovieRepository(
+            remoteDataSource = remoteMovieRepository,
+            categoryRemoteDataSource = FakeCategoryRemoteDataSource()
+        )
         val createMovie = repository.addMovie(
             MovieDraft(
                 title = "New Movie",
@@ -155,7 +162,10 @@ class RemoteMovieRepositoryTest {
     @Test
     fun `updateMovie maps the domain model into an update request dto`() = runTest {
         val remoteMovieRepository = FakeMovieRemoteDataSource()
-        val repository = RemoteMovieRepository(remoteDataSource = remoteMovieRepository)
+        val repository = RemoteMovieRepository(
+            remoteDataSource = remoteMovieRepository,
+            categoryRemoteDataSource = FakeCategoryRemoteDataSource()
+        )
         val updatedMovie = repository.updateMovie(
             Movie(
                 id = "movie-id",
@@ -224,7 +234,10 @@ class RemoteMovieRepositoryTest {
     @Test
     fun `deleteMovie calls the remote data source with the correct movie id`() = runTest {
         val remoteMovieRepository = FakeMovieRemoteDataSource()
-        val repository = RemoteMovieRepository(remoteDataSource = remoteMovieRepository)
+        val repository = RemoteMovieRepository(
+            remoteDataSource = remoteMovieRepository,
+            categoryRemoteDataSource = FakeCategoryRemoteDataSource()
+        )
         repository.deleteMovie("movie-id-to-delete")
 
         assertEquals(
@@ -274,7 +287,8 @@ class RemoteMovieRepositoryTest {
                         version = 1L
                     )
                 )
-            )
+            ),
+            categoryRemoteDataSource = FakeCategoryRemoteDataSource()
         )
 
         val searchResults = remoteMovieRepository.searchMovies("action")
@@ -343,7 +357,8 @@ class RemoteMovieRepositoryTest {
                         version = 1L
                     )
                 )
-            )
+            ),
+            categoryRemoteDataSource = FakeCategoryRemoteDataSource()
         )
 
         val sortedMoviesAsc = remoteMovieRepository.getMoviesSorted(SortBy.TITLE, ascending = true)
@@ -412,7 +427,8 @@ class RemoteMovieRepositoryTest {
                         version = 1L
                     )
                 )
-            )
+            ),
+            categoryRemoteDataSource = FakeCategoryRemoteDataSource()
         )
 
         val movie = remoteMovieRepository.getMoviesByCategory("10355")
@@ -439,12 +455,18 @@ class RemoteMovieRepositoryTest {
             ),
             actual = movie
         )
-
     }
-
 }
 
-
+private class FakeCategoryRemoteDataSource : CategoryRemoteDataSource {
+    override suspend fun fetchCategories(): List<CategoryDto> = emptyList()
+    override suspend fun fetchCategory(categoryId: String): CategoryDto? = null
+    override suspend fun createCategory(request: CreateCategoryRequestDto): CategoryDto =
+        CategoryDto("id", request.name, request.updatedAtEpochMillis)
+    override suspend fun updateCategory(categoryId: String, request: UpdateCategoryRequestDto): CategoryDto =
+        CategoryDto(categoryId, request.name, request.updatedAtEpochMillis)
+    override suspend fun deleteCategory(categoryId: String) {}
+}
 
 private class FakeMovieRemoteDataSource(
     private val fetchedMovies: List<MovieDto> = emptyList(),
@@ -522,6 +544,7 @@ private class FakeMovieRemoteDataSource(
     override suspend fun fetchMoviesByCategory(categoryId: String): List<MovieDto> {
         return fetchedMovies.filter { it.categoryId == categoryId }
     }
+
     override suspend fun fetchMoviesSorted(
         sortBy: SortBy,
         ascending: Boolean

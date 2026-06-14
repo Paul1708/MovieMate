@@ -46,7 +46,10 @@ class AndroidAppContainerFactory(
         val database = MovieMateDatabase(driver)
         val localMovieDataSource = SqlDelightMovieLocalDataSource(database)
         val localCategoryDataSource = SqlDelightCategoryLocalDataSource(database)
-        val movieRepository = LocalMovieRepository(localMovieDataSource)
+        val movieRepository = LocalMovieRepository(
+            localDataSource = localMovieDataSource,
+            categoryDataSource = localCategoryDataSource
+        )
         val categoryRepository = LocalCategoryRepository(localCategoryDataSource)
 
         return SharedModuleFactory.createAppContainer(
