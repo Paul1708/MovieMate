@@ -1,11 +1,9 @@
 package de.fh.erfurt.moviemate.presentation.movies.categories
 
-import de.fh.erfurt.moviemate.movies.domain.model.category.CategoryType
-
-// UI-Modell für eine Kategorie im Kategorie-Screen.
-// Es hält den Domain-Typ und bereits vorbereitete Texte für die Anzeige.
+// UI-Modell für Custom Categories. Movies speichern die Kategorie über `id`.
 data class CategoryUiModel(
-    val type: CategoryType,
-    val label: String,
-    val movieCountText: String? = null
+    val id: String,
+    val name: String,
+    val iconKey: String? = DefaultCategoryIconKey,
+    val movieCountText: String? = null,
 )

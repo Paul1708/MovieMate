@@ -27,6 +27,7 @@ fun MovieDetailPreviewRoute(
         state = stateHolder.state,
         mode = stateHolder.mode,
         editState = stateHolder.editState,
+        availableCategories = stateHolder.availableCategories,
         onAction = stateHolder::onAction,
         onBackClicked = onBackClicked,
         onRetryClicked = {

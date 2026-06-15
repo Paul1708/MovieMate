@@ -1,12 +1,10 @@
 package de.fh.erfurt.moviemate.presentation.movies.detail
 
 import de.fh.erfurt.moviemate.movies.presentation.detail.MovieDetailUiModel
+import de.fh.erfurt.moviemate.presentation.movies.categories.CategoryUiModel
 
 /**
  * Local form state for the detail edit mode.
- *
- * String fields keep user input lossless while editing; conversion and bounds
- * checks happen only when the form is applied to the UI model.
  */
 data class MovieDetailEditState(
     val title: String = "",
@@ -27,7 +25,7 @@ data class MovieDetailEditState(
                 title = movie.title,
                 description = movie.description,
                 releaseYear = movie.releaseYear?.toString().orEmpty(),
-                categoryId = movie.categoryName,
+                categoryId = movie.categoryId.ifBlank { movie.categoryName },
                 runtimeMinutes = movie.runtimeMinutes?.toString().orEmpty(),
                 isWatched = movie.isWatched,
                 comment = movie.comment.orEmpty(),
@@ -38,12 +36,20 @@ data class MovieDetailEditState(
         }
     }
 
-    fun applyTo(movie: MovieDetailUiModel): MovieDetailUiModel {
+    fun applyTo(
+        movie: MovieDetailUiModel,
+        categories: List<CategoryUiModel> = emptyList(),
+    ): MovieDetailUiModel {
+        val selectedCategoryId = categoryId.trim()
+        val selectedCategory = categories.firstOrNull { it.id == selectedCategoryId }
+
         return movie.copy(
             title = title.trim(),
             description = description.trim(),
             releaseYear = releaseYear.trim().toIntOrNull(),
-            categoryName = categoryId.trim(),
+            categoryId = selectedCategoryId,
+            categoryName = selectedCategory?.name ?: selectedCategoryId,
+            categoryIconKey = selectedCategory?.iconKey ?: movie.categoryIconKey,
             runtimeMinutes = runtimeMinutes.trim().toIntOrNull(),
             isWatched = isWatched,
             comment = comment.trim().ifBlank { null },

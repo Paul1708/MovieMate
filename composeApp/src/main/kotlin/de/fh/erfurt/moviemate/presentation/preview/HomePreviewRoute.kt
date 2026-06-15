@@ -4,7 +4,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import de.fh.erfurt.moviemate.movies.domain.model.category.CategoryType
 import de.fh.erfurt.moviemate.presentation.movies.home.HomeScreen
 import de.fh.erfurt.moviemate.presentation.movies.home.HomeUiAction
 
@@ -13,16 +12,16 @@ import de.fh.erfurt.moviemate.presentation.movies.home.HomeUiAction
  */
 @Composable
 fun HomePreviewRoute(
-    initialCategory: CategoryType? = null,
+    initialCategoryId: String? = null,
     modifier: Modifier = Modifier,
     onMovieSelected: (String) -> Unit = {},
     onAddClicked: () -> Unit = {}
 ) {
-    val stateHolder = remember { HomePreviewStateHolder(initialCategory = initialCategory) }
+    val stateHolder = remember { HomePreviewStateHolder(initialCategoryId = initialCategoryId) }
 
-    LaunchedEffect(initialCategory) {
-        if (stateHolder.state.selectedCategory != initialCategory) {
-            stateHolder.onAction(HomeUiAction.CategorySelected(initialCategory))
+    LaunchedEffect(initialCategoryId) {
+        if (stateHolder.state.selectedCategoryId != initialCategoryId) {
+            stateHolder.onAction(HomeUiAction.CategorySelected(initialCategoryId))
         }
     }
 

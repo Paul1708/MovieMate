@@ -123,7 +123,8 @@ fun HomeScreen(
 
     if (state.isFilterDialogVisible) {
         HomeFilterDialog(
-            selectedCategory = state.selectedCategory,
+            categories = state.availableCategories,
+            selectedCategoryId = state.selectedCategoryId,
             selectedSortBy = state.selectedSortBy,
             onCategorySelected = { onAction(HomeUiAction.CategorySelected(it)) },
             onSortSelected = { onAction(HomeUiAction.SortSelected(it)) },

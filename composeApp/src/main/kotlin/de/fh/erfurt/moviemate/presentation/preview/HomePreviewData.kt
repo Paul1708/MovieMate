@@ -6,12 +6,15 @@ import de.fh.erfurt.moviemate.presentation.movies.model.MovieUiModel
 
 // UI-Beispieldaten für den Homescreen. Sie nutzen bereits den gemeinsamen UI-Mapper.
 fun previewHomeMovies(): List<MovieUiModel> {
-    return sampleMovies().map { it.toHomeUiModel() }
+    val categories = sampleCategories()
+    return sampleMovies().map { it.toHomeUiModel(categories) }
 }
 
 // Vollständiger Beispiel-State für den Homescreen.
 fun previewHomeUiState(): HomeUiState {
+    val categories = sampleCategories()
     return HomeUiState(
-        movies = previewHomeMovies()
+        movies = sampleMovies().map { it.toHomeUiModel(categories) },
+        availableCategories = categories,
     )
 }

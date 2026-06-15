@@ -34,6 +34,7 @@ import de.fh.erfurt.moviemate.presentation.movies.detail.CategorySelector
 import de.fh.erfurt.moviemate.presentation.movies.detail.DetailTextField
 import de.fh.erfurt.moviemate.presentation.movies.detail.WatchProvidersEditor
 import de.fh.erfurt.moviemate.presentation.movies.detail.WatchedControl
+import de.fh.erfurt.moviemate.presentation.preview.sampleCategories
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateColors
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateIcons
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateShapes
@@ -131,8 +132,8 @@ private fun AddMovieForm(
 
         CategorySelector(
             selectedCategoryId = state.categoryId,
-            onCategorySelected = { onAction(AddMovieAction.CategoryChanged(it)) },
-            onCustomCategoryChanged = { onAction(AddMovieAction.CategoryChanged(it)) }
+            categories = state.availableCategories,
+            onCategorySelected = { onAction(AddMovieAction.CategoryChanged(it)) }
         )
 
         Row(horizontalArrangement = Arrangement.spacedBy(MovieMateSpacing.fieldSpacing)) {
@@ -253,7 +254,7 @@ private fun AddPosterPicker(
 @Composable
 private fun AddMovieScreenPreview() {
     AddMovieScreen(
-        state = AddMovieUiState(),
+        state = AddMovieUiState(availableCategories = sampleCategories()),
         onAction = {}
     )
 }

@@ -21,7 +21,8 @@ fun SelectionOptionRow(
     label: String,
     selected: Boolean,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    leadingContent: (@Composable () -> Unit)? = null,
 ) {
     Row(
         modifier = modifier
@@ -38,6 +39,7 @@ fun SelectionOptionRow(
                 unselectedColor = MovieMateColors.MutedText
             )
         )
+        leadingContent?.invoke()
         Text(
             text = label,
             color = if (selected) MovieMateColors.PrimaryText else MovieMateColors.SecondaryText,

@@ -10,7 +10,7 @@ import de.fh.erfurt.moviemate.presentation.movies.add.AddMovieUiState
  * Temporary in-memory state holder for the add movie mock UI.
  */
 class AddMoviePreviewStateHolder {
-    var state by mutableStateOf(AddMovieUiState())
+    var state by mutableStateOf(AddMovieUiState(availableCategories = sampleCategories()))
         private set
 
     fun onAction(action: AddMovieAction) {

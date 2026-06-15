@@ -1,12 +1,7 @@
 package de.fh.erfurt.moviemate.presentation.app.navigation
 
-import de.fh.erfurt.moviemate.movies.domain.model.category.CategoryType
-
 /**
  * Zentrale Routen der Android-App.
- *
- * Route-Strings bleiben hier gekapselt, damit Screens und Leaf-Composables nur
- * semantische Events ausgeben und keine Backstack-Details kennen muessen.
  */
 object MovieMateDestination {
     const val Home = "home"
@@ -20,11 +15,11 @@ object MovieMateDestination {
     const val HomeRoute = "$Home?$CategoryArg={$CategoryArg}"
     const val DetailRoute = "detail/{$MovieIdArg}"
 
-    fun homeRoute(category: CategoryType? = null): String {
-        return if (category == null) {
+    fun homeRoute(categoryId: String? = null): String {
+        return if (categoryId.isNullOrBlank()) {
             Home
         } else {
-            "$Home?$CategoryArg=${category.name}"
+            "$Home?$CategoryArg=$categoryId"
         }
     }
 
@@ -48,10 +43,4 @@ fun String?.selectedBottomNavItem(): BottomNavItem {
         startsWith(MovieMateDestination.Backup) -> BottomNavItem.Backup
         else -> BottomNavItem.Home
     }
-}
-
-fun String?.toCategoryTypeOrNull(): CategoryType? {
-    if (this == null) return null
-
-    return CategoryType.entries.firstOrNull { it.name == this }
 }

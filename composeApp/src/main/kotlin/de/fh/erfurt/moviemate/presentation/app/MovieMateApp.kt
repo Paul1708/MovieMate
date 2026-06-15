@@ -17,7 +17,6 @@ import de.fh.erfurt.moviemate.presentation.app.navigation.BottomBar
 import de.fh.erfurt.moviemate.presentation.app.navigation.BottomNavItem
 import de.fh.erfurt.moviemate.presentation.app.navigation.MovieMateDestination
 import de.fh.erfurt.moviemate.presentation.app.navigation.selectedBottomNavItem
-import de.fh.erfurt.moviemate.presentation.app.navigation.toCategoryTypeOrNull
 import de.fh.erfurt.moviemate.presentation.app.navigation.toRoute
 import de.fh.erfurt.moviemate.presentation.components.PlaceholderScreen
 import de.fh.erfurt.moviemate.presentation.preview.AddMoviePreviewRoute
@@ -74,12 +73,11 @@ fun MovieMateApp(
                     }
                 )
             ) { backStackEntry ->
-                val initialCategory = backStackEntry.arguments
+                val initialCategoryId = backStackEntry.arguments
                     ?.getString(MovieMateDestination.CategoryArg)
-                    .toCategoryTypeOrNull()
 
                 HomePreviewRoute(
-                    initialCategory = initialCategory,
+                    initialCategoryId = initialCategoryId,
                     onMovieSelected = { movieId ->
                         navController.navigate(MovieMateDestination.detailRoute(movieId))
                     },
@@ -93,8 +91,8 @@ fun MovieMateApp(
 
             composable(MovieMateDestination.Categories) {
                 CategoriesPreviewRoute(
-                    onCategorySelected = { category ->
-                        navController.navigate(MovieMateDestination.homeRoute(category)) {
+                    onCategorySelected = { categoryId ->
+                        navController.navigate(MovieMateDestination.homeRoute(categoryId)) {
                             popUpTo(navController.graph.findStartDestination().id) {
                                 inclusive = true
                             }

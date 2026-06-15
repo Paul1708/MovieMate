@@ -26,6 +26,8 @@ import de.fh.erfurt.moviemate.presentation.components.ScreenErrorState
 import de.fh.erfurt.moviemate.presentation.components.MovieMateScreenDefaults
 import de.fh.erfurt.moviemate.presentation.components.ScreenLoadingState
 import de.fh.erfurt.moviemate.presentation.movies.components.MovieFormTopBar
+import de.fh.erfurt.moviemate.presentation.movies.categories.CategoryUiModel
+import de.fh.erfurt.moviemate.presentation.preview.previewCategories
 import de.fh.erfurt.moviemate.presentation.preview.previewMovieDetailUiState
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateIcons
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateSpacing
@@ -38,6 +40,7 @@ fun MovieDetailScreen(
     state: MovieDetailUiState,
     mode: MovieDetailMode,
     editState: MovieDetailEditState,
+    availableCategories: List<CategoryUiModel>,
     onAction: (MovieDetailAction) -> Unit,
     onBackClicked: () -> Unit,
     onRetryClicked: () -> Unit,
@@ -110,6 +113,7 @@ fun MovieDetailScreen(
                     MovieDetailEditContent(
                         movie = movie,
                         editState = editState,
+                        availableCategories = availableCategories,
                         onAction = onAction,
                         modifier = Modifier.fillMaxSize()
                     )
@@ -204,6 +208,7 @@ private fun MovieDetailScreenPreview() {
         state = state,
         mode = MovieDetailMode.View,
         editState = state.movie?.let(MovieDetailEditState::from) ?: MovieDetailEditState(),
+        availableCategories = previewCategories(),
         onAction = {},
         onBackClicked = {},
         onRetryClicked = {}
@@ -222,6 +227,7 @@ private fun MovieDetailScreenEditPreview() {
         state = state,
         mode = MovieDetailMode.Edit,
         editState = state.movie?.let(MovieDetailEditState::from) ?: MovieDetailEditState(),
+        availableCategories = previewCategories(),
         onAction = {},
         onBackClicked = {},
         onRetryClicked = {}
@@ -238,6 +244,7 @@ private fun MovieDetailScreenLoadingPreview() {
         state = MovieDetailUiState(isLoading = true),
         mode = MovieDetailMode.View,
         editState = MovieDetailEditState(),
+        availableCategories = previewCategories(),
         onAction = {},
         onBackClicked = {},
         onRetryClicked = {}

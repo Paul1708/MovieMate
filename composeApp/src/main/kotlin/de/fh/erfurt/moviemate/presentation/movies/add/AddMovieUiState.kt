@@ -1,5 +1,7 @@
 package de.fh.erfurt.moviemate.presentation.movies.add
 
+import de.fh.erfurt.moviemate.presentation.movies.categories.CategoryUiModel
+
 /**
  * Local form state for the add movie screen.
  *
@@ -17,7 +19,8 @@ data class AddMovieUiState(
     val isWatched: Boolean = false,
     val watchProviders: List<String> = emptyList(),
     val watchProviderInput: String = "",
-    val comment: String = ""
+    val comment: String = "",
+    val availableCategories: List<CategoryUiModel> = emptyList(),
 ) {
     val canSave: Boolean
         get() = title.isNotBlank()

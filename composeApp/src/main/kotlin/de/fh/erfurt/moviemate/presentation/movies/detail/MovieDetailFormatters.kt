@@ -1,8 +1,6 @@
 package de.fh.erfurt.moviemate.presentation.movies.detail
 
-import de.fh.erfurt.moviemate.movies.domain.model.category.CategoryType
 import de.fh.erfurt.moviemate.movies.presentation.detail.MovieDetailUiModel
-import de.fh.erfurt.moviemate.presentation.movies.components.displayName
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateIcons
 import kotlin.math.roundToInt
 
@@ -14,7 +12,7 @@ internal fun MovieDetailUiModel.metaItems(): List<MovieDetailMetaItem> {
         MovieDetailMetaItem(
             icon = MovieMateIcons.category,
             label = "Category",
-            value = categoryLabel()
+            value = categoryName.ifBlank { "Unknown" }
         ),
         MovieDetailMetaItem(
             icon = MovieMateIcons.runtime,
@@ -27,20 +25,6 @@ internal fun MovieDetailUiModel.metaItems(): List<MovieDetailMetaItem> {
             value = releaseYear?.toString() ?: "Unknown"
         )
     )
-}
-
-/**
- * Formatiert die Kategorie für die lesende Detailansicht.
- */
-private fun MovieDetailUiModel.categoryLabel(): String {
-    val rawCategory = categoryName.takeIf { it.isNotBlank() } ?: return "Unknown"
-    val categoryType = CategoryType.fromString(rawCategory)
-
-    return if (categoryType == CategoryType.UNKNOWN && rawCategory != CategoryType.UNKNOWN.storageKey) {
-        rawCategory
-    } else {
-        categoryType.displayName()
-    }
 }
 
 /**

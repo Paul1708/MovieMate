@@ -3,9 +3,9 @@ package de.fh.erfurt.moviemate.presentation.preview
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import de.fh.erfurt.moviemate.movies.domain.model.category.CategoryType
 import de.fh.erfurt.moviemate.movies.domain.model.movie.Movie
 import de.fh.erfurt.moviemate.movies.domain.repository.movie.SortBy
+import de.fh.erfurt.moviemate.presentation.movies.categories.CategoryUiModel
 import de.fh.erfurt.moviemate.presentation.movies.home.HomeTab
 import de.fh.erfurt.moviemate.presentation.movies.home.HomeUiAction
 import de.fh.erfurt.moviemate.presentation.movies.home.HomeUiState
@@ -14,19 +14,17 @@ import de.fh.erfurt.moviemate.presentation.movies.model.MovieUiModel
 
 /**
  * Temporary state holder for the Android UI demo.
- *
- * Production screen state should come from shared presentation/use cases. This
- * class stays in the preview package so it is easy to remove when that wiring is
- * available.
  */
 class HomePreviewStateHolder(
     private val sourceMovies: List<Movie> = sampleMovies(),
-    initialCategory: CategoryType? = null
+    private val categories: List<CategoryUiModel> = sampleCategories(),
+    initialCategoryId: String? = null
 ) {
     var state by mutableStateOf(
         HomeUiState(
-            movies = sourceMovies.filterMovies(selectedCategory = initialCategory),
-            selectedCategory = initialCategory
+            movies = sourceMovies.filterMovies(selectedCategoryId = initialCategoryId),
+            availableCategories = categories,
+            selectedCategoryId = initialCategoryId
         )
     )
         private set
@@ -37,10 +35,10 @@ class HomePreviewStateHolder(
             HomeUiAction.SearchClicked -> updateState(isSearchVisible = !state.isSearchVisible)
             is HomeUiAction.SearchChanged -> updateState(searchQuery = action.query)
             HomeUiAction.FilterClicked -> updateState(isFilterDialogVisible = true)
-            is HomeUiAction.CategorySelected -> updateState(selectedCategory = action.category)
+            is HomeUiAction.CategorySelected -> updateState(selectedCategoryId = action.categoryId)
             is HomeUiAction.SortSelected -> updateState(selectedSortBy = action.sortCriterion)
             HomeUiAction.ClearCategoryFilterClicked -> updateState(
-                selectedCategory = null,
+                selectedCategoryId = null,
                 isFilterDialogVisible = false
             )
             HomeUiAction.ClearSortClicked -> updateState(
@@ -58,7 +56,7 @@ class HomePreviewStateHolder(
         selectedTab: HomeTab = state.selectedTab,
         searchQuery: String = state.searchQuery,
         isSearchVisible: Boolean = state.isSearchVisible,
-        selectedCategory: CategoryType? = state.selectedCategory,
+        selectedCategoryId: String? = state.selectedCategoryId,
         selectedSortBy: SortBy = state.selectedSortBy,
         isFilterDialogVisible: Boolean = state.isFilterDialogVisible
     ) {
@@ -66,13 +64,14 @@ class HomePreviewStateHolder(
             movies = sourceMovies.filterMovies(
                 selectedTab = selectedTab,
                 searchQuery = searchQuery,
-                selectedCategory = selectedCategory,
+                selectedCategoryId = selectedCategoryId,
                 selectedSortBy = selectedSortBy
             ),
+            availableCategories = categories,
             selectedTab = selectedTab,
             searchQuery = searchQuery,
             isSearchVisible = isSearchVisible,
-            selectedCategory = selectedCategory,
+            selectedCategoryId = selectedCategoryId,
             selectedSortBy = selectedSortBy,
             isFilterDialogVisible = isFilterDialogVisible,
             isLoading = false,
@@ -83,7 +82,7 @@ class HomePreviewStateHolder(
     private fun List<Movie>.filterMovies(
         selectedTab: HomeTab = HomeTab.All,
         searchQuery: String = "",
-        selectedCategory: CategoryType? = null,
+        selectedCategoryId: String? = null,
         selectedSortBy: SortBy = SortBy.UPDATED_AT
     ): List<MovieUiModel> {
         return this
@@ -98,10 +97,10 @@ class HomePreviewStateHolder(
                 searchQuery.isBlank() || movie.title.contains(searchQuery, ignoreCase = true)
             }
             .filter { movie ->
-                selectedCategory == null || movie.categoryId == selectedCategory.storageKey
+                selectedCategoryId == null || movie.categoryId == selectedCategoryId
             }
             .sortForHome(selectedSortBy)
-            .map { movie -> movie.toHomeUiModel() }
+            .map { movie -> movie.toHomeUiModel(categories) }
     }
 }
 

@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import de.fh.erfurt.moviemate.movies.presentation.detail.MovieDetailUiModel
+import de.fh.erfurt.moviemate.presentation.movies.categories.CategoryUiModel
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateIcons
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateSpacing
 
@@ -26,6 +27,7 @@ import de.fh.erfurt.moviemate.presentation.theme.MovieMateSpacing
 internal fun MovieDetailEditContent(
     movie: MovieDetailUiModel,
     editState: MovieDetailEditState,
+    availableCategories: List<CategoryUiModel>,
     onAction: (MovieDetailAction) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -49,8 +51,8 @@ internal fun MovieDetailEditContent(
 
         CategorySelector(
             selectedCategoryId = editState.categoryId,
-            onCategorySelected = { onAction(MovieDetailAction.CategoryChanged(it)) },
-            onCustomCategoryChanged = { onAction(MovieDetailAction.CategoryChanged(it)) }
+            categories = availableCategories,
+            onCategorySelected = { onAction(MovieDetailAction.CategoryChanged(it)) }
         )
 
         Row(horizontalArrangement = Arrangement.spacedBy(MovieMateSpacing.fieldSpacing)) {

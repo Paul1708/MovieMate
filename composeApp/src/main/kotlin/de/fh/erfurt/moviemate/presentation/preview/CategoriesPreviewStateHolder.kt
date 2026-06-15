@@ -7,17 +7,18 @@ import de.fh.erfurt.moviemate.movies.domain.model.movie.Movie
 import de.fh.erfurt.moviemate.presentation.movies.categories.CategoriesUiAction
 import de.fh.erfurt.moviemate.presentation.movies.categories.CategoriesUiState
 import de.fh.erfurt.moviemate.presentation.movies.categories.CategoryUiModel
+import de.fh.erfurt.moviemate.presentation.movies.categories.DefaultCategoryIconKey
 
 /**
  * Temporary state holder for preview/demo category data.
  */
 class CategoriesPreviewStateHolder(
-    private val sourceMovies: List<Movie> = sampleMovies()
+    private val sourceMovies: List<Movie> = sampleMovies(),
+    initialCategories: List<CategoryUiModel> = sampleCategories(),
 ) {
-    private val sourceCategories: List<CategoryUiModel>
-        get() = previewCategories(sourceMovies)
+    private var allCategories: List<CategoryUiModel> = previewCategories(sourceMovies, initialCategories)
 
-    var state by mutableStateOf(CategoriesUiState(categories = sourceCategories))
+    var state by mutableStateOf(CategoriesUiState(categories = allCategories))
         private set
 
     fun onAction(action: CategoriesUiAction) {
@@ -26,6 +27,24 @@ class CategoriesPreviewStateHolder(
             is CategoriesUiAction.SearchChanged -> updateState(searchQuery = action.query)
             is CategoriesUiAction.CategoryClicked -> Unit
             CategoriesUiAction.RetryClicked -> updateState()
+            CategoriesUiAction.AddClicked -> state = state.copy(
+                isAddDialogVisible = true,
+                addCategoryName = "",
+                selectedIconKey = DefaultCategoryIconKey,
+                addCategoryError = null,
+            )
+            is CategoriesUiAction.AddNameChanged -> state = state.copy(
+                addCategoryName = action.name,
+                addCategoryError = null,
+            )
+            is CategoriesUiAction.AddIconSelected -> state = state.copy(selectedIconKey = action.iconKey)
+            CategoriesUiAction.AddConfirmed -> addCategory()
+            CategoriesUiAction.AddDismissed -> state = state.copy(
+                isAddDialogVisible = false,
+                addCategoryName = "",
+                selectedIconKey = DefaultCategoryIconKey,
+                addCategoryError = null,
+            )
         }
     }
 
@@ -43,10 +62,52 @@ class CategoriesPreviewStateHolder(
     }
 
     private fun filterCategories(searchQuery: String): List<CategoryUiModel> {
-        if (searchQuery.isBlank()) return sourceCategories
+        if (searchQuery.isBlank()) return allCategories
 
-        return sourceCategories.filter { category ->
-            category.label.contains(searchQuery, ignoreCase = true)
+        return allCategories.filter { category ->
+            category.name.contains(searchQuery, ignoreCase = true)
         }
     }
+
+    private fun addCategory() {
+        val trimmedName = state.addCategoryName.trim()
+        if (trimmedName.isBlank()) {
+            state = state.copy(addCategoryError = "Name is required")
+            return
+        }
+        if (allCategories.any { it.name.equals(trimmedName, ignoreCase = true) }) {
+            state = state.copy(addCategoryError = "Category already exists")
+            return
+        }
+
+        val newCategory = CategoryUiModel(
+            id = trimmedName.toCategoryId(allCategories.map { it.id }),
+            name = trimmedName,
+            iconKey = state.selectedIconKey,
+            movieCountText = "0 Movies",
+        )
+        allCategories = (allCategories + newCategory).sortedBy { it.name.lowercase() }
+        state = state.copy(
+            categories = filterCategories(state.searchQuery),
+            isAddDialogVisible = false,
+            addCategoryName = "",
+            selectedIconKey = DefaultCategoryIconKey,
+            addCategoryError = null,
+        )
+    }
+}
+
+private fun String.toCategoryId(existingIds: List<String>): String {
+    val base = lowercase()
+        .replace(Regex("[^a-z0-9]+"), "-")
+        .trim('-')
+        .ifBlank { "category" }
+
+    var candidate = base
+    var suffix = 2
+    while (candidate in existingIds) {
+        candidate = "$base-$suffix"
+        suffix++
+    }
+    return candidate
 }

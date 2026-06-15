@@ -12,7 +12,6 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
-import de.fh.erfurt.moviemate.movies.domain.model.category.CategoryType
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateColors
 
 /**
@@ -23,7 +22,7 @@ import de.fh.erfurt.moviemate.presentation.theme.MovieMateColors
  */
 @Composable
 internal fun CategoryGenreIcon(
-    type: CategoryType,
+    iconKey: String?,
     modifier: Modifier = Modifier
 ) {
     Canvas(modifier = modifier) {
@@ -34,7 +33,7 @@ internal fun CategoryGenreIcon(
             join = StrokeJoin.Round
         )
 
-        when (type.categoryIconStyle()) {
+        when (iconKey.categoryIconOption().style) {
             CategoryIconStyle.Spark -> drawSparkIcon(color = color, stroke = stroke)
             CategoryIconStyle.Map -> drawMapIcon(color = color, stroke = stroke)
             CategoryIconStyle.Reel -> drawReelIcon(color = color, stroke = stroke)
@@ -47,44 +46,6 @@ internal fun CategoryGenreIcon(
             CategoryIconStyle.Arc -> drawArcIcon(color = color, stroke = stroke)
             CategoryIconStyle.Grid -> drawGridIcon(color = color, stroke = stroke)
         }
-    }
-}
-
-private enum class CategoryIconStyle {
-    Spark,
-    Map,
-    Reel,
-    Document,
-    Smile,
-    Lens,
-    Frame,
-    Crystal,
-    Orbit,
-    Arc,
-    Grid
-}
-
-private fun CategoryType.categoryIconStyle(): CategoryIconStyle {
-    return when (this) {
-        CategoryType.ACTION -> CategoryIconStyle.Spark
-        CategoryType.ADVENTURE -> CategoryIconStyle.Map
-        CategoryType.FANTASY -> CategoryIconStyle.Crystal
-        CategoryType.ANIMATION -> CategoryIconStyle.Reel
-        CategoryType.BIOGRAPHY -> CategoryIconStyle.Document
-        CategoryType.COMEDY -> CategoryIconStyle.Smile
-        CategoryType.CRIME -> CategoryIconStyle.Lens
-        CategoryType.DOCUMENTARY -> CategoryIconStyle.Frame
-        CategoryType.DRAMA -> CategoryIconStyle.Frame
-        CategoryType.FAMILY -> CategoryIconStyle.Smile
-        CategoryType.HISTORY -> CategoryIconStyle.Document
-        CategoryType.HORROR -> CategoryIconStyle.Arc
-        CategoryType.MYSTERY -> CategoryIconStyle.Lens
-        CategoryType.ROMANCE -> CategoryIconStyle.Spark
-        CategoryType.SCI_FI -> CategoryIconStyle.Orbit
-        CategoryType.THRILLER -> CategoryIconStyle.Arc
-        CategoryType.WAR -> CategoryIconStyle.Grid
-        CategoryType.WESTERN -> CategoryIconStyle.Map
-        CategoryType.UNKNOWN -> CategoryIconStyle.Grid
     }
 }
 

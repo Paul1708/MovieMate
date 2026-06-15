@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import de.fh.erfurt.moviemate.movies.domain.model.movie.Movie
 import de.fh.erfurt.moviemate.movies.presentation.detail.MovieDetailUiModel
+import de.fh.erfurt.moviemate.presentation.movies.categories.CategoryUiModel
 import de.fh.erfurt.moviemate.presentation.movies.detail.MovieDetailAction
 import de.fh.erfurt.moviemate.presentation.movies.detail.MovieDetailEditState
 import de.fh.erfurt.moviemate.presentation.movies.detail.MovieDetailMode
@@ -17,11 +18,12 @@ import de.fh.erfurt.moviemate.presentation.movies.detail.MovieDetailMode
  */
 class MovieDetailPreviewStateHolder(
     private val sourceMovies: List<Movie> = sampleMovies(),
+    val availableCategories: List<CategoryUiModel> = sampleCategories(),
     movieId: String
 ) {
     private var currentMovieId = movieId
 
-    var state by mutableStateOf(previewMovieDetailUiState(movieId, sourceMovies))
+    var state by mutableStateOf(previewMovieDetailUiState(movieId, sourceMovies, availableCategories))
         private set
 
     var mode by mutableStateOf(MovieDetailMode.View)
@@ -32,7 +34,7 @@ class MovieDetailPreviewStateHolder(
 
     fun loadMovie(movieId: String) {
         currentMovieId = movieId
-        state = previewMovieDetailUiState(movieId, sourceMovies)
+        state = previewMovieDetailUiState(movieId, sourceMovies, availableCategories)
         mode = MovieDetailMode.View
         resetEditState()
     }
@@ -71,7 +73,7 @@ class MovieDetailPreviewStateHolder(
 
     private fun saveEditState() {
         val movie = state.movie ?: return
-        state = state.copy(movie = editState.applyTo(movie))
+        state = state.copy(movie = editState.applyTo(movie, availableCategories))
         mode = MovieDetailMode.View
         resetEditState()
     }

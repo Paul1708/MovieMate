@@ -1,5 +1,6 @@
 package de.fh.erfurt.moviemate.presentation.movies.categories
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -15,12 +16,21 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,11 +40,10 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import de.fh.erfurt.moviemate.presentation.components.MovieMateScreenBackground
+import de.fh.erfurt.moviemate.presentation.components.MovieMateScreenDefaults
 import de.fh.erfurt.moviemate.presentation.components.ScreenEmptyState
 import de.fh.erfurt.moviemate.presentation.components.ScreenErrorState
-import de.fh.erfurt.moviemate.presentation.components.MovieMateScreenDefaults
 import de.fh.erfurt.moviemate.presentation.components.ScreenLoadingState
 import de.fh.erfurt.moviemate.presentation.components.SearchField
 import de.fh.erfurt.moviemate.presentation.components.TopBarIconButton
@@ -46,10 +55,6 @@ import de.fh.erfurt.moviemate.presentation.theme.MovieMateSpacing
 
 /**
  * Category overview screen.
- *
- * The screen is stateless from the UI perspective: it renders the given state
- * and reports user interactions as actions so the current preview holder can
- * later be replaced by a real shared ViewModel.
  */
 @Composable
 fun CategoriesScreen(
@@ -61,9 +66,7 @@ fun CategoriesScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(
-                    horizontal = MovieMateScreenDefaults.HorizontalPadding
-                )
+                .padding(horizontal = MovieMateScreenDefaults.HorizontalPadding)
                 .padding(top = MovieMateScreenDefaults.VerticalPadding),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -93,10 +96,42 @@ fun CategoriesScreen(
                 state.categories.isEmpty() -> ScreenEmptyState(message = "No categories found")
                 else -> CategoriesGrid(
                     categories = state.categories,
-                    onCategoryClicked = { onAction(CategoriesUiAction.CategoryClicked(it.type)) }
+                    onCategoryClicked = { onAction(CategoriesUiAction.CategoryClicked(it.id)) }
                 )
             }
         }
+
+        FloatingActionButton(
+            onClick = { onAction(CategoriesUiAction.AddClicked) },
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(
+                    end = MovieMateScreenDefaults.HorizontalPadding,
+                    bottom = MovieMateSpacing.detailLargeSpacing
+                )
+                .semantics { contentDescription = "Add category" },
+            shape = CircleShape,
+            containerColor = MovieMateColors.Accent,
+            contentColor = MovieMateColors.PrimaryText
+        ) {
+            Text(
+                text = MovieMateIcons.add,
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.Medium
+            )
+        }
+    }
+
+    if (state.isAddDialogVisible) {
+        AddCategoryDialog(
+            name = state.addCategoryName,
+            selectedIconKey = state.selectedIconKey,
+            errorMessage = state.addCategoryError,
+            onNameChanged = { onAction(CategoriesUiAction.AddNameChanged(it)) },
+            onIconSelected = { onAction(CategoriesUiAction.AddIconSelected(it)) },
+            onConfirm = { onAction(CategoriesUiAction.AddConfirmed) },
+            onDismiss = { onAction(CategoriesUiAction.AddDismissed) }
+        )
     }
 }
 
@@ -160,7 +195,7 @@ private fun CategoriesGrid(
         contentPadding = PaddingValues(bottom = MovieMateSpacing.navigationContentBottomPadding),
         modifier = Modifier.fillMaxSize()
     ) {
-        items(categories, key = { it.type.name }) { category ->
+        items(categories, key = { it.id }) { category ->
             CategoryTile(
                 category = category,
                 onClick = { onCategoryClicked(category) }
@@ -187,21 +222,21 @@ private fun CategoryTile(
                 color = MovieMateColors.CardBorder,
                 shape = shape
             )
-            .semantics { contentDescription = "Category ${category.label}" }
+            .semantics { contentDescription = "Category ${category.name}" }
             .clickable(onClick = onClick)
             .padding(MovieMateSpacing.categoryTilePadding),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
         CategoryGenreIcon(
-            type = category.type,
+            iconKey = category.iconKey,
             modifier = Modifier.size(MovieMateSpacing.categoryIconSize)
         )
 
         Spacer(modifier = Modifier.height(MovieMateSpacing.categoryIconBottomSpacing))
 
         Text(
-            text = category.label,
+            text = category.name,
             style = MaterialTheme.typography.labelMedium,
             color = MovieMateColors.PrimaryText,
             fontWeight = FontWeight.Bold,
@@ -216,6 +251,118 @@ private fun CategoryTile(
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )
+    }
+}
+
+@Composable
+private fun AddCategoryDialog(
+    name: String,
+    selectedIconKey: String,
+    errorMessage: String?,
+    onNameChanged: (String) -> Unit,
+    onIconSelected: (String) -> Unit,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        containerColor = MovieMateColors.CardBackground,
+        titleContentColor = MovieMateColors.PrimaryText,
+        textContentColor = MovieMateColors.SecondaryText,
+        title = { Text("Add category") },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(MovieMateSpacing.titleSpacing)) {
+                OutlinedTextField(
+                    value = name,
+                    onValueChange = onNameChanged,
+                    label = { Text("Name") },
+                    singleLine = true,
+                    isError = errorMessage != null,
+                    supportingText = errorMessage?.let { message ->
+                        { Text(message) }
+                    },
+                    shape = RoundedCornerShape(MovieMateShapes.controlRadius),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedContainerColor = MovieMateColors.SoftControl,
+                        unfocusedContainerColor = MovieMateColors.SoftControl,
+                        focusedBorderColor = MovieMateColors.AccentLight,
+                        unfocusedBorderColor = MovieMateColors.SoftControlBorder,
+                        cursorColor = MovieMateColors.AccentLight,
+                    ),
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Text(
+                    text = "Icon",
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MovieMateColors.PrimaryText,
+                    fontWeight = FontWeight.SemiBold
+                )
+                CategoryIconPicker(
+                    selectedIconKey = selectedIconKey,
+                    onIconSelected = onIconSelected
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onConfirm) {
+                Text("Save")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancel")
+            }
+        }
+    )
+}
+
+@Composable
+internal fun CategoryIconPicker(
+    selectedIconKey: String?,
+    onIconSelected: (String) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    LazyRow(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(MovieMateSpacing.compactSpacing)
+    ) {
+        items(CategoryIconOptions, key = { it.key }) { option ->
+            CategoryIconChoice(
+                option = option,
+                selected = selectedIconKey.categoryIconOption().key == option.key,
+                onClick = { onIconSelected(option.key) }
+            )
+        }
+    }
+}
+
+@Composable
+private fun CategoryIconChoice(
+    option: CategoryIconOption,
+    selected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        modifier = modifier.semantics { contentDescription = "Category icon ${option.label}" },
+        shape = RoundedCornerShape(MovieMateShapes.chipRadius),
+        color = if (selected) MovieMateColors.SoftControl else MovieMateColors.CardBackgroundElevated,
+        border = BorderStroke(
+            width = MovieMateSpacing.dividerThickness,
+            color = if (selected) MovieMateColors.AccentLight else MovieMateColors.CardBorder
+        ),
+        onClick = onClick
+    ) {
+        Column(
+            modifier = Modifier.padding(MovieMateSpacing.compactSpacing),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            CategoryGenreIcon(
+                iconKey = option.key,
+                modifier = Modifier.size(MovieMateSpacing.categoryIconSize)
+            )
+        }
     }
 }
 

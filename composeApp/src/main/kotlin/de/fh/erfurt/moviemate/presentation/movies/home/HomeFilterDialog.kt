@@ -1,9 +1,12 @@
 package de.fh.erfurt.moviemate.presentation.movies.home
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AlertDialog
@@ -11,26 +14,24 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import de.fh.erfurt.moviemate.movies.domain.model.category.CategoryType
 import de.fh.erfurt.moviemate.movies.domain.repository.movie.SortBy
 import de.fh.erfurt.moviemate.presentation.components.SelectionOptionRow
-import de.fh.erfurt.moviemate.presentation.movies.components.MovieCategoryTypes
-import de.fh.erfurt.moviemate.presentation.movies.components.displayName
+import de.fh.erfurt.moviemate.presentation.movies.categories.CategoryGenreIcon
+import de.fh.erfurt.moviemate.presentation.movies.categories.CategoryUiModel
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateColors
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateSpacing
 
 /**
  * Einfacher Filter-Dialog für den Homescreen.
- *
- * Der Dialog bündelt Kategorie und Sortierung hinter dem Filter-Icon, damit die
- * Topbar dem Mockup folgt.
  */
 @Composable
 fun HomeFilterDialog(
-    selectedCategory: CategoryType?,
+    categories: List<CategoryUiModel>,
+    selectedCategoryId: String?,
     selectedSortBy: SortBy,
-    onCategorySelected: (CategoryType?) -> Unit,
+    onCategorySelected: (String?) -> Unit,
     onSortSelected: (SortBy) -> Unit,
     onClearClicked: () -> Unit,
     onClearSortClicked: () -> Unit,
@@ -60,16 +61,27 @@ fun HomeFilterDialog(
                 item {
                     SelectionOptionRow(
                         label = "All categories",
-                        selected = selectedCategory == null,
+                        selected = selectedCategoryId == null,
                         onClick = { onCategorySelected(null) }
                     )
                 }
 
-                items(MovieCategoryTypes) { category ->
+                items(categories, key = { it.id }) { category ->
                     SelectionOptionRow(
-                        label = category.displayName(),
-                        selected = selectedCategory == category,
-                        onClick = { onCategorySelected(category) }
+                        label = category.name,
+                        selected = selectedCategoryId == category.id,
+                        onClick = { onCategorySelected(category.id) },
+                        leadingContent = {
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(MovieMateSpacing.compactSpacing),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                CategoryGenreIcon(
+                                    iconKey = category.iconKey,
+                                    modifier = Modifier.size(MovieMateSpacing.categoryIconSize)
+                                )
+                            }
+                        }
                     )
                 }
 

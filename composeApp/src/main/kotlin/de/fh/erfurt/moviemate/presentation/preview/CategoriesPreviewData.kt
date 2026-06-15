@@ -1,29 +1,32 @@
 package de.fh.erfurt.moviemate.presentation.preview
 
 import de.fh.erfurt.moviemate.movies.domain.model.movie.Movie
-import de.fh.erfurt.moviemate.movies.domain.model.category.CategoryType
-import de.fh.erfurt.moviemate.presentation.movies.categories.CategoriesUiState
 import de.fh.erfurt.moviemate.presentation.movies.categories.CategoryUiModel
+import de.fh.erfurt.moviemate.presentation.movies.categories.defaultIconKey
 import de.fh.erfurt.moviemate.presentation.movies.components.MovieCategoryTypes
 import de.fh.erfurt.moviemate.presentation.movies.components.displayName
+import de.fh.erfurt.moviemate.presentation.movies.categories.CategoriesUiState
 
 // Beispiel-Kategorien für Preview und Entwicklung ohne Backend.
-// Die Filmzahlen werden aus denselben Mock-Filmen berechnet, die auch der Homescreen nutzt.
-fun previewCategories(
-    movies: List<Movie> = sampleMovies()
-): List<CategoryUiModel> {
-    val movieCountByCategory = movies
-        .groupingBy { movie -> CategoryType.fromString(movie.categoryId) }
-        .eachCount()
-
+fun sampleCategories(): List<CategoryUiModel> {
     return MovieCategoryTypes.map { type ->
-        val movieCount = movieCountByCategory[type] ?: 0
-
         CategoryUiModel(
-            type = type,
-            label = type.displayName(),
-            movieCountText = movieCount.toMovieCountText()
+            id = type.storageKey,
+            name = type.displayName(),
+            iconKey = type.defaultIconKey(),
         )
+    }
+}
+
+fun previewCategories(
+    movies: List<Movie> = sampleMovies(),
+    categories: List<CategoryUiModel> = sampleCategories(),
+): List<CategoryUiModel> {
+    val movieCountByCategory = movies.groupingBy { movie -> movie.categoryId.orEmpty() }.eachCount()
+
+    return categories.map { category ->
+        val movieCount = movieCountByCategory[category.id] ?: 0
+        category.copy(movieCountText = movieCount.toMovieCountText())
     }
 }
 
