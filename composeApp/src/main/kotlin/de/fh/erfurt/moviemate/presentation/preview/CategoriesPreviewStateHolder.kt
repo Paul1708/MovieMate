@@ -26,8 +26,24 @@ class CategoriesPreviewStateHolder(
             CategoriesUiAction.SearchClicked -> updateState(isSearchVisible = !state.isSearchVisible)
             is CategoriesUiAction.SearchChanged -> updateState(searchQuery = action.query)
             is CategoriesUiAction.CategoryClicked -> Unit
+            is CategoriesUiAction.CategoryLongPressed -> updateState(
+                isDeleteMode = true,
+                pendingDeleteCategoryId = null
+            )
+            is CategoriesUiAction.DeleteCategoryClicked -> state = state.copy(
+                isDeleteMode = true,
+                pendingDeleteCategoryId = action.categoryId
+            )
+            CategoriesUiAction.ConfirmDeleteCategoryClicked -> confirmDeleteCategory()
+            CategoriesUiAction.DeleteCategoryDismissed -> state = state.copy(pendingDeleteCategoryId = null)
+            CategoriesUiAction.ExitDeleteMode -> updateState(
+                isDeleteMode = false,
+                pendingDeleteCategoryId = null
+            )
             CategoriesUiAction.RetryClicked -> updateState()
             CategoriesUiAction.AddClicked -> state = state.copy(
+                isDeleteMode = false,
+                pendingDeleteCategoryId = null,
                 isAddDialogVisible = true,
                 addCategoryName = "",
                 selectedIconKey = DefaultCategoryIconKey,
@@ -40,6 +56,8 @@ class CategoriesPreviewStateHolder(
             is CategoriesUiAction.AddIconSelected -> state = state.copy(selectedIconKey = action.iconKey)
             CategoriesUiAction.AddConfirmed -> addCategory()
             CategoriesUiAction.AddDismissed -> state = state.copy(
+                isDeleteMode = false,
+                pendingDeleteCategoryId = null,
                 isAddDialogVisible = false,
                 addCategoryName = "",
                 selectedIconKey = DefaultCategoryIconKey,
@@ -50,12 +68,16 @@ class CategoriesPreviewStateHolder(
 
     private fun updateState(
         searchQuery: String = state.searchQuery,
-        isSearchVisible: Boolean = state.isSearchVisible
+        isSearchVisible: Boolean = state.isSearchVisible,
+        isDeleteMode: Boolean = state.isDeleteMode,
+        pendingDeleteCategoryId: String? = state.pendingDeleteCategoryId,
     ) {
         state = state.copy(
             categories = filterCategories(searchQuery),
             searchQuery = searchQuery,
             isSearchVisible = isSearchVisible,
+            isDeleteMode = isDeleteMode,
+            pendingDeleteCategoryId = pendingDeleteCategoryId,
             isLoading = false,
             errorMessage = null
         )
@@ -89,10 +111,27 @@ class CategoriesPreviewStateHolder(
         allCategories = (allCategories + newCategory).sortedBy { it.name.lowercase() }
         state = state.copy(
             categories = filterCategories(state.searchQuery),
+            isDeleteMode = false,
+            pendingDeleteCategoryId = null,
             isAddDialogVisible = false,
             addCategoryName = "",
             selectedIconKey = DefaultCategoryIconKey,
             addCategoryError = null,
+        )
+    }
+
+    private fun confirmDeleteCategory() {
+        val categoryId = state.pendingDeleteCategoryId ?: return
+        deleteCategory(categoryId)
+    }
+
+    private fun deleteCategory(categoryId: String) {
+        allCategories = allCategories.filterNot { category -> category.id == categoryId }
+        val visibleCategories = filterCategories(state.searchQuery)
+        state = state.copy(
+            categories = visibleCategories,
+            isDeleteMode = visibleCategories.isNotEmpty(),
+            pendingDeleteCategoryId = null
         )
     }
 }

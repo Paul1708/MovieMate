@@ -1,9 +1,11 @@
 package de.fh.erfurt.moviemate.presentation.movies.categories
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -40,6 +42,8 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import de.fh.erfurt.moviemate.presentation.components.DeleteBadge
+import de.fh.erfurt.moviemate.presentation.components.DeleteConfirmationDialog
 import de.fh.erfurt.moviemate.presentation.components.MovieMateScreenBackground
 import de.fh.erfurt.moviemate.presentation.components.MovieMateScreenDefaults
 import de.fh.erfurt.moviemate.presentation.components.ScreenEmptyState
@@ -47,6 +51,7 @@ import de.fh.erfurt.moviemate.presentation.components.ScreenErrorState
 import de.fh.erfurt.moviemate.presentation.components.ScreenLoadingState
 import de.fh.erfurt.moviemate.presentation.components.SearchField
 import de.fh.erfurt.moviemate.presentation.components.TopBarIconButton
+import de.fh.erfurt.moviemate.presentation.components.deleteModeWiggle
 import de.fh.erfurt.moviemate.presentation.preview.previewCategoriesUiState
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateColors
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateIcons
@@ -62,6 +67,10 @@ fun CategoriesScreen(
     onAction: (CategoriesUiAction) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    BackHandler(enabled = state.isDeleteMode && state.pendingDeleteCategoryId == null) {
+        onAction(CategoriesUiAction.ExitDeleteMode)
+    }
+
     MovieMateScreenBackground(modifier = modifier) {
         Column(
             modifier = Modifier
@@ -96,29 +105,40 @@ fun CategoriesScreen(
                 state.categories.isEmpty() -> ScreenEmptyState(message = "No categories found")
                 else -> CategoriesGrid(
                     categories = state.categories,
-                    onCategoryClicked = { onAction(CategoriesUiAction.CategoryClicked(it.id)) }
+                    isDeleteMode = state.isDeleteMode,
+                    onCategoryClicked = {
+                        if (state.isDeleteMode) {
+                            onAction(CategoriesUiAction.ExitDeleteMode)
+                        } else {
+                            onAction(CategoriesUiAction.CategoryClicked(it.id))
+                        }
+                    },
+                    onCategoryLongPressed = { onAction(CategoriesUiAction.CategoryLongPressed(it.id)) },
+                    onDeleteCategoryClicked = { onAction(CategoriesUiAction.DeleteCategoryClicked(it.id)) }
                 )
             }
         }
 
-        FloatingActionButton(
-            onClick = { onAction(CategoriesUiAction.AddClicked) },
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(
-                    end = MovieMateScreenDefaults.HorizontalPadding,
-                    bottom = MovieMateSpacing.detailLargeSpacing
+        if (!state.isDeleteMode) {
+            FloatingActionButton(
+                onClick = { onAction(CategoriesUiAction.AddClicked) },
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(
+                        end = MovieMateScreenDefaults.HorizontalPadding,
+                        bottom = MovieMateSpacing.detailLargeSpacing
+                    )
+                    .semantics { contentDescription = "Add category" },
+                shape = CircleShape,
+                containerColor = MovieMateColors.Accent,
+                contentColor = MovieMateColors.PrimaryText
+            ) {
+                Text(
+                    text = MovieMateIcons.add,
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Medium
                 )
-                .semantics { contentDescription = "Add category" },
-            shape = CircleShape,
-            containerColor = MovieMateColors.Accent,
-            contentColor = MovieMateColors.PrimaryText
-        ) {
-            Text(
-                text = MovieMateIcons.add,
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Medium
-            )
+            }
         }
     }
 
@@ -131,6 +151,18 @@ fun CategoriesScreen(
             onIconSelected = { onAction(CategoriesUiAction.AddIconSelected(it)) },
             onConfirm = { onAction(CategoriesUiAction.AddConfirmed) },
             onDismiss = { onAction(CategoriesUiAction.AddDismissed) }
+        )
+    }
+
+    val pendingDeleteCategory = state.categories.firstOrNull { category ->
+        category.id == state.pendingDeleteCategoryId
+    }
+    if (pendingDeleteCategory != null) {
+        DeleteConfirmationDialog(
+            title = "Delete category?",
+            message = "Are you sure you want to delete \"${pendingDeleteCategory.name}\"? Movies in this category will not be deleted.",
+            onConfirm = { onAction(CategoriesUiAction.ConfirmDeleteCategoryClicked) },
+            onDismiss = { onAction(CategoriesUiAction.DeleteCategoryDismissed) }
         )
     }
 }
@@ -186,7 +218,10 @@ private fun CategoriesTopBar(
 @Composable
 private fun CategoriesGrid(
     categories: List<CategoryUiModel>,
-    onCategoryClicked: (CategoryUiModel) -> Unit
+    isDeleteMode: Boolean,
+    onCategoryClicked: (CategoryUiModel) -> Unit,
+    onCategoryLongPressed: (CategoryUiModel) -> Unit,
+    onDeleteCategoryClicked: (CategoryUiModel) -> Unit,
 ) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
@@ -198,59 +233,88 @@ private fun CategoriesGrid(
         items(categories, key = { it.id }) { category ->
             CategoryTile(
                 category = category,
-                onClick = { onCategoryClicked(category) }
+                isDeleteMode = isDeleteMode,
+                onClick = { onCategoryClicked(category) },
+                onLongClick = { onCategoryLongPressed(category) },
+                onDeleteClick = { onDeleteCategoryClicked(category) }
             )
         }
     }
 }
 
 @Composable
+@OptIn(ExperimentalFoundationApi::class)
 private fun CategoryTile(
     category: CategoryUiModel,
-    onClick: () -> Unit
+    isDeleteMode: Boolean,
+    onClick: () -> Unit,
+    onLongClick: () -> Unit,
+    onDeleteClick: () -> Unit,
 ) {
     val shape = RoundedCornerShape(MovieMateShapes.folderRadius)
 
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(MovieMateSpacing.categoryTileHeight)
-            .clip(shape)
-            .background(MovieMateColors.CardBackgroundElevated)
-            .border(
-                width = MovieMateSpacing.dividerThickness,
-                color = MovieMateColors.CardBorder,
-                shape = shape
-            )
-            .semantics { contentDescription = "Category ${category.name}" }
-            .clickable(onClick = onClick)
-            .padding(MovieMateSpacing.categoryTilePadding),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+            .deleteModeWiggle(isDeleteMode)
     ) {
-        CategoryGenreIcon(
-            iconKey = category.iconKey,
-            modifier = Modifier.size(MovieMateSpacing.categoryIconSize)
-        )
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(MovieMateSpacing.categoryTileHeight)
+                .clip(shape)
+                .background(MovieMateColors.CardBackgroundElevated)
+                .border(
+                    width = MovieMateSpacing.dividerThickness,
+                    color = MovieMateColors.CardBorder,
+                    shape = shape
+                )
+                .semantics { contentDescription = "Category ${category.name}" }
+                .combinedClickable(
+                    onClick = onClick,
+                    onLongClick = onLongClick
+                )
+                .padding(MovieMateSpacing.categoryTilePadding),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            CategoryGenreIcon(
+                iconKey = category.iconKey,
+                modifier = Modifier.size(MovieMateSpacing.categoryIconSize)
+            )
 
-        Spacer(modifier = Modifier.height(MovieMateSpacing.categoryIconBottomSpacing))
+            Spacer(modifier = Modifier.height(MovieMateSpacing.categoryIconBottomSpacing))
 
-        Text(
-            text = category.name,
-            style = MaterialTheme.typography.labelMedium,
-            color = MovieMateColors.PrimaryText,
-            fontWeight = FontWeight.Bold,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-        )
+            Text(
+                text = category.name,
+                style = MaterialTheme.typography.labelMedium,
+                color = MovieMateColors.PrimaryText,
+                fontWeight = FontWeight.Bold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
 
-        Text(
-            text = category.movieCountText ?: "0 Movies",
-            style = MaterialTheme.typography.labelSmall,
-            color = MovieMateColors.SecondaryText,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-        )
+            Text(
+                text = category.movieCountText ?: "0 Movies",
+                style = MaterialTheme.typography.labelSmall,
+                color = MovieMateColors.SecondaryText,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+
+        if (isDeleteMode) {
+            DeleteBadge(
+                contentDescription = "Delete category ${category.name}",
+                onClick = onDeleteClick,
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(
+                        top = MovieMateSpacing.compactSpacing,
+                        end = MovieMateSpacing.compactSpacing
+                    )
+            )
+        }
     }
 }
 

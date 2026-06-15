@@ -14,6 +14,8 @@ data class HomeUiState(
     val selectedCategoryId: String? = null,
     val selectedSortBy: SortBy = SortBy.UPDATED_AT,
     val isFilterDialogVisible: Boolean = false,
+    val isDeleteMode: Boolean = false,
+    val pendingDeleteMovieId: String? = null,
     val isLoading: Boolean = false,
     val errorMessage: String? = null
 )

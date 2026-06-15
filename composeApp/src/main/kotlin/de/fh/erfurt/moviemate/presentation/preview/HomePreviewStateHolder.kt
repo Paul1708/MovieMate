@@ -16,13 +16,15 @@ import de.fh.erfurt.moviemate.presentation.movies.model.MovieUiModel
  * Temporary state holder for the Android UI demo.
  */
 class HomePreviewStateHolder(
-    private val sourceMovies: List<Movie> = sampleMovies(),
+    sourceMovies: List<Movie> = sampleMovies(),
     private val categories: List<CategoryUiModel> = sampleCategories(),
     initialCategoryId: String? = null
 ) {
+    private var allMovies: List<Movie> = sourceMovies
+
     var state by mutableStateOf(
         HomeUiState(
-            movies = sourceMovies.filterMovies(selectedCategoryId = initialCategoryId),
+            movies = allMovies.filterMovies(selectedCategoryId = initialCategoryId),
             availableCategories = categories,
             selectedCategoryId = initialCategoryId
         )
@@ -47,6 +49,20 @@ class HomePreviewStateHolder(
             )
             HomeUiAction.FilterDismissed -> updateState(isFilterDialogVisible = false)
             is HomeUiAction.MovieClicked -> Unit
+            is HomeUiAction.MovieLongPressed -> updateState(
+                isDeleteMode = true,
+                pendingDeleteMovieId = null
+            )
+            is HomeUiAction.DeleteMovieClicked -> state = state.copy(
+                isDeleteMode = true,
+                pendingDeleteMovieId = action.movieId
+            )
+            HomeUiAction.ConfirmDeleteMovieClicked -> confirmDeleteMovie()
+            HomeUiAction.DeleteMovieDismissed -> state = state.copy(pendingDeleteMovieId = null)
+            HomeUiAction.ExitDeleteMode -> updateState(
+                isDeleteMode = false,
+                pendingDeleteMovieId = null
+            )
             HomeUiAction.AddClicked -> Unit
             HomeUiAction.RetryClicked -> updateState()
         }
@@ -58,10 +74,12 @@ class HomePreviewStateHolder(
         isSearchVisible: Boolean = state.isSearchVisible,
         selectedCategoryId: String? = state.selectedCategoryId,
         selectedSortBy: SortBy = state.selectedSortBy,
-        isFilterDialogVisible: Boolean = state.isFilterDialogVisible
+        isFilterDialogVisible: Boolean = state.isFilterDialogVisible,
+        isDeleteMode: Boolean = state.isDeleteMode,
+        pendingDeleteMovieId: String? = state.pendingDeleteMovieId,
     ) {
         state = state.copy(
-            movies = sourceMovies.filterMovies(
+            movies = allMovies.filterMovies(
                 selectedTab = selectedTab,
                 searchQuery = searchQuery,
                 selectedCategoryId = selectedCategoryId,
@@ -74,8 +92,29 @@ class HomePreviewStateHolder(
             selectedCategoryId = selectedCategoryId,
             selectedSortBy = selectedSortBy,
             isFilterDialogVisible = isFilterDialogVisible,
+            isDeleteMode = isDeleteMode,
+            pendingDeleteMovieId = pendingDeleteMovieId,
             isLoading = false,
             errorMessage = null
+        )
+    }
+
+    private fun confirmDeleteMovie() {
+        val movieId = state.pendingDeleteMovieId ?: return
+        deleteMovie(movieId)
+    }
+
+    private fun deleteMovie(movieId: String) {
+        allMovies = allMovies.filterNot { movie -> movie.id == movieId }
+        val hasVisibleMovies = allMovies.filterMovies(
+            selectedTab = state.selectedTab,
+            searchQuery = state.searchQuery,
+            selectedCategoryId = state.selectedCategoryId,
+            selectedSortBy = state.selectedSortBy
+        ).isNotEmpty()
+        updateState(
+            isDeleteMode = hasVisibleMovies,
+            pendingDeleteMovieId = null
         )
     }
 

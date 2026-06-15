@@ -1,6 +1,8 @@
 package de.fh.erfurt.moviemate.presentation.movies.home
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -19,12 +21,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import de.fh.erfurt.moviemate.presentation.components.DeleteBadge
+import de.fh.erfurt.moviemate.presentation.components.DeleteConfirmationDialog
 import de.fh.erfurt.moviemate.presentation.components.MovieMateScreenBackground
 import de.fh.erfurt.moviemate.presentation.components.ScreenEmptyState
 import de.fh.erfurt.moviemate.presentation.components.ScreenErrorState
 import de.fh.erfurt.moviemate.presentation.components.MovieMateScreenDefaults
 import de.fh.erfurt.moviemate.presentation.components.ScreenLoadingState
 import de.fh.erfurt.moviemate.presentation.components.SearchField
+import de.fh.erfurt.moviemate.presentation.components.deleteModeWiggle
 import de.fh.erfurt.moviemate.presentation.movies.components.MovieCard
 import de.fh.erfurt.moviemate.presentation.preview.previewHomeUiState
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateColors
@@ -44,6 +49,10 @@ fun HomeScreen(
     onAction: (HomeUiAction) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    BackHandler(enabled = state.isDeleteMode && state.pendingDeleteMovieId == null) {
+        onAction(HomeUiAction.ExitDeleteMode)
+    }
+
     MovieMateScreenBackground(modifier = modifier) {
         Column(
             modifier = Modifier
@@ -91,33 +100,61 @@ fun HomeScreen(
                         .padding(top = MovieMateSpacing.listTopPadding)
                 ) {
                     items(state.movies, key = { it.id }) { movie ->
-                        MovieCard(
-                            movie = movie,
-                            onClick = { onAction(HomeUiAction.MovieClicked(movie.id)) },
-                            modifier = Modifier.fillMaxWidth()
-                        )
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .deleteModeWiggle(state.isDeleteMode)
+                        ) {
+                            MovieCard(
+                                movie = movie,
+                                onClick = {
+                                    if (state.isDeleteMode) {
+                                        onAction(HomeUiAction.ExitDeleteMode)
+                                    } else {
+                                        onAction(HomeUiAction.MovieClicked(movie.id))
+                                    }
+                                },
+                                onLongClick = { onAction(HomeUiAction.MovieLongPressed(movie.id)) },
+                                modifier = Modifier.fillMaxWidth()
+                            )
+
+                            if (state.isDeleteMode) {
+                                DeleteBadge(
+                                    contentDescription = "Delete movie ${movie.title}",
+                                    onClick = { onAction(HomeUiAction.DeleteMovieClicked(movie.id)) },
+                                    modifier = Modifier
+                                        .align(Alignment.TopEnd)
+                                        .padding(
+                                            top = MovieMateSpacing.compactSpacing,
+                                            end = MovieMateSpacing.compactSpacing
+                                        )
+                                )
+                            }
+                        }
                     }
                 }
             }
         }
 
-        FloatingActionButton(
-            onClick = { onAction(HomeUiAction.AddClicked) },
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(
-                    end = MovieMateScreenDefaults.HorizontalPadding,
-                    bottom = MovieMateSpacing.detailLargeSpacing
-                ),
-            shape = CircleShape,
-            containerColor = MovieMateColors.Accent,
-            contentColor = MovieMateColors.PrimaryText
-        ) {
-            Text(
-                text = "+",
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Medium
-            )
+        if (!state.isDeleteMode) {
+            FloatingActionButton(
+                onClick = { onAction(HomeUiAction.AddClicked) },
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(
+                        end = MovieMateScreenDefaults.HorizontalPadding,
+                        bottom = MovieMateSpacing.detailLargeSpacing
+                    ),
+                shape = CircleShape,
+                containerColor = MovieMateColors.Accent,
+                contentColor = MovieMateColors.PrimaryText
+            ) {
+                Text(
+                    text = "+",
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Medium
+                )
+            }
         }
     }
 
@@ -131,6 +168,18 @@ fun HomeScreen(
             onClearClicked = { onAction(HomeUiAction.ClearCategoryFilterClicked) },
             onClearSortClicked = { onAction(HomeUiAction.ClearSortClicked) },
             onDismiss = { onAction(HomeUiAction.FilterDismissed) }
+        )
+    }
+
+    val pendingDeleteMovie = state.movies.firstOrNull { movie ->
+        movie.id == state.pendingDeleteMovieId
+    }
+    if (pendingDeleteMovie != null) {
+        DeleteConfirmationDialog(
+            title = "Delete movie?",
+            message = "Are you sure you want to delete \"${pendingDeleteMovie.title}\"? This action cannot be undone.",
+            onConfirm = { onAction(HomeUiAction.ConfirmDeleteMovieClicked) },
+            onDismiss = { onAction(HomeUiAction.DeleteMovieDismissed) }
         )
     }
 

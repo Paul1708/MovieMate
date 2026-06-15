@@ -1,8 +1,9 @@
 package de.fh.erfurt.moviemate.presentation.movies.components
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -42,15 +43,20 @@ import de.fh.erfurt.moviemate.presentation.theme.MovieMateSpacing
  * ist bereits vorbereitet, damit später der Detail-Screen geöffnet werden kann.
  */
 @Composable
+@OptIn(ExperimentalFoundationApi::class)
 fun MovieCard(
     movie: MovieUiModel,
     modifier: Modifier = Modifier,
-    onClick: () -> Unit = {}
+    onClick: () -> Unit = {},
+    onLongClick: () -> Unit = {},
 ) {
     Card(
         modifier = modifier
             .height(MovieMateSpacing.movieCardHeight)
-            .clickable(onClick = onClick)
+            .combinedClickable(
+                onClick = onClick,
+                onLongClick = onLongClick
+            )
             .semantics {
                 contentDescription =
                     "Movie ${movie.title}, rating ${movie.ratingText}, category ${movie.categoryText}, year ${movie.yearText}"
