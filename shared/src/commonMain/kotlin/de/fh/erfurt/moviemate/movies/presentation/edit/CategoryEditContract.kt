@@ -6,12 +6,14 @@ data class CategoryEditUiState(
     val errorMessage: String? = null,
     val savedCategoryId: String? = null,
     val initialCategoryId: String? = null,
+    val selectedIconKey: String? = null,
     val showDiscardDialog: Boolean = false,
 )
 
 sealed interface CategoryEditEvent {
     data class SaveRequested(
         val name: String,
+        val iconKey: String? = null,
     ) : CategoryEditEvent
 
     data object BackClicked : CategoryEditEvent

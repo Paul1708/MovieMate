@@ -20,6 +20,7 @@ class FakeCategoryRepository(
         val category = Category(
             id = nextId.toString(),
             name = draft.name,
+            iconKey = draft.iconKey,
             updatedAtEpochMillis = draft.updatedAtEpochMillis,
         )
         storedCategories += category

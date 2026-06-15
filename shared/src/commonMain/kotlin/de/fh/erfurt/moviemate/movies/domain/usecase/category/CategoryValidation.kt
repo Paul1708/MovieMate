@@ -8,11 +8,17 @@ internal fun validateCategoryName(name: String) {
     require(name.length <= 50) { "Category name must not exceed 50 characters" }
 }
 
+internal fun validateCategoryIconKey(iconKey: String?) {
+    require(iconKey == null || iconKey.length <= 50) { "Category icon key must not exceed 50 characters" }
+}
+
 internal fun validateCategory(category: Category) {
     require(category.id.isNotBlank()) { "Category ID cannot be empty" }
     validateCategoryName(category.name)
+    validateCategoryIconKey(category.iconKey)
 }
 
 internal fun validateCategoryDraft(draft: CategoryDraft) {
     validateCategoryName(draft.name)
+    validateCategoryIconKey(draft.iconKey)
 }
