@@ -6,16 +6,8 @@ import de.fh.erfurt.moviemate.app.di.SharedModuleFactory
 import de.fh.erfurt.moviemate.movies.data.local.datasource.SqlDelightCategoryLocalDataSource
 import de.fh.erfurt.moviemate.movies.data.local.datasource.SqlDelightMovieLocalDataSource
 import de.fh.erfurt.moviemate.movies.data.local.db.MovieMateDatabase
-import de.fh.erfurt.moviemate.movies.data.local.db.MovieMateDatabase.Companion.invoke
-import de.fh.erfurt.moviemate.movies.data.remote.client.MoviesApiConfiguration
-import de.fh.erfurt.moviemate.movies.data.remote.client.MoviesHttpClientFactory
-import de.fh.erfurt.moviemate.movies.data.remote.datasource.KtorCategoryRemoteDataSource
-import de.fh.erfurt.moviemate.movies.data.remote.datasource.KtorMovieRemoteDataSource
 import de.fh.erfurt.moviemate.movies.data.repository.local.LocalCategoryRepository
 import de.fh.erfurt.moviemate.movies.data.repository.local.LocalMovieRepository
-import de.fh.erfurt.moviemate.movies.data.repository.remote.RemoteCategoryRepository
-import de.fh.erfurt.moviemate.movies.data.repository.remote.RemoteMovieRepository
-import io.ktor.client.engine.darwin.Darwin
 
 class IosAppContainerFactory {
     fun create(): AppContainer {
@@ -51,7 +43,10 @@ class IosAppContainerFactory {
         val database = MovieMateDatabase(driver)
         val localMovieDataSource = SqlDelightMovieLocalDataSource(database)
         val localCategoryDataSource = SqlDelightCategoryLocalDataSource(database)
-        val movieRepository = LocalMovieRepository(localMovieDataSource)
+        val movieRepository = LocalMovieRepository(
+            localDataSource = localMovieDataSource,
+            categoryDataSource = localCategoryDataSource,
+        )
         val categoryRepository = LocalCategoryRepository(localCategoryDataSource)
 
         return SharedModuleFactory.createAppContainer(

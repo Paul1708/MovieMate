@@ -1,5 +1,6 @@
 package de.fh.erfurt.moviemate.movies.presentation.edit
 
+import de.fh.erfurt.moviemate.movies.presentation.list.CategoryListItemUiModel
 
 data class MovieEditUiState(
     val isLoading: Boolean = false,
@@ -9,6 +10,7 @@ data class MovieEditUiState(
     val initialMovieId: String? = null, // Unterscheidung zwischen Neuanlage und Bearbeitung
     val showDiscardDialog: Boolean = false,
     val currentWatchProviders: List<String> = emptyList(),
+    val availableCategories: List<CategoryListItemUiModel> = emptyList(),
 )
 
 sealed interface MovieEditEvent {
@@ -32,7 +34,7 @@ sealed interface MovieEditEvent {
     data object KeepEditingRequested : MovieEditEvent
     data object DiscardChangesConfirmed : MovieEditEvent
 
-    // Dynamische Listenverwaltung für Watch-Provider
+    // Dynamische Listenverwaltung fuer Watch-Provider
     data class AddWatchProviderRequested(val provider: String) : MovieEditEvent
     data class RemoveWatchProviderRequested(val provider: String) : MovieEditEvent
 }
@@ -43,5 +45,5 @@ sealed interface MovieEditEffect {
     ) : MovieEditEffect
 
     data object SavedSuccess : MovieEditEffect
-    data object NavigateBack : MovieEditEffect // Auslösung der Navigation nach DiscardConfirmed
+    data object NavigateBack : MovieEditEffect // Ausloesung der Navigation nach DiscardConfirmed
 }

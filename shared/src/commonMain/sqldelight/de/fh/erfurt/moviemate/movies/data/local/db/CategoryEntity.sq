@@ -1,12 +1,14 @@
 CREATE TABLE categoryEntity (
     id TEXT NOT NULL PRIMARY KEY,
-    type TEXT NOT NULL
+    name TEXT NOT NULL,
+    updatedAtEpochMillis INTEGER NOT NULL,
+    version INTEGER
 );
 
 selectAll:
 SELECT *
 FROM categoryEntity
-ORDER BY type ASC;
+ORDER BY name ASC;
 
 selectById:
 SELECT *
@@ -14,8 +16,16 @@ FROM categoryEntity
 WHERE id = ?;
 
 insertCategory:
-INSERT OR REPLACE INTO categoryEntity(id, type)
-VALUES (?, ?);
+INSERT INTO categoryEntity(id, name, updatedAtEpochMillis, version)
+VALUES (?, ?, ?, ?);
+
+updateCategory:
+UPDATE categoryEntity
+SET
+    name = ?,
+    updatedAtEpochMillis = ?,
+    version = ?
+WHERE id = ?;
 
 deleteCategory:
 DELETE FROM categoryEntity

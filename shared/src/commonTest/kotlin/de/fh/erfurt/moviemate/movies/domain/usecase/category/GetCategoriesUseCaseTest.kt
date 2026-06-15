@@ -1,7 +1,6 @@
 package de.fh.erfurt.moviemate.movies.domain.usecase.category
 
 import de.fh.erfurt.moviemate.movies.domain.model.category.Category
-import de.fh.erfurt.moviemate.movies.domain.model.category.CategoryType
 import de.fh.erfurt.moviemate.movies.domain.repository.FakeCategoryRepository
 import kotlin.test.Test
 import kotlinx.coroutines.test.runTest
@@ -14,8 +13,8 @@ class GetCategoriesUseCaseTest {
     fun `invoke returns the categories from the repository`() = runTest {
         // Given
         val exceptedCategories = listOf(
-            Category(id = "1", type = CategoryType.ACTION),
-            Category(id = "2", type = CategoryType.COMEDY),
+            Category(id = "1", name = "Action", updatedAtEpochMillis = 1L),
+            Category(id = "2", name = "Comedy", updatedAtEpochMillis = 2L),
         )
         val useCase = GetCategoriesUseCase(
             categoryRepository = FakeCategoryRepository(exceptedCategories)

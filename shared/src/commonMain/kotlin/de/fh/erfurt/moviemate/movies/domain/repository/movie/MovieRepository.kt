@@ -21,4 +21,8 @@ interface MovieRepository {
     suspend fun getMoviesByCategory(categoryId: String): List<Movie>
 
     suspend fun getMoviesSorted(sortBy: SortBy = SortBy.TITLE, ascending: Boolean = true): List<Movie>
+
+    suspend fun exportBackup(): String
+
+    suspend fun importBackup(jsonString: String)
 }

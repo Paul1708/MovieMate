@@ -6,6 +6,7 @@ import de.fh.erfurt.moviemate.movies.data.local.idpolicy.LocalIdPolicy
 import de.fh.erfurt.moviemate.movies.data.mapper.local.toDomainModel
 import de.fh.erfurt.moviemate.movies.data.mapper.local.toLocalEntity
 import de.fh.erfurt.moviemate.movies.domain.model.category.Category
+import de.fh.erfurt.moviemate.movies.domain.model.category.CategoryDraft
 import de.fh.erfurt.moviemate.movies.domain.repository.category.CategoryRepository
 
 class LocalCategoryRepository(
@@ -21,18 +22,19 @@ class LocalCategoryRepository(
         return localDataSource.getCategory(categoryId)?.toDomainModel()
     }
 
-    suspend fun saveCategory(category: Category): Category {
+    override suspend fun addCategory(draft: CategoryDraft): Category {
         val existingIds = localDataSource.getCategories().map { it.id }
-        val resolvedCategory = if (category.id.isBlank()) {
-            category.copy(id = idPolicy.nextId(existingIds))
-        } else {
-            category
-        }
-
-        return localDataSource.insertCategory(resolvedCategory.toLocalEntity()).toDomainModel()
+        val storedCategory = localDataSource.insertCategory(
+            draft.toLocalEntity(idPolicy.nextId(existingIds)),
+        )
+        return storedCategory.toDomainModel()
     }
 
-    suspend fun saveCategories(categories: List<Category>): List<Category> {
-        return categories.map { category -> saveCategory(category) }
+    override suspend fun updateCategory(category: Category): Category {
+        return localDataSource.updateCategory(category.toLocalEntity()).toDomainModel()
+    }
+
+    override suspend fun deleteCategory(categoryId: String) {
+        localDataSource.deleteCategory(categoryId)
     }
 }

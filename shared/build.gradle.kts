@@ -52,8 +52,6 @@ kotlin {
             implementation(libs.ktor.client.mock)
             implementation(libs.coroutines.test)
             implementation(libs.sqldelight.sqlite.driver)
-
-
         }
 
         androidUnitTest.dependencies {
@@ -63,6 +61,7 @@ kotlin {
         }
 
         jvmTest.dependencies {
+            implementation(libs.sqldelight.sqlite.driver)
             implementation(libs.kotlin.testJunit)
         }
     }
@@ -87,4 +86,3 @@ sqldelight {
         }
     }
 }
-

@@ -15,6 +15,14 @@ sealed interface CategoryDetailEvent {
     data class LoadRequested(
         val categoryId: String,
     ) : CategoryDetailEvent
+
+    data class EditRequested(
+        val categoryId: String,
+    ) : CategoryDetailEvent
+
+    data class DeleteRequested(
+        val categoryId: String,
+    ) : CategoryDetailEvent
 }
 
 sealed interface CategoryDetailEffect {

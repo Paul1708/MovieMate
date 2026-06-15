@@ -76,4 +76,13 @@ class FakeMovieRepository(
         return if (ascending) sorted else sorted.reversed()
     }
 
+    override suspend fun exportBackup(): String {
+        // Für Testzwecke reicht eine minimale Implementierung oder ein vordefinierter String
+        return "{ \"movies\": [], \"categories\": [] }"
+    }
+
+    override suspend fun importBackup(jsonString: String) {
+        // Logik für Test-Imports falls benötigt, ansonsten leer belassen
+    }
+
 }
