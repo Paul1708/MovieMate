@@ -9,6 +9,7 @@ data class CategoryDetailUiState(
 data class CategoryDetailUiModel(
     val id: String,
     val name: String,
+    val iconKey: String? = null,
 )
 
 sealed interface CategoryDetailEvent {

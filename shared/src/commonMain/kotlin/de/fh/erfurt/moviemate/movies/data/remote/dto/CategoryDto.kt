@@ -6,6 +6,7 @@ import kotlinx.serialization.Serializable
 data class CategoryDto(
     val id: String,
     val name: String,
+    val iconKey: String? = null,
     val updatedAtEpochMillis: Long,
     val version: Long? = null,
 )

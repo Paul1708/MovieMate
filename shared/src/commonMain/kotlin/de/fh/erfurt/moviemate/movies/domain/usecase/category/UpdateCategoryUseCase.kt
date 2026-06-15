@@ -11,7 +11,8 @@ class UpdateCategoryUseCase(
 
         return categoryRepository.updateCategory(
             category = category.copy(
-                name = category.name.trim()
+                name = category.name.trim(),
+                iconKey = category.iconKey?.trim()?.takeIf { it.isNotBlank() },
             )
         )
     }

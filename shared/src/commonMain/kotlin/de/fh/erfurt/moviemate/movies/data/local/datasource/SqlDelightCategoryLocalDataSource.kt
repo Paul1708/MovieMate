@@ -26,6 +26,7 @@ class SqlDelightCategoryLocalDataSource(
         queries.insertCategory(
             resolvedCategory.id,
             resolvedCategory.name,
+            resolvedCategory.iconKey,
             resolvedCategory.updatedAtEpochMillis,
             resolvedCategory.version,
         )
@@ -36,6 +37,7 @@ class SqlDelightCategoryLocalDataSource(
         require(category.id.isNotBlank()) { "Category id must not be blank when updating the local cache." }
         queries.updateCategory(
             category.name,
+            category.iconKey,
             category.updatedAtEpochMillis,
             category.version,
             category.id,
@@ -53,3 +55,4 @@ class SqlDelightCategoryLocalDataSource(
         return copy(id = idPolicy.nextId(existingIds))
     }
 }
+

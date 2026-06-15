@@ -109,6 +109,7 @@ class LocalMovieRepository(
             CategoryDto(
                 id = category.id,
                 name = category.name,
+                iconKey = category.iconKey,
                 updatedAtEpochMillis = category.updatedAtEpochMillis,
                 version = category.version,
             )
@@ -125,6 +126,7 @@ class LocalMovieRepository(
             val entity = LocalCategoryEntity(
                 id = dto.id,
                 name = dto.name,
+                iconKey = dto.iconKey,
                 updatedAtEpochMillis = dto.updatedAtEpochMillis,
                 version = dto.version,
             )
@@ -164,4 +166,7 @@ class LocalMovieRepository(
             }
         }
     }
+
+
+
 }

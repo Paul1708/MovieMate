@@ -93,6 +93,7 @@ fun MovieEntity.toLocalModel(): LocalMovieEntity = LocalMovieEntity(
 fun LocalCategoryEntity.toDomainModel(): Category = Category(
     id = id,
     name = name,
+    iconKey = iconKey,
     updatedAtEpochMillis = updatedAtEpochMillis,
     version = version,
 )
@@ -100,6 +101,7 @@ fun LocalCategoryEntity.toDomainModel(): Category = Category(
 fun Category.toLocalEntity(): LocalCategoryEntity = LocalCategoryEntity(
     id = id,
     name = name,
+    iconKey = iconKey,
     updatedAtEpochMillis = updatedAtEpochMillis,
     version = version,
 )
@@ -107,6 +109,7 @@ fun Category.toLocalEntity(): LocalCategoryEntity = LocalCategoryEntity(
 fun CategoryDraft.toLocalEntity(id: String): LocalCategoryEntity = LocalCategoryEntity(
     id = id,
     name = name,
+    iconKey = iconKey,
     updatedAtEpochMillis = updatedAtEpochMillis,
     version = null,
 )
@@ -114,6 +117,7 @@ fun CategoryDraft.toLocalEntity(id: String): LocalCategoryEntity = LocalCategory
 fun CategoryEntity.toLocalModel(): LocalCategoryEntity = LocalCategoryEntity(
     id = id,
     name = name,
+    iconKey = iconKey,
     updatedAtEpochMillis = updatedAtEpochMillis,
     version = version,
 )
@@ -126,3 +130,4 @@ private fun Map<String, String>?.toJsonStringOrNull(): String? =
 
 private inline fun <reified T> String?.fromJsonStringOrNull(): T? =
     this?.takeIf { it.isNotBlank() }?.let { localJson.decodeFromString(it) }
+

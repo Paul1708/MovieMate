@@ -462,9 +462,19 @@ private class FakeCategoryRemoteDataSource : CategoryRemoteDataSource {
     override suspend fun fetchCategories(): List<CategoryDto> = emptyList()
     override suspend fun fetchCategory(categoryId: String): CategoryDto? = null
     override suspend fun createCategory(request: CreateCategoryRequestDto): CategoryDto =
-        CategoryDto("id", request.name, request.updatedAtEpochMillis)
+        CategoryDto(
+            id = "id",
+            name = request.name,
+            iconKey = request.iconKey,
+            updatedAtEpochMillis = request.updatedAtEpochMillis,
+        )
     override suspend fun updateCategory(categoryId: String, request: UpdateCategoryRequestDto): CategoryDto =
-        CategoryDto(categoryId, request.name, request.updatedAtEpochMillis)
+        CategoryDto(
+            id = categoryId,
+            name = request.name,
+            iconKey = request.iconKey,
+            updatedAtEpochMillis = request.updatedAtEpochMillis,
+        )
     override suspend fun deleteCategory(categoryId: String) {}
 }
 

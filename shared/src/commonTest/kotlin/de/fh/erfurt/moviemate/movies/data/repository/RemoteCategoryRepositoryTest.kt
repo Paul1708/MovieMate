@@ -107,11 +107,11 @@ private class FakeRemoteCategoryDataSource (
     }
 
     override suspend fun createCategory(request: CreateCategoryRequestDto): CategoryDto {
-        return dto("created", request.name, request.updatedAtEpochMillis)
+        return dto("created", request.name, request.updatedAtEpochMillis, request.iconKey)
     }
 
     override suspend fun updateCategory(categoryId: String, request: UpdateCategoryRequestDto): CategoryDto {
-        return dto(categoryId, request.name, request.updatedAtEpochMillis)
+        return dto(categoryId, request.name, request.updatedAtEpochMillis, request.iconKey)
     }
 
     override suspend fun deleteCategory(categoryId: String) = Unit
@@ -119,15 +119,26 @@ private class FakeRemoteCategoryDataSource (
 
 }
 
-private fun dto(id: String, name: String, updatedAtEpochMillis: Long) = CategoryDto(
+private fun dto(
+    id: String,
+    name: String,
+    updatedAtEpochMillis: Long,
+    iconKey: String? = null,
+) = CategoryDto(
     id = id,
     name = name,
+    iconKey = iconKey,
     updatedAtEpochMillis = updatedAtEpochMillis,
 )
 
-private fun category(id: String, name: String, updatedAtEpochMillis: Long) = Category(
+private fun category(
+    id: String,
+    name: String,
+    updatedAtEpochMillis: Long,
+    iconKey: String? = null,
+) = Category(
     id = id,
     name = name,
+    iconKey = iconKey,
     updatedAtEpochMillis = updatedAtEpochMillis,
 )
-
