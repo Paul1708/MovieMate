@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -26,6 +28,7 @@ import de.fh.erfurt.moviemate.presentation.app.startup.MovieMateStartupStep
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlin.time.Duration.Companion.milliseconds
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,14 +46,44 @@ private fun MovieMateStartup(
     applicationContext: Context
 ) {
     var startupState by remember { mutableStateOf<MovieMateStartupState>(MovieMateStartupState.Loading()) }
-    var retryCount by remember { mutableStateOf(0) }
+    var retryCount by remember { mutableIntStateOf(0) }
     var isOpeningVisible by remember { mutableStateOf(true) }
-    var openingAlpha by remember { mutableStateOf(1f) }
+    var openingAlpha by remember { mutableFloatStateOf(1f) }
 
+    RunStartupEffect(
+        applicationContext = applicationContext,
+        retryCount = retryCount,
+        onStartupStateChanged = { startupState = it },
+        onOpeningVisibilityChanged = { isOpeningVisible = it },
+        onOpeningAlphaChanged = { openingAlpha = it }
+    )
+
+    FadeOpeningOnReadyEffect(
+        startupState = startupState,
+        onOpeningAlphaChanged = { openingAlpha = it },
+        onOpeningHidden = { isOpeningVisible = false }
+    )
+
+    MovieMateStartupContent(
+        startupState = startupState,
+        isOpeningVisible = isOpeningVisible,
+        openingAlpha = openingAlpha,
+        onRetryClicked = { retryCount += 1 }
+    )
+}
+
+@Composable
+private fun RunStartupEffect(
+    applicationContext: Context,
+    retryCount: Int,
+    onStartupStateChanged: (MovieMateStartupState) -> Unit,
+    onOpeningVisibilityChanged: (Boolean) -> Unit,
+    onOpeningAlphaChanged: (Float) -> Unit
+) {
     LaunchedEffect(applicationContext, retryCount) {
-        startupState = MovieMateStartupState.Loading()
-        isOpeningVisible = true
-        openingAlpha = 1f
+        onStartupStateChanged(MovieMateStartupState.Loading())
+        onOpeningVisibilityChanged(true)
+        onOpeningAlphaChanged(1f)
 
         val openingStartedAt = SystemClock.uptimeMillis()
         runCatching {
@@ -58,57 +91,57 @@ private fun MovieMateStartup(
                 applicationContext = applicationContext,
                 ioDispatcher = Dispatchers.IO
             ).run { step ->
-                startupState = MovieMateStartupState.Loading(step)
+                onStartupStateChanged(MovieMateStartupState.Loading(step))
             }
         }.onSuccess { container ->
-            val elapsedMillis = SystemClock.uptimeMillis() - openingStartedAt
-            val remainingOpeningMillis = MinimumOpeningDurationMillis - elapsedMillis
-
-            if (remainingOpeningMillis > 0) {
-                delay(remainingOpeningMillis)
-            }
-
-            startupState = MovieMateStartupState.Ready(container)
+            delayRemainingOpeningTime(openingStartedAt)
+            onStartupStateChanged(MovieMateStartupState.Ready(container))
         }.onFailure { throwable ->
-            startupState = MovieMateStartupState.Error(throwable.startupMessage())
+            onStartupStateChanged(MovieMateStartupState.Error(throwable.startupMessage()))
         }
     }
+}
 
+@Composable
+private fun FadeOpeningOnReadyEffect(
+    startupState: MovieMateStartupState,
+    onOpeningAlphaChanged: (Float) -> Unit,
+    onOpeningHidden: () -> Unit
+) {
     LaunchedEffect(startupState) {
-        if (startupState is MovieMateStartupState.Ready) {
-            val fadeStartedAt = withFrameNanos { frameTimeNanos -> frameTimeNanos }
-            var progress = 0f
-
-            while (progress < 1f) {
-                val frameTimeNanos = withFrameNanos { it }
-                progress = ((frameTimeNanos - fadeStartedAt).toFloat() / OpeningFadeOutDurationNanos)
-                    .coerceIn(0f, 1f)
-                openingAlpha = 1f - progress
-            }
-
-            openingAlpha = 0f
-            isOpeningVisible = false
+        if (startupState !is MovieMateStartupState.Ready) {
+            return@LaunchedEffect
         }
-    }
 
+        fadeOpening(onOpeningAlphaChanged)
+        onOpeningHidden()
+    }
+}
+
+@Composable
+private fun MovieMateStartupContent(
+    startupState: MovieMateStartupState,
+    isOpeningVisible: Boolean,
+    openingAlpha: Float,
+    onRetryClicked: () -> Unit
+) {
     MovieMateTheme {
-        val state = startupState
-        val readyState = state as? MovieMateStartupState.Ready
+        val readyState = startupState as? MovieMateStartupState.Ready
         Box(modifier = Modifier.fillMaxSize()) {
             if (readyState != null) {
                 MovieMateApp(appContainer = readyState.appContainer)
             }
 
             if (isOpeningVisible) {
-                val errorState = state as? MovieMateStartupState.Error
+                val errorState = startupState as? MovieMateStartupState.Error
                 val retryAction = if (errorState != null) {
-                    { retryCount += 1 }
+                    onRetryClicked
                 } else {
                     null
                 }
 
                 MovieMateOpeningScreen(
-                    message = state.startupMessage(),
+                    message = startupState.startupMessage(),
                     errorMessage = errorState?.message,
                     onRetryClicked = retryAction,
                     modifier = Modifier
@@ -118,6 +151,31 @@ private fun MovieMateStartup(
             }
         }
     }
+}
+
+private suspend fun delayRemainingOpeningTime(openingStartedAt: Long) {
+    val elapsedDuration = (SystemClock.uptimeMillis() - openingStartedAt).milliseconds
+    val remainingOpeningDuration = MinimumOpeningDuration - elapsedDuration
+
+    if (remainingOpeningDuration.isPositive()) {
+        delay(remainingOpeningDuration)
+    }
+}
+
+private suspend fun fadeOpening(
+    onOpeningAlphaChanged: (Float) -> Unit
+) {
+    val fadeStartedAt = withFrameNanos { frameTimeNanos -> frameTimeNanos }
+    var progress = 0f
+
+    while (progress < 1f) {
+        val frameTimeNanos = withFrameNanos { it }
+        progress = ((frameTimeNanos - fadeStartedAt).toFloat() / OpeningFadeOutDurationNanos)
+            .coerceIn(0f, 1f)
+        onOpeningAlphaChanged(1f - progress)
+    }
+
+    onOpeningAlphaChanged(0f)
 }
 
 @Preview
@@ -143,6 +201,6 @@ private fun Throwable.startupMessage(): String {
     }
 }
 
-private const val MinimumOpeningDurationMillis = 600L
+private val MinimumOpeningDuration = 600.milliseconds
 private const val OpeningFadeOutDurationMillis = 450L
 private const val OpeningFadeOutDurationNanos = OpeningFadeOutDurationMillis * 1_000_000L
