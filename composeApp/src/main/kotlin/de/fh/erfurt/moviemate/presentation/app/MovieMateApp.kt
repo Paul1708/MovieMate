@@ -18,20 +18,20 @@ import de.fh.erfurt.moviemate.presentation.app.navigation.BottomNavItem
 import de.fh.erfurt.moviemate.presentation.app.navigation.MovieMateDestination
 import de.fh.erfurt.moviemate.presentation.app.navigation.selectedBottomNavItem
 import de.fh.erfurt.moviemate.presentation.app.navigation.toRoute
-import de.fh.erfurt.moviemate.presentation.components.PlaceholderScreen
 import de.fh.erfurt.moviemate.presentation.preview.AddMoviePreviewRoute
 import de.fh.erfurt.moviemate.presentation.preview.CategoriesPreviewRoute
 import de.fh.erfurt.moviemate.presentation.preview.HomePreviewRoute
 import de.fh.erfurt.moviemate.presentation.preview.MovieDetailPreviewRoute
+import de.fh.erfurt.moviemate.presentation.movies.backup.BackupRoute
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateColors
 
 /**
  * App-Gerüst mit Navigation, Bottom Bar und den aktuell angebundenen Screens.
  */
-@Suppress("UNUSED_PARAMETER")
 @Composable
 fun MovieMateApp(
-    appContainer: AppContainer? = null
+    appContainer: AppContainer? = null,
+    dispatchers: MovieMateDispatchers = MovieMateDispatcherDefaults.Default
 ) {
     // Der Container wird hier bereits angenommen, auch wenn die aktuellen
     // Routen noch mit Preview-State arbeiten. So kann später pro Route auf
@@ -132,9 +132,9 @@ fun MovieMateApp(
             }
 
             composable(MovieMateDestination.Backup) {
-                PlaceholderScreen(
-                    title = "Backup",
-                    message = "Backup screen is prepared."
+                BackupRoute(
+                    appContainer = appContainer,
+                    ioDispatcher = dispatchers.io
                 )
             }
         }

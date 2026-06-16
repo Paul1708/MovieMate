@@ -50,6 +50,9 @@ object MovieMateSpacing {
     val addPosterHeight = 132.dp
     val addFormBottomPadding = 96.dp
 
+    val backupActionCardHeight = 92.dp
+    val backupActionIconSize = 44.dp
+
     val movieCardHeight = 132.dp
     val moviePosterWidth = 84.dp
     val moviePosterHeight = 112.dp
