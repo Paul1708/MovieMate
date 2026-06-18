@@ -9,23 +9,6 @@ data class MoviesListUiState(
 sealed interface MoviesListEvent {
     data object LoadRequested : MoviesListEvent
 
-    data class AddRequested(
-        val title: String,
-        val description: String,
-        val releaseYear: Int? = null,
-        val categoryId: String? = null,
-        val posterUrl: String? = null,
-        val runtimeMinutes: Int? = null,
-        val userRating: Int? = null,
-        val imdbRating: Double? = null,
-        val isWatched: Boolean = false,
-        val watchProviders: List<String>? = null,
-        val comment: String? = null,
-    ) : MoviesListEvent
-
-    data class UpdateRequested(
-        val movieId: String,
-    ) : MoviesListEvent
 
     data class DeleteRequested(
         val movieId: String,

@@ -15,6 +15,9 @@ data class MovieEditUiState(
     )
 
 sealed interface MovieEditEvent {
+
+    data class LoadRequested(val movieId: String?) : MovieEditEvent
+
     data class SaveRequested(
         val title: String,
         val description: String,

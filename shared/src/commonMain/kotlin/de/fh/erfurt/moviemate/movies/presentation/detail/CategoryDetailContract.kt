@@ -16,10 +16,6 @@ sealed interface CategoryDetailEvent {
         val categoryId: String,
     ) : CategoryDetailEvent
 
-    data class EditRequested(
-        val categoryId: String,
-    ) : CategoryDetailEvent
-
     data class DeleteRequested(
         val categoryId: String,
     ) : CategoryDetailEvent
