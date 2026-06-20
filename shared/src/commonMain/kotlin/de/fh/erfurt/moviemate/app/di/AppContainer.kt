@@ -49,6 +49,7 @@ class AppContainer(
     val categoryEditViewModel = CategoryEditViewModel(
         addCategoryUseCase = addCategoryUseCase,
         updateCategoryUseCase = updateCategoryUseCase,
+        getCategoryUseCase = getCategoryUseCase,
     )
     // Movies layer
     val getMoviesUseCase = GetMoviesUseCase(movieRepository)
@@ -63,9 +64,6 @@ class AppContainer(
     val updateMovieUserRatingUseCase = UpdateMovieUserRatingUseCase(movieRepository)
 
     val moviesListViewModel = MoviesListViewModel(
-        getMoviesUseCase = getMoviesUseCase,
-        addMovieUseCase = addMovieUseCase,
-        updateMovieUseCase = updateMovieUseCase,
         deleteMovieUseCase = deleteMovieUseCase,
         searchMoviesUseCase = searchMoviesUseCase,
         getMoviesByCategoryUseCase = getMoviesByCategoryUseCase,
@@ -86,6 +84,7 @@ class AppContainer(
     val movieEditViewModel = MovieEditViewModel(
         addMovieUseCase = addMovieUseCase,
         updateMovieUseCase = updateMovieUseCase,
+        getMovieUseCase = getMovieUseCase,
         getCategoriesUseCase = getCategoriesUseCase,
     )
 
