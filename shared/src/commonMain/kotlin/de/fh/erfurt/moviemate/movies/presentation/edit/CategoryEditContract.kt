@@ -17,7 +17,7 @@ sealed interface CategoryEditEvent {
 
     data class SaveRequested(
         val name: String,
-        val updatedAtEpochMillis: Long
+        val updatedAtEpochMillis: Long,
         val iconKey: String? = null,
     ) : CategoryEditEvent
 
