@@ -25,7 +25,7 @@ class LocalCategoryRepository(
     override suspend fun addCategory(draft: CategoryDraft): Category {
         val existingIds = localDataSource.getCategories().map { it.id }
         val storedCategory = localDataSource.insertCategory(
-            draft.toLocalEntity(idPolicy.nextId(existingIds))
+            draft.toLocalEntity(idPolicy.nextId(existingIds)),
         )
         return storedCategory.toDomainModel()
     }

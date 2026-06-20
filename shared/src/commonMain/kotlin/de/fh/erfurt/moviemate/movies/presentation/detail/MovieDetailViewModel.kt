@@ -25,7 +25,7 @@ class MovieDetailViewModel(
     private val deleteMovieUseCase: DeleteMovieUseCase,
     private val updateMovieUseCase: UpdateMovieUseCase,
     private val getCategoryUseCase: GetCategoryUseCase,
-    ) {
+) {
 
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
 

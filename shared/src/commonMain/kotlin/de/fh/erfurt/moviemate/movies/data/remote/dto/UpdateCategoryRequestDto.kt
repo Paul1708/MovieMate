@@ -5,5 +5,6 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class UpdateCategoryRequestDto(
     val name: String,
+    val iconKey: String? = null,
     val updatedAtEpochMillis: Long
 )

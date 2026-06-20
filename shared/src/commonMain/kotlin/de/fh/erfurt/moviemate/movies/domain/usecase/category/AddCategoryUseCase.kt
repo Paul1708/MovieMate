@@ -12,7 +12,8 @@ class AddCategoryUseCase(
 
         return categoryRepository.addCategory(
             draft = draft.copy(
-                name = draft.name.trim()
+                name = draft.name.trim(),
+                iconKey = draft.iconKey?.trim()?.takeIf { it.isNotBlank() },
             )
         )
     }

@@ -72,6 +72,7 @@ class RemoteMovieRepository(
                     categoryId = dto.id,
                     request = UpdateCategoryRequestDto(
                         name = dto.name,
+                        iconKey = dto.iconKey,
                         updatedAtEpochMillis = dto.updatedAtEpochMillis
                     )
                 )
@@ -79,6 +80,7 @@ class RemoteMovieRepository(
                 categoryRemoteDataSource.createCategory(
                     request = CreateCategoryRequestDto(
                         name = dto.name,
+                        iconKey = dto.iconKey,
                         updatedAtEpochMillis = dto.updatedAtEpochMillis
                     )
                 )

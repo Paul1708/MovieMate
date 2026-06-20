@@ -15,6 +15,9 @@ import de.fh.erfurt.moviemate.movies.domain.model.movie.Movie
 import de.fh.erfurt.moviemate.movies.domain.model.movie.MovieDraft
 import de.fh.erfurt.moviemate.movies.domain.repository.movie.MovieRepository
 import de.fh.erfurt.moviemate.movies.domain.repository.movie.SortBy
+import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.builtins.MapSerializer
+import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.Json
 
 class LocalMovieRepository(
@@ -98,7 +101,7 @@ class LocalMovieRepository(
                 externalIds = movie.externalIds,
                 watchProviders = movie.watchProviders,
                 updatedAtEpochMillis = movie.updatedAtEpochMillis,
-                version = movie.version
+                version = movie.version,
             )
         }
 
@@ -106,24 +109,26 @@ class LocalMovieRepository(
             CategoryDto(
                 id = category.id,
                 name = category.name,
+                iconKey = category.iconKey,
                 updatedAtEpochMillis = category.updatedAtEpochMillis,
-                version = category.version
+                version = category.version,
             )
         }
 
         val backup = BackupDataDto(movies = moviesDto, categories = categoriesDto)
-        return jsonSerializer.encodeToString(backup)
+        return jsonSerializer.encodeToString(BackupDataDto.serializer(), backup)
     }
 
     override suspend fun importBackup(jsonString: String) {
-        val backup = jsonSerializer.decodeFromString<BackupDataDto>(jsonString)
+        val backup = jsonSerializer.decodeFromString(BackupDataDto.serializer(), jsonString)
 
         backup.categories.forEach { dto ->
             val entity = LocalCategoryEntity(
                 id = dto.id,
                 name = dto.name,
+                iconKey = dto.iconKey,
                 updatedAtEpochMillis = dto.updatedAtEpochMillis,
-                version = dto.version
+                version = dto.version,
             )
             if (categoryDataSource.getCategory(entity.id) != null) {
                 categoryDataSource.updateCategory(entity)
@@ -145,10 +150,14 @@ class LocalMovieRepository(
                 comment = dto.comment,
                 userRating = dto.userRating?.toLong(),
                 imdbRating = dto.imdbRating,
-                externalIds = dto.externalIds?.let { jsonSerializer.encodeToString(it) },
-                watchProviders = dto.watchProviders?.let { jsonSerializer.encodeToString(it) },
+                externalIds = dto.externalIds?.let {
+                    jsonSerializer.encodeToString(MapSerializer(String.serializer(), String.serializer()), it)
+                },
+                watchProviders = dto.watchProviders?.let {
+                    jsonSerializer.encodeToString(ListSerializer(String.serializer()), it)
+                },
                 updatedAtEpochMillis = dto.updatedAtEpochMillis,
-                version = dto.version
+                version = dto.version,
             )
             if (localDataSource.getMovie(entity.id) != null) {
                 localDataSource.updateMovie(entity)
