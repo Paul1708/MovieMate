@@ -1,0 +1,34 @@
+CREATE TABLE categoryEntity (
+    id TEXT NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL,
+    iconKey TEXT,
+    updatedAtEpochMillis INTEGER NOT NULL,
+    version INTEGER
+);
+
+selectAll:
+SELECT *
+FROM categoryEntity
+ORDER BY name ASC;
+
+selectById:
+SELECT *
+FROM categoryEntity
+WHERE id = ?;
+
+insertCategory:
+INSERT INTO categoryEntity(id, name, iconKey, updatedAtEpochMillis, version)
+VALUES (?, ?, ?, ?, ?);
+
+updateCategory:
+UPDATE categoryEntity
+SET
+    name = ?,
+    iconKey = ?,
+    updatedAtEpochMillis = ?,
+    version = ?
+WHERE id = ?;
+
+deleteCategory:
+DELETE FROM categoryEntity
+WHERE id = ?;

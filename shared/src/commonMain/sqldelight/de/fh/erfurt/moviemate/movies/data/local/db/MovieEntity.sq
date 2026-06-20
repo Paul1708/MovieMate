@@ -1,0 +1,79 @@
+CREATE TABLE movieEntity (
+    id TEXT NOT NULL PRIMARY KEY,
+    title TEXT NOT NULL,
+    description TEXT NOT NULL,
+    releaseYear INTEGER,
+    categoryId TEXT,
+    posterUrl TEXT,
+    runtimeMinutes INTEGER,
+    isWatched INTEGER NOT NULL,
+    comment TEXT,
+    userRating INTEGER,
+    imdbRating REAL,
+    externalIds TEXT,
+    watchProviders TEXT,
+    updatedAtEpochMillis INTEGER NOT NULL,
+    version INTEGER,
+    FOREIGN KEY (categoryId) REFERENCES categoryEntity(id) ON DELETE SET NULL
+);
+
+selectAll:
+SELECT *
+FROM movieEntity
+ORDER BY updatedAtEpochMillis DESC;
+
+selectById:
+SELECT *
+FROM movieEntity
+WHERE id = ?;
+
+insertMovie:
+INSERT INTO movieEntity(
+    id, title, description, releaseYear, categoryId, posterUrl, runtimeMinutes, isWatched, comment, userRating, imdbRating, externalIds, watchProviders, updatedAtEpochMillis, version
+)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+updateMovie:
+UPDATE movieEntity
+SET
+    title = ?,
+    description = ?,
+    releaseYear = ?,
+    categoryId = ?,
+    posterUrl = ?,
+    runtimeMinutes = ?,
+    isWatched = ?,
+    comment = ?,
+    userRating = ?,
+    imdbRating = ?,
+    externalIds = ?,
+    watchProviders = ?,
+    updatedAtEpochMillis = ?,
+    version = ?
+WHERE id = ?;
+
+deleteMovie:
+DELETE FROM movieEntity
+WHERE id = ?;
+
+searchMovies:
+SELECT *
+FROM movieEntity
+WHERE title LIKE '%' || :query || '%'
+ORDER BY updatedAtEpochMillis DESC;
+
+selectByCategoryId:
+SELECT *
+FROM movieEntity
+WHERE categoryId = :categoryId
+ORDER BY updatedAtEpochMillis DESC;
+
+updateMovieWatchedStatus:
+UPDATE movieEntity
+SET isWatched = ?, updatedAtEpochMillis = ?
+WHERE id = ?;
+
+updateMovieUserRating:
+UPDATE movieEntity
+SET userRating = ?, updatedAtEpochMillis = ?
+WHERE id = ?;
