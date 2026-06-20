@@ -82,6 +82,7 @@ class MovieEditViewModel(
             _uiState.update { it.copy(isSaving = true, errorMessage = null) }
             try {
                 val currentId = _uiState.value.initialMovieId
+                val selectedCategoryId = resolveCategoryId(event.categoryName)
                 if (currentId != null) {
                     val existing = getMovieUseCase(currentId) ?: throw IllegalStateException("The movie does not exist.")
                     updateMovieUseCase(
@@ -89,7 +90,7 @@ class MovieEditViewModel(
                             title = event.title,
                             description = event.description,
                             releaseYear = event.releaseYear,
-                            categoryId = event.categoryId,
+                            categoryId = selectedCategoryId,
                             posterUrl = event.posterUrl,
                             runtimeMinutes = event.runtimeMinutes,
                             userRating = event.userRating,
@@ -106,7 +107,7 @@ class MovieEditViewModel(
                             title = event.title,
                             description = event.description,
                             releaseYear = event.releaseYear,
-                            categoryId = event.categoryId,
+                            categoryId = selectedCategoryId,
                             posterUrl = event.posterUrl,
                             runtimeMinutes = event.runtimeMinutes,
                             userRating = event.userRating,
@@ -126,5 +127,14 @@ class MovieEditViewModel(
                 _effect.emit(MovieEditEffect.ShowMessage(e.message ?: "Failed to save."))
             }
         }
+    }
+
+    private fun resolveCategoryId(categoryName: String?): String? {
+        val trimmed = categoryName?.trim().orEmpty()
+        if (trimmed.isBlank()) return null
+
+        return _uiState.value.availableCategories.firstOrNull { category ->
+            category.id == trimmed || category.name == trimmed
+        }?.id ?: trimmed
     }
 }
