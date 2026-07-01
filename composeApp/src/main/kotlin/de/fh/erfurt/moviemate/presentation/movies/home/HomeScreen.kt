@@ -24,9 +24,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import de.fh.erfurt.moviemate.presentation.components.DeleteBadge
 import de.fh.erfurt.moviemate.presentation.components.DeleteConfirmationDialog
 import de.fh.erfurt.moviemate.presentation.components.MovieMateScreenBackground
+import de.fh.erfurt.moviemate.presentation.components.MovieMateScreenDefaults
 import de.fh.erfurt.moviemate.presentation.components.ScreenEmptyState
 import de.fh.erfurt.moviemate.presentation.components.ScreenErrorState
-import de.fh.erfurt.moviemate.presentation.components.MovieMateScreenDefaults
 import de.fh.erfurt.moviemate.presentation.components.ScreenLoadingState
 import de.fh.erfurt.moviemate.presentation.components.SearchField
 import de.fh.erfurt.moviemate.presentation.components.deleteModeWiggle
@@ -36,12 +36,7 @@ import de.fh.erfurt.moviemate.presentation.theme.MovieMateColors
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateSpacing
 
 /**
- * Sichtbare Oberfläche des Homescreens.
- *
- * Diese Funktion baut den Screen aus dem Mockup zusammen: Titel, Tab-Leiste,
- * Suchfeld, Filmliste und untere Navigation. Sie enthält selbst keine
- * Backend-Logik, sondern bekommt alle Daten über den State und meldet Klicks
- * über Callbacks nach außen.
+ * Stateless Home screen. Data and actions are supplied by HomeRoute.
  */
 @Composable
 fun HomeScreen(
@@ -182,12 +177,8 @@ fun HomeScreen(
             onDismiss = { onAction(HomeUiAction.DeleteMovieDismissed) }
         )
     }
-
 }
 
-/**
- * Preview des Homescreens mit Beispieldaten.
- */
 @Preview
 @Composable
 private fun HomeScreenPreview() {
@@ -197,9 +188,6 @@ private fun HomeScreenPreview() {
     )
 }
 
-/**
- * Preview des Homescreens ohne Filme.
- */
 @Preview
 @Composable
 private fun HomeScreenEmptyPreview() {
@@ -209,9 +197,6 @@ private fun HomeScreenEmptyPreview() {
     )
 }
 
-/**
- * Preview des Homescreens im Ladezustand.
- */
 @Preview
 @Composable
 private fun HomeScreenLoadingPreview() {
@@ -221,9 +206,6 @@ private fun HomeScreenLoadingPreview() {
     )
 }
 
-/**
- * Preview des Homescreens mit Fehlermeldung.
- */
 @Preview
 @Composable
 private fun HomeScreenErrorPreview() {

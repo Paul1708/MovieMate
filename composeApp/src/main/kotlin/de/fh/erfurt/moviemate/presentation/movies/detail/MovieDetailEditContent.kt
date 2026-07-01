@@ -1,27 +1,35 @@
 package de.fh.erfurt.moviemate.presentation.movies.detail
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import de.fh.erfurt.moviemate.movies.presentation.detail.MovieDetailUiModel
 import de.fh.erfurt.moviemate.presentation.movies.categories.CategoryUiModel
+import de.fh.erfurt.moviemate.presentation.theme.MovieMateColors
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateIcons
+import de.fh.erfurt.moviemate.presentation.theme.MovieMateShapes
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateSpacing
 
 /**
- * Bearbeitungsformular für alle änderbaren Detaildaten eines Films.
+ * Edit form for all changeable movie detail fields.
  */
 @Composable
 internal fun MovieDetailEditContent(
@@ -37,10 +45,9 @@ internal fun MovieDetailEditContent(
             .padding(bottom = MovieMateSpacing.addFormBottomPadding),
         verticalArrangement = Arrangement.spacedBy(MovieMateSpacing.titleSpacing)
     ) {
-        MovieDetailPoster(
-            posterUrl = movie.posterUrl,
-            onClick = { onAction(MovieDetailAction.ImageClicked) },
-            modifier = Modifier.height(MovieMateSpacing.detailEditPosterHeight)
+        EditablePosterPicker(
+            posterUrl = editState.posterUrl,
+            onClick = { onAction(MovieDetailAction.ImageClicked) }
         )
 
         DetailTextField(
@@ -135,6 +142,51 @@ internal fun MovieDetailEditContent(
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Cancel")
+        }
+    }
+}
+
+@Composable
+private fun EditablePosterPicker(
+    posterUrl: String?,
+    onClick: () -> Unit,
+) {
+    Box {
+        MovieDetailPoster(
+            posterUrl = posterUrl,
+            onClick = onClick,
+            modifier = Modifier.height(MovieMateSpacing.detailEditPosterHeight)
+        )
+
+        Column(
+            modifier = Modifier
+                .align(Alignment.Center)
+                .background(
+                    color = MovieMateColors.ScreenBackground.copy(alpha = 0.78f),
+                    shape = RoundedCornerShape(MovieMateShapes.chipRadius)
+                )
+                .padding(MovieMateSpacing.detailCardPadding),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = MovieMateIcons.image,
+                style = MaterialTheme.typography.headlineMedium,
+                color = MovieMateColors.AccentLight
+            )
+            Text(
+                text = if (posterUrl.isNullOrBlank()) "Click to add image" else "Click to change image",
+                style = MaterialTheme.typography.titleSmall,
+                color = MovieMateColors.PrimaryText,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(top = MovieMateSpacing.compactSpacing)
+            )
+            Text(
+                text = "Choose a poster from your device",
+                style = MaterialTheme.typography.bodySmall,
+                color = MovieMateColors.SecondaryText,
+                modifier = Modifier.padding(top = MovieMateSpacing.detailMicroSpacing)
+            )
         }
     }
 }

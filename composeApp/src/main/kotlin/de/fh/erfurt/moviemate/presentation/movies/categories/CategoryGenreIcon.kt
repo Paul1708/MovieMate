@@ -17,8 +17,8 @@ import de.fh.erfurt.moviemate.presentation.theme.MovieMateColors
 /**
  * Lightweight vector icon for a category tile.
  *
- * Keeping the drawings local avoids adding an icon dependency while the UI is
- * still mock-driven. The mapping can be replaced with real assets later.
+ * Keeping the drawings local avoids adding an icon dependency for the current
+ * small category icon set.
  */
 @Composable
 internal fun CategoryGenreIcon(

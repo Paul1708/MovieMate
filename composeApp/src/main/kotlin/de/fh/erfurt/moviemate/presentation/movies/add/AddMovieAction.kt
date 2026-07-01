@@ -1,15 +1,13 @@
 package de.fh.erfurt.moviemate.presentation.movies.add
 
 /**
- * User intents emitted by the add movie UI.
- *
- * The preview route handles these locally until the real backend-backed add
- * flow is ready.
+ * User intents emitted by the add movie UI and handled by the route state holder.
  */
 sealed interface AddMovieAction {
     data object CancelClicked : AddMovieAction
     data object SaveClicked : AddMovieAction
     data object PosterClicked : AddMovieAction
+    data class PosterSelected(val uri: String) : AddMovieAction
     data object FetchMovieDataClicked : AddMovieAction
 
     data class TitleChanged(val value: String) : AddMovieAction
