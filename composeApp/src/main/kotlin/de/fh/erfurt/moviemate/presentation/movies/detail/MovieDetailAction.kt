@@ -1,16 +1,14 @@
 package de.fh.erfurt.moviemate.presentation.movies.detail
 
 /**
- * User intents emitted by the detail UI.
- *
- * The preview state holder handles these actions locally for now. The same
- * contract can later be translated to shared presentation events.
+ * User intents emitted by the detail UI and handled by the route state holder.
  */
 sealed interface MovieDetailAction {
     data object EditClicked : MovieDetailAction
     data object SaveEditClicked : MovieDetailAction
     data object CancelEditClicked : MovieDetailAction
     data object ImageClicked : MovieDetailAction
+    data class PosterSelected(val uri: String) : MovieDetailAction
 
     data class WatchedChanged(val isWatched: Boolean) : MovieDetailAction
     data class TitleChanged(val value: String) : MovieDetailAction

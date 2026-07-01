@@ -49,7 +49,6 @@ internal fun MovieDetailReadContent(
         ) {
             MovieDetailPoster(
                 posterUrl = movie.posterUrl,
-                showPlayButton = true,
                 modifier = Modifier.height(MovieMateSpacing.detailHeroHeight)
             )
 

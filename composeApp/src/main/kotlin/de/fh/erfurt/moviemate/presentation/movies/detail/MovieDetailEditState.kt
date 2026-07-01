@@ -9,6 +9,7 @@ import de.fh.erfurt.moviemate.presentation.movies.categories.CategoryUiModel
 data class MovieDetailEditState(
     val title: String = "",
     val description: String = "",
+    val posterUrl: String? = null,
     val releaseYear: String = "",
     val categoryId: String = "",
     val runtimeMinutes: String = "",
@@ -24,6 +25,7 @@ data class MovieDetailEditState(
             return MovieDetailEditState(
                 title = movie.title,
                 description = movie.description,
+                posterUrl = movie.posterUrl,
                 releaseYear = movie.releaseYear?.toString().orEmpty(),
                 categoryId = movie.categoryId.ifBlank { movie.categoryName },
                 runtimeMinutes = movie.runtimeMinutes?.toString().orEmpty(),
@@ -46,6 +48,7 @@ data class MovieDetailEditState(
         return movie.copy(
             title = title.trim(),
             description = description.trim(),
+            posterUrl = posterUrl,
             releaseYear = releaseYear.trim().toIntOrNull(),
             categoryId = selectedCategoryId,
             categoryName = selectedCategory?.name ?: selectedCategoryId,

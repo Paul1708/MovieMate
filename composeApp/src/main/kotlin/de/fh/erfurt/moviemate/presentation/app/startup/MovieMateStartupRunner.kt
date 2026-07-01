@@ -22,22 +22,15 @@ class MovieMateStartupRunner(
 
         onStepChanged(MovieMateStartupStep.CheckCategories)
         withContext(ioDispatcher) {
-            // TODO Backend-Umstellung: Prüfen, ob hier nur lokale Kategorien gelesen werden
-            // oder ob ein kurzer Remote-Status-/Sync-Check nötig ist. Längere Synchronisationen
-            // sollten nach dem App-Start im Hintergrund laufen.
             appContainer.getCategoriesUseCase()
         }
 
         onStepChanged(MovieMateStartupStep.LoadMovies)
         withContext(ioDispatcher) {
-            // TODO Backend-Umstellung: Beim Wechsel von Preview-/Mockdaten auf echte Daten
-            // sollte dieser Aufruf dieselbe Quelle vorbereiten, die Home später anzeigt.
             appContainer.getMoviesUseCase()
         }
 
         onStepChanged(MovieMateStartupStep.LoadStartView)
-        // TODO Backend-Umstellung: Wenn Home und Kategorien nicht mehr über Preview-Routen
-        // laufen, hier nur noch notwendige Startdaten prüfen und keine komplette Backend-Ladung blockieren.
         return appContainer
     }
 }

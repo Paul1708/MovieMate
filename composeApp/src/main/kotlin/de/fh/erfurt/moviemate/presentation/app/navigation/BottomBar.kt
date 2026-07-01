@@ -17,11 +17,7 @@ import de.fh.erfurt.moviemate.presentation.theme.MovieMateColors
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateSpacing
 
 /**
- * Untere Navigation der App.
- *
- * Die Bar zeigt die Hauptbereiche aus dem Mockup: Home, Kategorien, Add und
- * Backup. Die Klicks sind schon als Callback vorbereitet, werden aber erst
- * später an eine echte Navigation angeschlossen.
+ * Bottom navigation for Home, Categories, Add, and Backup.
  */
 @Composable
 fun BottomBar(

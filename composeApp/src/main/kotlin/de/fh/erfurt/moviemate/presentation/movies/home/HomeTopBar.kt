@@ -27,7 +27,7 @@ import de.fh.erfurt.moviemate.presentation.theme.MovieMateSpacing
 /**
  * Obere Bedienleiste des Homescreens.
  *
- * Oben liegen Titel und Aktionen, darunter die Filter-Chips aus dem Mockup.
+ * Oben liegen Titel und Aktionen, darunter die Filter-Chips.
  */
 @Composable
 fun HomeTopBar(

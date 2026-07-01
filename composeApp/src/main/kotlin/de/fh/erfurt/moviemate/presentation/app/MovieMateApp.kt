@@ -18,25 +18,18 @@ import de.fh.erfurt.moviemate.presentation.app.navigation.BottomNavItem
 import de.fh.erfurt.moviemate.presentation.app.navigation.MovieMateDestination
 import de.fh.erfurt.moviemate.presentation.app.navigation.selectedBottomNavItem
 import de.fh.erfurt.moviemate.presentation.app.navigation.toRoute
-import de.fh.erfurt.moviemate.presentation.preview.AddMoviePreviewRoute
-import de.fh.erfurt.moviemate.presentation.preview.CategoriesPreviewRoute
-import de.fh.erfurt.moviemate.presentation.preview.HomePreviewRoute
-import de.fh.erfurt.moviemate.presentation.preview.MovieDetailPreviewRoute
+import de.fh.erfurt.moviemate.presentation.movies.add.AddMovieRoute
 import de.fh.erfurt.moviemate.presentation.movies.backup.BackupRoute
+import de.fh.erfurt.moviemate.presentation.movies.categories.CategoriesRoute
+import de.fh.erfurt.moviemate.presentation.movies.detail.MovieDetailRoute
+import de.fh.erfurt.moviemate.presentation.movies.home.HomeRoute
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateColors
 
-/**
- * App-Gerüst mit Navigation, Bottom Bar und den aktuell angebundenen Screens.
- */
 @Composable
 fun MovieMateApp(
     appContainer: AppContainer? = null,
     dispatchers: MovieMateDispatchers = MovieMateDispatcherDefaults.Default
 ) {
-    // Der Container wird hier bereits angenommen, auch wenn die aktuellen
-    // Routen noch mit Preview-State arbeiten. So kann später pro Route auf
-    // echte Shared-ViewModels umgestellt werden, ohne den App-Einstieg erneut
-    // umzubauen.
     val navController = rememberNavController()
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = currentBackStackEntry?.destination?.route
@@ -76,7 +69,9 @@ fun MovieMateApp(
                 val initialCategoryId = backStackEntry.arguments
                     ?.getString(MovieMateDestination.CategoryArg)
 
-                HomePreviewRoute(
+                HomeRoute(
+                    appContainer = appContainer,
+                    ioDispatcher = dispatchers.io,
                     initialCategoryId = initialCategoryId,
                     onMovieSelected = { movieId ->
                         navController.navigate(MovieMateDestination.detailRoute(movieId))
@@ -90,7 +85,9 @@ fun MovieMateApp(
             }
 
             composable(MovieMateDestination.Categories) {
-                CategoriesPreviewRoute(
+                CategoriesRoute(
+                    appContainer = appContainer,
+                    ioDispatcher = dispatchers.io,
                     onCategorySelected = { categoryId ->
                         navController.navigate(MovieMateDestination.homeRoute(categoryId)) {
                             popUpTo(navController.graph.findStartDestination().id) {
@@ -115,7 +112,9 @@ fun MovieMateApp(
                     ?.getString(MovieMateDestination.MovieIdArg)
                     .orEmpty()
 
-                MovieDetailPreviewRoute(
+                MovieDetailRoute(
+                    appContainer = appContainer,
+                    ioDispatcher = dispatchers.io,
                     movieId = movieId,
                     onBackClicked = {
                         navController.popBackStack()
@@ -124,7 +123,9 @@ fun MovieMateApp(
             }
 
             composable(MovieMateDestination.Add) {
-                AddMoviePreviewRoute(
+                AddMovieRoute(
+                    appContainer = appContainer,
+                    ioDispatcher = dispatchers.io,
                     onCloseClicked = {
                         navController.popBackStack()
                     }

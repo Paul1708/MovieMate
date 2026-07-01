@@ -29,19 +29,13 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import de.fh.erfurt.moviemate.presentation.movies.detail.MovieDetailPoster
 import de.fh.erfurt.moviemate.presentation.movies.model.MovieUiModel
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateColors
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateIcons
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateShapes
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateSpacing
 
-/**
- * Einzelne Filmkarte in der Homescreen-Liste.
- *
- * Die Karte zeigt links das Poster und rechts die wichtigsten Filmdaten:
- * Titel, Bewertung, Kategorie, Jahr und Laufzeit. Der Klick auf die Karte
- * ist bereits vorbereitet, damit später der Detail-Screen geöffnet werden kann.
- */
 @Composable
 @OptIn(ExperimentalFoundationApi::class)
 fun MovieCard(
@@ -60,7 +54,7 @@ fun MovieCard(
             .semantics {
                 contentDescription =
                     "Movie ${movie.title}, rating ${movie.ratingText}, category ${movie.categoryText}, year ${movie.yearText}"
-        },
+            },
         shape = RoundedCornerShape(MovieMateShapes.cardRadius),
         colors = CardDefaults.cardColors(containerColor = MovieMateColors.CardBackground),
         border = BorderStroke(MovieMateSpacing.dividerThickness, MovieMateColors.CardBorder),
@@ -73,7 +67,10 @@ fun MovieCard(
                 .padding(MovieMateSpacing.cardPadding),
             verticalAlignment = Alignment.Top
         ) {
-            PosterPlaceholder(title = movie.title)
+            MoviePoster(
+                title = movie.title,
+                posterUri = movie.posterUri,
+            )
 
             Spacer(modifier = Modifier.width(MovieMateSpacing.movieCardPosterSpacing))
 
@@ -111,15 +108,22 @@ fun MovieCard(
     }
 }
 
-/**
- * Platzhalter für das Filmposter.
- *
- * Diese Box steht an der Stelle, an der später das echte Poster aus `posterUri`
- * angezeigt wird. Im aktuellen UI-Schritt hilft sie, die Proportionen aus dem
- * Mockup nachzubauen.
- */
 @Composable
-private fun PosterPlaceholder(title: String) {
+private fun MoviePoster(
+    title: String,
+    posterUri: String?,
+) {
+    if (!posterUri.isNullOrBlank()) {
+        MovieDetailPoster(
+            posterUrl = posterUri,
+            modifier = Modifier.size(
+                width = MovieMateSpacing.moviePosterWidth,
+                height = MovieMateSpacing.moviePosterHeight
+            )
+        )
+        return
+    }
+
     val initial = title.firstOrNull()?.uppercaseChar()?.toString() ?: MovieMateIcons.image
     Box(
         modifier = Modifier
@@ -166,13 +170,6 @@ private fun MovieRatingRow(text: String) {
     }
 }
 
-/**
- * Kleine Informationszeile innerhalb einer Filmkarte.
- *
- * Sie kombiniert ein einfaches Symbol mit einem Text, zum Beispiel Stern plus
- * Bewertung oder Kalender plus Jahr. Dadurch bleiben die Metadaten der Karte
- * einheitlich ausgerichtet.
- */
 @Composable
 private fun MovieMetaRow(
     icon: String,
