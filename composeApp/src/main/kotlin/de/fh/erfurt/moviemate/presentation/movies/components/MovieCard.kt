@@ -29,6 +29,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import de.fh.erfurt.moviemate.presentation.movies.categories.CategoryGenreIcon
 import de.fh.erfurt.moviemate.presentation.movies.detail.MovieDetailPoster
 import de.fh.erfurt.moviemate.presentation.movies.model.MovieUiModel
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateColors
@@ -93,9 +94,16 @@ fun MovieCard(
 
                 MovieRatingRow(text = movie.ratingText)
                 Spacer(modifier = Modifier.height(MovieMateSpacing.movieCardRatingMetaSpacing))
-                MovieMetaRow(icon = MovieMateIcons.category, text = movie.categoryYearText())
+                MovieCategoryDateRow(movie = movie)
                 Spacer(modifier = Modifier.height(MovieMateSpacing.movieCardMetaSpacing))
-                MovieMetaRow(icon = MovieMateIcons.runtime, text = movie.runtimeText)
+                MovieMetaRow(
+                    icon = {
+                        MovieRuntimeIcon(
+                            modifier = Modifier.size(MovieMateSpacing.movieCardMetadataIconSize)
+                        )
+                    },
+                    text = movie.runtimeText
+                )
             }
 
             Text(
@@ -172,18 +180,16 @@ private fun MovieRatingRow(text: String) {
 
 @Composable
 private fun MovieMetaRow(
-    icon: String,
-    text: String
+    icon: @Composable () -> Unit,
+    text: String,
+    modifier: Modifier = Modifier,
 ) {
     Row(
+        modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(MovieMateSpacing.movieCardMetadataIconSpacing)
     ) {
-        Text(
-            text = icon,
-            style = MaterialTheme.typography.bodySmall,
-            color = MovieMateColors.MutedText
-        )
+        icon()
         Text(
             text = text,
             style = MaterialTheme.typography.bodySmall,
@@ -194,8 +200,32 @@ private fun MovieMetaRow(
     }
 }
 
-private fun MovieUiModel.categoryYearText(): String {
-    return listOf(categoryText, yearText)
-        .filter { it.isNotBlank() }
-        .joinToString(separator = " - ")
+@Composable
+private fun MovieCategoryDateRow(movie: MovieUiModel) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(MovieMateSpacing.movieCardMetadataGroupSpacing)
+    ) {
+        MovieMetaRow(
+            icon = {
+                CategoryGenreIcon(
+                    iconKey = movie.categoryIconKey,
+                    modifier = Modifier.size(MovieMateSpacing.movieCardMetadataIconSize)
+                )
+            },
+            text = movie.categoryText,
+            modifier = Modifier.weight(1f, fill = false)
+        )
+
+        if (movie.yearText.isNotBlank()) {
+            MovieMetaRow(
+                icon = {
+                    MovieDateIcon(
+                        modifier = Modifier.size(MovieMateSpacing.movieCardMetadataIconSize)
+                    )
+                },
+                text = movie.yearText
+            )
+        }
+    }
 }

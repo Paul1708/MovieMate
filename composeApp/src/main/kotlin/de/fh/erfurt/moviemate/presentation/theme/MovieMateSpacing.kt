@@ -36,6 +36,7 @@ object MovieMateSpacing {
     val detailCardPadding = 12.dp
     val detailChipHorizontalPadding = 12.dp
     val detailChipVerticalPadding = 8.dp
+    val detailChipIconSize = 18.dp
     val detailInfoVerticalPadding = 9.dp
     val detailStatusButtonHeight = 50.dp
     val detailHeroHeight = 270.dp
@@ -59,6 +60,8 @@ object MovieMateSpacing {
     val movieCardMetaSpacing = 5.dp
     val movieCardTrailingIconStartPadding = 8.dp
     val movieCardMetadataIconSpacing = 6.dp
+    val movieCardMetadataGroupSpacing = 8.dp
+    val movieCardMetadataIconSize = 16.dp
 
     val homeTabHorizontalPadding = 16.dp
     val homeTabVerticalPadding = 10.dp

@@ -16,9 +16,6 @@ object MovieMateIcons {
 
     const val rating = "★"
     const val ratingEmpty = "☆"
-    const val category = "▣"
-    const val year = "▦"
-    const val runtime = "◷"
     const val watched = "✓"
     const val provider = "▶"
     const val updated = "↻"

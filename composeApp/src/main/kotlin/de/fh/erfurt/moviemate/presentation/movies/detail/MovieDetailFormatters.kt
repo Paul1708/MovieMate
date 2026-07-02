@@ -10,17 +10,17 @@ import kotlin.math.roundToInt
 internal fun MovieDetailUiModel.metaItems(): List<MovieDetailMetaItem> {
     return listOf(
         MovieDetailMetaItem(
-            icon = MovieMateIcons.category,
+            icon = MovieDetailMetaIcon.Category(categoryIconKey),
             label = "Category",
             value = categoryName.ifBlank { "Unknown" }
         ),
         MovieDetailMetaItem(
-            icon = MovieMateIcons.runtime,
+            icon = MovieDetailMetaIcon.Runtime,
             label = "Runtime",
             value = runtimeMinutes?.let { "$it min" } ?: "Unknown"
         ),
         MovieDetailMetaItem(
-            icon = MovieMateIcons.year,
+            icon = MovieDetailMetaIcon.Date,
             label = "Year",
             value = releaseYear?.toString() ?: "Unknown"
         )

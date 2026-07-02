@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -18,15 +19,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
+import de.fh.erfurt.moviemate.presentation.movies.categories.CategoryGenreIcon
+import de.fh.erfurt.moviemate.presentation.movies.components.MovieDateIcon
+import de.fh.erfurt.moviemate.presentation.movies.components.MovieRuntimeIcon
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateColors
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateShapes
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateSpacing
 
 data class MovieDetailMetaItem(
-    val icon: String,
+    val icon: MovieDetailMetaIcon,
     val label: String,
     val value: String
 )
+
+sealed class MovieDetailMetaIcon {
+    data class Category(val iconKey: String?) : MovieDetailMetaIcon()
+    object Runtime : MovieDetailMetaIcon()
+    object Date : MovieDetailMetaIcon()
+}
 
 /**
  * Horizontale Übersicht der wichtigsten Filmdaten direkt unter dem Titel.
@@ -74,10 +84,8 @@ private fun MovieDetailMetaChip(
             horizontalArrangement = Arrangement.spacedBy(MovieMateSpacing.detailMicroSpacing),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = item.icon,
-                style = MaterialTheme.typography.labelSmall,
-                color = MovieMateColors.SecondaryText
+            MovieDetailMetaIconContent(
+                icon = item.icon
             )
             Text(
                 text = item.value,
@@ -86,5 +94,28 @@ private fun MovieDetailMetaChip(
                 fontWeight = FontWeight.SemiBold
             )
         }
+    }
+}
+
+@Composable
+private fun MovieDetailMetaIconContent(
+    icon: MovieDetailMetaIcon,
+    modifier: Modifier = Modifier,
+) {
+    val iconModifier = modifier.size(MovieMateSpacing.detailChipIconSize)
+
+    when (icon) {
+        is MovieDetailMetaIcon.Category -> CategoryGenreIcon(
+            iconKey = icon.iconKey,
+            modifier = iconModifier
+        )
+
+        MovieDetailMetaIcon.Runtime -> MovieRuntimeIcon(
+            modifier = iconModifier
+        )
+
+        MovieDetailMetaIcon.Date -> MovieDateIcon(
+            modifier = iconModifier
+        )
     }
 }
