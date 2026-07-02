@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -387,8 +386,13 @@ internal fun CategoryIconPicker(
     onIconSelected: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    LazyRow(
-        modifier = modifier.fillMaxWidth(),
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(5),
+        modifier = modifier
+            .fillMaxWidth()
+            .height(MovieMateSpacing.categoryIconPickerHeight),
+        contentPadding = PaddingValues(vertical = MovieMateSpacing.dialogRowVerticalPadding),
+        verticalArrangement = Arrangement.spacedBy(MovieMateSpacing.compactSpacing),
         horizontalArrangement = Arrangement.spacedBy(MovieMateSpacing.compactSpacing)
     ) {
         items(CategoryIconOptions, key = { it.key }) { option ->
@@ -418,9 +422,9 @@ private fun CategoryIconChoice(
         ),
         onClick = onClick
     ) {
-        Column(
+        Box(
             modifier = Modifier.padding(MovieMateSpacing.compactSpacing),
-            horizontalAlignment = Alignment.CenterHorizontally
+            contentAlignment = Alignment.Center
         ) {
             CategoryGenreIcon(
                 iconKey = option.key,

@@ -66,7 +66,8 @@ object MovieMateSpacing {
     val categoryGridSpacing = 12.dp
     val categoryTileHeight = 92.dp
     val categoryTilePadding = 10.dp
-    val categoryIconSize = 28.dp
+    val categoryIconSize = 32.dp
+    val categoryIconPickerHeight = 220.dp
     val categoryIconBottomSpacing = 6.dp
     val categoryHeaderIndicatorWidth = 42.dp
     val categoryHeaderIndicatorHeight = 2.dp

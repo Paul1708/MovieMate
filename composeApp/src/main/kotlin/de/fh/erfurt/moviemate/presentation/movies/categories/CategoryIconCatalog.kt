@@ -9,33 +9,79 @@ data class CategoryIconOption(
 )
 
 enum class CategoryIconStyle {
-    Spark,
-    Map,
-    Reel,
-    Document,
-    Smile,
-    Lens,
-    Frame,
-    Crystal,
-    Orbit,
-    Arc,
-    Grid,
+    Action,
+    Comedy,
+    Drama,
+    Theater,
+    Romance,
+    Fantasy,
+    Adventure,
+    ScienceFiction,
+    Thriller,
+    Horror,
+    Mystery,
+    Crime,
+    History,
+    Documentary,
+    Musical,
+    Biography,
+    Family,
+    Animation,
+    Kids,
+    Gaming,
+    Superhero,
+    War,
+    Western,
+    RoadMovie,
+    Nature,
+    Sport,
+    Magic,
+    ArtHouse,
+    MindBending,
+    TimeTravel,
+    Cult,
+    Disaster,
+    Survival,
+    Other,
 }
 
-const val DefaultCategoryIconKey = "grid"
+const val DefaultCategoryIconKey = "other"
 
 val CategoryIconOptions: List<CategoryIconOption> = listOf(
-    CategoryIconOption("spark", "Spark", CategoryIconStyle.Spark),
-    CategoryIconOption("map", "Map", CategoryIconStyle.Map),
-    CategoryIconOption("reel", "Reel", CategoryIconStyle.Reel),
-    CategoryIconOption("document", "Document", CategoryIconStyle.Document),
-    CategoryIconOption("smile", "Smile", CategoryIconStyle.Smile),
-    CategoryIconOption("lens", "Lens", CategoryIconStyle.Lens),
-    CategoryIconOption("frame", "Frame", CategoryIconStyle.Frame),
-    CategoryIconOption("crystal", "Crystal", CategoryIconStyle.Crystal),
-    CategoryIconOption("orbit", "Orbit", CategoryIconStyle.Orbit),
-    CategoryIconOption("arc", "Arc", CategoryIconStyle.Arc),
-    CategoryIconOption("grid", "Grid", CategoryIconStyle.Grid),
+    CategoryIconOption("action", "Action", CategoryIconStyle.Action),
+    CategoryIconOption("comedy", "Comedy", CategoryIconStyle.Comedy),
+    CategoryIconOption("drama", "Drama", CategoryIconStyle.Drama),
+    CategoryIconOption("theater", "Theater", CategoryIconStyle.Theater),
+    CategoryIconOption("romance", "Romance", CategoryIconStyle.Romance),
+    CategoryIconOption("fantasy", "Fantasy", CategoryIconStyle.Fantasy),
+    CategoryIconOption("adventure", "Adventure", CategoryIconStyle.Adventure),
+    CategoryIconOption("sci_fi", "Science Fiction", CategoryIconStyle.ScienceFiction),
+    CategoryIconOption("thriller", "Thriller", CategoryIconStyle.Thriller),
+    CategoryIconOption("horror", "Horror", CategoryIconStyle.Horror),
+    CategoryIconOption("mystery", "Mystery", CategoryIconStyle.Mystery),
+    CategoryIconOption("crime", "Crime", CategoryIconStyle.Crime),
+    CategoryIconOption("history", "History", CategoryIconStyle.History),
+    CategoryIconOption("documentary", "Documentary", CategoryIconStyle.Documentary),
+    CategoryIconOption("musical", "Musical", CategoryIconStyle.Musical),
+    CategoryIconOption("biography", "Biography", CategoryIconStyle.Biography),
+    CategoryIconOption("family", "Family", CategoryIconStyle.Family),
+    CategoryIconOption("animation", "Animation", CategoryIconStyle.Animation),
+    CategoryIconOption("kids", "Kids", CategoryIconStyle.Kids),
+    CategoryIconOption("gaming", "Gaming", CategoryIconStyle.Gaming),
+    CategoryIconOption("superhero", "Superhero", CategoryIconStyle.Superhero),
+    CategoryIconOption("war", "War", CategoryIconStyle.War),
+    CategoryIconOption("western", "Western", CategoryIconStyle.Western),
+    CategoryIconOption("road_movie", "Road Movie", CategoryIconStyle.RoadMovie),
+    CategoryIconOption("nature", "Nature", CategoryIconStyle.Nature),
+    CategoryIconOption("sport", "Sport", CategoryIconStyle.Sport),
+    CategoryIconOption("magic", "Magic", CategoryIconStyle.Magic),
+    CategoryIconOption("art_house", "Art House", CategoryIconStyle.ArtHouse),
+    CategoryIconOption("mind_bending", "Mind-Bending", CategoryIconStyle.MindBending),
+    CategoryIconOption("time_travel", "Time Travel", CategoryIconStyle.TimeTravel),
+    CategoryIconOption("cult", "Cult", CategoryIconStyle.Cult),
+    CategoryIconOption("disaster", "Disaster", CategoryIconStyle.Disaster),
+    CategoryIconOption("survival", "Survival", CategoryIconStyle.Survival),
+    CategoryIconOption("other", "Other", CategoryIconStyle.Other),
 )
 
 fun String?.categoryIconOption(): CategoryIconOption {
@@ -45,24 +91,24 @@ fun String?.categoryIconOption(): CategoryIconOption {
 
 fun CategoryType.defaultIconKey(): String {
     return when (this) {
-        CategoryType.ACTION -> "spark"
-        CategoryType.ADVENTURE -> "map"
-        CategoryType.FANTASY -> "crystal"
-        CategoryType.ANIMATION -> "reel"
-        CategoryType.BIOGRAPHY -> "document"
-        CategoryType.COMEDY -> "smile"
-        CategoryType.CRIME -> "lens"
-        CategoryType.DOCUMENTARY -> "frame"
-        CategoryType.DRAMA -> "frame"
-        CategoryType.FAMILY -> "smile"
-        CategoryType.HISTORY -> "document"
-        CategoryType.HORROR -> "arc"
-        CategoryType.MYSTERY -> "lens"
-        CategoryType.ROMANCE -> "spark"
-        CategoryType.SCI_FI -> "orbit"
-        CategoryType.THRILLER -> "arc"
-        CategoryType.WAR -> "grid"
-        CategoryType.WESTERN -> "map"
+        CategoryType.ACTION -> "action"
+        CategoryType.ADVENTURE -> "adventure"
+        CategoryType.FANTASY -> "fantasy"
+        CategoryType.ANIMATION -> "animation"
+        CategoryType.BIOGRAPHY -> "biography"
+        CategoryType.COMEDY -> "comedy"
+        CategoryType.CRIME -> "crime"
+        CategoryType.DOCUMENTARY -> "documentary"
+        CategoryType.DRAMA -> "drama"
+        CategoryType.FAMILY -> "family"
+        CategoryType.HISTORY -> "history"
+        CategoryType.HORROR -> "horror"
+        CategoryType.MYSTERY -> "mystery"
+        CategoryType.ROMANCE -> "romance"
+        CategoryType.SCI_FI -> "sci_fi"
+        CategoryType.THRILLER -> "thriller"
+        CategoryType.WAR -> "war"
+        CategoryType.WESTERN -> "western"
         CategoryType.UNKNOWN -> DefaultCategoryIconKey
     }
 }
