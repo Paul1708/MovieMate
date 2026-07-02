@@ -1,10 +1,7 @@
 package de.fh.erfurt.moviemate.presentation.theme
 
 object MovieMateIcons {
-    const val home = "⌂"
-    const val categories = "▦"
     const val add = "+"
-    const val backup = "≡"
     const val exportBackup = "↑"
     const val importBackup = "↓"
     const val chevronRight = ">"

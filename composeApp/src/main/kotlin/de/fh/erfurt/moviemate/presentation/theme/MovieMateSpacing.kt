@@ -30,6 +30,7 @@ object MovieMateSpacing {
     val noElevation = 0.dp
     val topBarIconSize = 36.dp
     val bottomBarHeight = 72.dp
+    val bottomBarIconSize = 26.dp
     val navigationContentBottomPadding = 72.dp
     val detailControlHorizontalPadding = 12.dp
     val detailControlVerticalPadding = 10.dp
