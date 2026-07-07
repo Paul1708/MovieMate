@@ -147,6 +147,5 @@ getMoviesUseCase(
 ## Nächste mögliche Schritte ohne Backend
 
 - Tests für Filterung und Sortierung ergänzen
-- echte Icons statt Text-Symbolen vorbereiten
 - Posteranzeige vorbereiten
 - Detail-Platzhalter später durch echten Detail-Screen ersetzen

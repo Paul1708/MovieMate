@@ -33,6 +33,7 @@ import de.fh.erfurt.moviemate.presentation.movies.categories.CategoryGenreIcon
 import de.fh.erfurt.moviemate.presentation.movies.detail.MovieDetailPoster
 import de.fh.erfurt.moviemate.presentation.movies.model.MovieUiModel
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateColors
+import de.fh.erfurt.moviemate.presentation.theme.MovieMateIcon
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateIcons
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateShapes
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateSpacing
@@ -132,7 +133,7 @@ private fun MoviePoster(
         return
     }
 
-    val initial = title.firstOrNull()?.uppercaseChar()?.toString() ?: MovieMateIcons.image
+    val initial = title.firstOrNull()?.uppercaseChar()?.toString()
     Box(
         modifier = Modifier
             .size(width = MovieMateSpacing.moviePosterWidth, height = MovieMateSpacing.moviePosterHeight)
@@ -148,12 +149,21 @@ private fun MoviePoster(
             ),
         contentAlignment = Alignment.Center
     ) {
-        Text(
-            text = initial,
-            color = MovieMateColors.AccentLight,
-            style = MaterialTheme.typography.headlineMedium,
-            fontWeight = FontWeight.Bold
-        )
+        if (initial == null) {
+            MovieMateIcon(
+                icon = MovieMateIcons.image,
+                tint = MovieMateColors.AccentLight,
+                secondaryTint = MovieMateColors.Accent,
+                modifier = Modifier.size(MovieMateSpacing.posterPlaceholderIconSize)
+            )
+        } else {
+            Text(
+                text = initial,
+                color = MovieMateColors.AccentLight,
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.Bold
+            )
+        }
     }
 }
 

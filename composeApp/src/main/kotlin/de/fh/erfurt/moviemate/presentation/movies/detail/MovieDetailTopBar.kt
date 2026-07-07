@@ -33,7 +33,7 @@ fun MovieDetailTopBar(
         contentAlignment = Alignment.Center
     ) {
         TopBarIconButton(
-            text = MovieMateIcons.back,
+            icon = MovieMateIcons.back,
             contentDescription = "Go back",
             onClick = onBackClicked,
             modifier = Modifier

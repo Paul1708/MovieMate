@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
@@ -25,6 +26,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateColors
+import de.fh.erfurt.moviemate.presentation.theme.MovieMateIcon
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateIcons
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateShapes
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateSpacing
@@ -51,11 +53,21 @@ internal fun WatchedControl(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = "${MovieMateIcons.watched} Watch status",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MovieMateColors.SecondaryText
-                )
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(MovieMateSpacing.detailTinySpacing),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    MovieMateIcon(
+                        icon = MovieMateIcons.watched,
+                        tint = MovieMateColors.SecondaryText,
+                        modifier = Modifier.size(MovieMateSpacing.detailLabelIconSize)
+                    )
+                    Text(
+                        text = "Watch status",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MovieMateColors.SecondaryText
+                    )
+                }
                 Text(
                     text = if (isWatched) "Watched" else "Watch later",
                     style = MaterialTheme.typography.bodyMedium,
@@ -108,10 +120,10 @@ internal fun WatchedStatusChip(
             horizontalArrangement = Arrangement.spacedBy(MovieMateSpacing.detailMicroSpacing),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = MovieMateIcons.watched,
-                style = MaterialTheme.typography.labelSmall,
-                color = if (isWatched) MovieMateColors.AccentLight else MovieMateColors.SecondaryText
+            MovieMateIcon(
+                icon = MovieMateIcons.watched,
+                tint = if (isWatched) MovieMateColors.AccentLight else MovieMateColors.SecondaryText,
+                modifier = Modifier.size(MovieMateSpacing.detailChipIconSize)
             )
             Text(
                 text = label,

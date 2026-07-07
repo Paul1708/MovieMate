@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -35,6 +36,7 @@ import de.fh.erfurt.moviemate.presentation.movies.detail.WatchProvidersEditor
 import de.fh.erfurt.moviemate.presentation.movies.detail.WatchedControl
 import de.fh.erfurt.moviemate.presentation.preview.sampleCategories
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateColors
+import de.fh.erfurt.moviemate.presentation.theme.MovieMateIcon
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateIcons
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateSpacing
 
@@ -97,9 +99,10 @@ fun AddMovieScreen(
                         horizontalArrangement = Arrangement.spacedBy(MovieMateSpacing.compactSpacing),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(
-                            text = MovieMateIcons.search,
-                            style = MaterialTheme.typography.labelMedium
+                        MovieMateIcon(
+                            icon = MovieMateIcons.search,
+                            tint = MovieMateColors.PrimaryText,
+                            modifier = Modifier.size(MovieMateSpacing.inlineActionIconSize)
                         )
                         Text(
                             text = "Fetch",
@@ -257,10 +260,11 @@ private fun AddPosterPicker(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Text(
-                text = MovieMateIcons.image,
-                style = MaterialTheme.typography.headlineMedium,
-                color = MovieMateColors.AccentLight
+            MovieMateIcon(
+                icon = MovieMateIcons.image,
+                tint = MovieMateColors.AccentLight,
+                secondaryTint = MovieMateColors.Accent,
+                modifier = Modifier.size(MovieMateSpacing.posterActionIconSize)
             )
             Text(
                 text = if (posterUrl.isNullOrBlank()) "Add poster" else "Change poster",

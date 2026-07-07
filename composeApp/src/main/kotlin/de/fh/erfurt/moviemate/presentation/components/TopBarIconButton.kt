@@ -14,6 +14,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateColors
+import de.fh.erfurt.moviemate.presentation.theme.MovieMateIcon
+import de.fh.erfurt.moviemate.presentation.theme.MovieMateIconType
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateSpacing
 
 /**
@@ -29,6 +31,46 @@ fun TopBarIconButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    TopBarIconButtonContainer(
+        contentDescription = contentDescription,
+        onClick = onClick,
+        modifier = modifier
+    ) {
+        Text(
+            text = text,
+            style = MaterialTheme.typography.titleMedium,
+            color = MovieMateColors.PrimaryText
+        )
+    }
+}
+
+@Composable
+fun TopBarIconButton(
+    icon: MovieMateIconType,
+    contentDescription: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    TopBarIconButtonContainer(
+        contentDescription = contentDescription,
+        onClick = onClick,
+        modifier = modifier
+    ) {
+        MovieMateIcon(
+            icon = icon,
+            tint = MovieMateColors.PrimaryText,
+            modifier = Modifier.size(MovieMateSpacing.topBarGlyphSize)
+        )
+    }
+}
+
+@Composable
+private fun TopBarIconButtonContainer(
+    contentDescription: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit
+) {
     Box(
         modifier = modifier
             .size(MovieMateSpacing.topBarIconSize)
@@ -42,10 +84,6 @@ fun TopBarIconButton(
             .semantics { this.contentDescription = contentDescription },
         contentAlignment = Alignment.Center
     ) {
-        Text(
-            text = text,
-            style = MaterialTheme.typography.titleMedium,
-            color = MovieMateColors.PrimaryText
-        )
+        content()
     }
 }

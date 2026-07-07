@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -24,6 +25,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import de.fh.erfurt.moviemate.movies.presentation.detail.MovieDetailUiModel
 import de.fh.erfurt.moviemate.presentation.movies.categories.CategoryUiModel
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateColors
+import de.fh.erfurt.moviemate.presentation.theme.MovieMateIcon
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateIcons
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateShapes
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateSpacing
@@ -169,10 +171,11 @@ private fun EditablePosterPicker(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Text(
-                text = MovieMateIcons.image,
-                style = MaterialTheme.typography.headlineMedium,
-                color = MovieMateColors.AccentLight
+            MovieMateIcon(
+                icon = MovieMateIcons.image,
+                tint = MovieMateColors.AccentLight,
+                secondaryTint = MovieMateColors.Accent,
+                modifier = Modifier.size(MovieMateSpacing.posterActionIconSize)
             )
             Text(
                 text = if (posterUrl.isNullOrBlank()) "Click to add image" else "Click to change image",

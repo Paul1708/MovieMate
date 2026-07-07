@@ -36,6 +36,8 @@ import de.fh.erfurt.moviemate.movies.presentation.backup.BackupUiState
 import de.fh.erfurt.moviemate.presentation.components.MovieMateScreenBackground
 import de.fh.erfurt.moviemate.presentation.components.MovieMateScreenDefaults
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateColors
+import de.fh.erfurt.moviemate.presentation.theme.MovieMateIcon
+import de.fh.erfurt.moviemate.presentation.theme.MovieMateIconType
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateIcons
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateShapes
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateSpacing
@@ -110,7 +112,7 @@ private fun BackupTopBar() {
 private fun BackupActionCard(
     title: String,
     subtitle: String,
-    icon: String,
+    icon: MovieMateIconType,
     contentDescription: String,
     enabled: Boolean,
     onClick: () -> Unit
@@ -163,10 +165,10 @@ private fun BackupActionCard(
 
             Spacer(modifier = Modifier.width(MovieMateSpacing.compactSpacing))
 
-            Text(
-                text = MovieMateIcons.chevronRight,
-                style = MaterialTheme.typography.titleMedium,
-                color = MovieMateColors.PrimaryText
+            MovieMateIcon(
+                icon = MovieMateIcons.chevronRight,
+                tint = MovieMateColors.PrimaryText,
+                modifier = Modifier.size(MovieMateSpacing.backupChevronIconSize)
             )
         }
     }
@@ -174,7 +176,7 @@ private fun BackupActionCard(
 
 @Composable
 private fun BackupActionIcon(
-    icon: String
+    icon: MovieMateIconType
 ) {
     Box(
         modifier = Modifier
@@ -182,11 +184,11 @@ private fun BackupActionIcon(
             .background(MovieMateColors.Accent, CircleShape),
         contentAlignment = Alignment.Center
     ) {
-        Text(
-            text = icon,
-            style = MaterialTheme.typography.titleLarge,
-            color = MovieMateColors.PrimaryText,
-            fontWeight = FontWeight.Bold
+        MovieMateIcon(
+            icon = icon,
+            tint = MovieMateColors.PrimaryText,
+            secondaryTint = MovieMateColors.PrimaryText.copy(alpha = BackupSecondaryIconAlpha),
+            modifier = Modifier.size(MovieMateSpacing.backupActionGlyphSize)
         )
     }
 }
@@ -278,3 +280,4 @@ private fun BackupScreenErrorPreview() {
 }
 
 private const val DisabledActionAlpha = 0.58f
+private const val BackupSecondaryIconAlpha = 0.78f

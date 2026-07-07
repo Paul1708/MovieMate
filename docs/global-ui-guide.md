@@ -35,7 +35,13 @@ Diese Bausteine ersetzen screenspezifische Loading-/Empty-/Error-Komponenten, so
 
 Einheitliche runde Icon-Schaltfläche für Topbars.
 
-Aktuell werden einfache Text-Symbole genutzt. Später können hier echte Icons eingebunden werden, ohne jeden Screen einzeln umzubauen.
+Unterstützt Text-Symbole und die zentralen Canvas-Icons aus `MovieMateIcons.kt`, damit neue Topbar-Aktionen denselben runden Button-Stil behalten.
+
+### `MovieMateIcons.kt`
+
+Zentrale Canvas-Icons für wiederverwendbare App-Aktionen und Statussymbole, zum Beispiel Suche, Filter, Navigation zurück, Entfernen, Backup, Watch-Status und Bild-Platzhalter.
+
+Feature-spezifische Iconsets bleiben in ihren Feature-Paketen: Bottom-Navigation in `app/navigation`, Kategorie-Genres in `movies/categories` und Film-Metadaten in `movies/components`.
 
 ### `MovieMateColors.kt`
 

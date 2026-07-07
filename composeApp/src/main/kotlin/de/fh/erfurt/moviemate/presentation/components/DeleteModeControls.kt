@@ -22,10 +22,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateColors
+import de.fh.erfurt.moviemate.presentation.theme.MovieMateIcon
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateIcons
+import de.fh.erfurt.moviemate.presentation.theme.MovieMateSpacing
 
 @Composable
 fun Modifier.deleteModeWiggle(enabled: Boolean): Modifier {
@@ -65,10 +66,10 @@ fun DeleteBadge(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
-            Text(
-                text = MovieMateIcons.remove,
-                style = MaterialTheme.typography.labelLarge,
-                fontWeight = FontWeight.Bold
+            MovieMateIcon(
+                icon = MovieMateIcons.remove,
+                tint = MovieMateColors.PrimaryText,
+                modifier = Modifier.size(MovieMateSpacing.deleteBadgeIconSize)
             )
         }
     }

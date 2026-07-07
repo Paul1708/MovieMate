@@ -184,7 +184,7 @@ private fun CategoriesTopBar(
             )
 
             TopBarIconButton(
-                text = MovieMateIcons.search,
+                icon = MovieMateIcons.search,
                 contentDescription = "Search categories",
                 onClick = onSearchClicked
             )

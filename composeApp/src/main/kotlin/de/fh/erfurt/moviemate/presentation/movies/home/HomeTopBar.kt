@@ -57,12 +57,12 @@ fun HomeTopBar(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 TopBarIconButton(
-                    text = MovieMateIcons.search,
+                    icon = MovieMateIcons.search,
                     contentDescription = "Open search",
                     onClick = onSearchClicked
                 )
                 TopBarIconButton(
-                    text = MovieMateIcons.filter,
+                    icon = MovieMateIcons.filter,
                     contentDescription = "Open filter",
                     onClick = onFilterClicked
                 )

@@ -29,6 +29,7 @@ object MovieMateSpacing {
     val dividerThickness = 1.dp
     val noElevation = 0.dp
     val topBarIconSize = 36.dp
+    val topBarGlyphSize = 18.dp
     val bottomBarHeight = 72.dp
     val bottomBarIconSize = 26.dp
     val navigationContentBottomPadding = 72.dp
@@ -38,6 +39,9 @@ object MovieMateSpacing {
     val detailChipHorizontalPadding = 12.dp
     val detailChipVerticalPadding = 8.dp
     val detailChipIconSize = 18.dp
+    val detailLabelIconSize = 14.dp
+    val deleteBadgeIconSize = 14.dp
+    val inlineActionIconSize = 16.dp
     val detailInfoVerticalPadding = 9.dp
     val detailStatusButtonHeight = 50.dp
     val detailHeroHeight = 270.dp
@@ -47,10 +51,14 @@ object MovieMateSpacing {
     val detailTopBarOverlayPadding = 20.dp
 
     val addPosterHeight = 132.dp
+    val posterActionIconSize = 32.dp
+    val posterPlaceholderIconSize = 24.dp
     val addFormBottomPadding = 96.dp
 
     val backupActionCardHeight = 92.dp
     val backupActionIconSize = 44.dp
+    val backupActionGlyphSize = 24.dp
+    val backupChevronIconSize = 18.dp
 
     val movieCardHeight = 132.dp
     val moviePosterWidth = 84.dp

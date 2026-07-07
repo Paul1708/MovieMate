@@ -1,6 +1,7 @@
 package de.fh.erfurt.moviemate.presentation.movies.components
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.MaterialTheme
@@ -13,6 +14,7 @@ import androidx.compose.ui.text.font.FontWeight
 import de.fh.erfurt.moviemate.presentation.components.MovieMateScreenDefaults
 import de.fh.erfurt.moviemate.presentation.components.TopBarIconButton
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateColors
+import de.fh.erfurt.moviemate.presentation.theme.MovieMateIconType
 
 /**
  * Shared top bar for add/edit movie forms.
@@ -31,18 +33,67 @@ fun MovieFormTopBar(
     actionEnabled: Boolean = true,
     onActionClicked: (() -> Unit)? = null
 ) {
+    MovieFormTopBarContent(
+        title = title,
+        navigationButton = {
+            TopBarIconButton(
+                text = navigationIcon,
+                contentDescription = navigationContentDescription,
+                onClick = onNavigationClicked,
+                modifier = Modifier.align(Alignment.CenterStart)
+            )
+        },
+        modifier = modifier,
+        actionLabel = actionLabel,
+        actionEnabled = actionEnabled,
+        onActionClicked = onActionClicked
+    )
+}
+
+@Composable
+fun MovieFormTopBar(
+    title: String,
+    navigationIcon: MovieMateIconType,
+    navigationContentDescription: String,
+    onNavigationClicked: () -> Unit,
+    modifier: Modifier = Modifier,
+    actionLabel: String? = null,
+    actionEnabled: Boolean = true,
+    onActionClicked: (() -> Unit)? = null
+) {
+    MovieFormTopBarContent(
+        title = title,
+        navigationButton = {
+            TopBarIconButton(
+                icon = navigationIcon,
+                contentDescription = navigationContentDescription,
+                onClick = onNavigationClicked,
+                modifier = Modifier.align(Alignment.CenterStart)
+            )
+        },
+        modifier = modifier,
+        actionLabel = actionLabel,
+        actionEnabled = actionEnabled,
+        onActionClicked = onActionClicked
+    )
+}
+
+@Composable
+private fun MovieFormTopBarContent(
+    title: String,
+    navigationButton: @Composable BoxScope.() -> Unit,
+    modifier: Modifier = Modifier,
+    actionLabel: String? = null,
+    actionEnabled: Boolean = true,
+    onActionClicked: (() -> Unit)? = null
+) {
     Box(
         modifier = modifier
             .fillMaxWidth()
             .height(MovieMateScreenDefaults.TopBarHeight),
         contentAlignment = Alignment.Center
     ) {
-        TopBarIconButton(
-            text = navigationIcon,
-            contentDescription = navigationContentDescription,
-            onClick = onNavigationClicked,
-            modifier = Modifier.align(Alignment.CenterStart)
-        )
+        navigationButton()
 
         Text(
             text = title,

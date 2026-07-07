@@ -8,9 +8,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -28,8 +27,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateColors
+import de.fh.erfurt.moviemate.presentation.theme.MovieMateIcon
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateIcons
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateShapes
+import de.fh.erfurt.moviemate.presentation.theme.MovieMateSpacing
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -96,10 +97,11 @@ fun MovieDetailPoster(
             }
 
             showPlaceholderIcon -> {
-                Text(
-                    text = MovieMateIcons.image,
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MovieMateColors.PrimaryText
+                MovieMateIcon(
+                    icon = MovieMateIcons.image,
+                    tint = MovieMateColors.PrimaryText,
+                    secondaryTint = MovieMateColors.AccentLight,
+                    modifier = Modifier.size(MovieMateSpacing.posterPlaceholderIconSize)
                 )
             }
         }
