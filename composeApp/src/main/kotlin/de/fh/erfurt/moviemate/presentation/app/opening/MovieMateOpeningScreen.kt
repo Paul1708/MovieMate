@@ -47,10 +47,10 @@ import de.fh.erfurt.moviemate.presentation.theme.MovieMateSpacing
 @Preview
 @Composable
 fun MovieMateOpeningScreen(
+    modifier: Modifier = Modifier,
     message: String = "App vorbereiten...",
     errorMessage: String? = null,
     onRetryClicked: (() -> Unit)? = null,
-    modifier: Modifier = Modifier
 ) {
     MovieMateScreenBackground(modifier = modifier) {
         OpeningFilmReels(modifier = Modifier.fillMaxSize())

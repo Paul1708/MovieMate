@@ -3,10 +3,8 @@ package de.fh.erfurt.moviemate.presentation.movies.add
 import de.fh.erfurt.moviemate.presentation.movies.categories.CategoryUiModel
 
 /**
- * Local form state for the add movie screen.
- *
- * Values stay as strings so the UI can keep incomplete user input. Real
- * validation and persistence can be added when the backend flow is connected.
+ * Draft form state owned by AddMovieViewModel.
+ * Values stay as strings so the UI can keep incomplete user input.
  */
 data class AddMovieUiState(
     val title: String = "",

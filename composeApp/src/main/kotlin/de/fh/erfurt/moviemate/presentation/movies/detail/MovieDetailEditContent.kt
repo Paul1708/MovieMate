@@ -39,7 +39,8 @@ internal fun MovieDetailEditContent(
     editState: MovieDetailEditState,
     availableCategories: List<CategoryUiModel>,
     onAction: (MovieDetailAction) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isSaving: Boolean = false,
 ) {
     Column(
         modifier = modifier
@@ -134,9 +135,10 @@ internal fun MovieDetailEditContent(
 
         Button(
             onClick = { onAction(MovieDetailAction.SaveEditClicked) },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            enabled = !isSaving,
         ) {
-            Text("Save changes")
+            Text(if (isSaving) "Saving..." else "Save changes")
         }
 
         TextButton(

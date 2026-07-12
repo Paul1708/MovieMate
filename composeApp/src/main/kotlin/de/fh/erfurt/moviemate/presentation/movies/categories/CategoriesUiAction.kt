@@ -1,7 +1,8 @@
 package de.fh.erfurt.moviemate.presentation.movies.categories
 
-// Aktionen, die der Kategorie-Screen an seinen State-Holder meldet.
+// Aktionen, die der Kategorie-Screen an sein ViewModel meldet.
 sealed interface CategoriesUiAction {
+    data object LoadRequested : CategoriesUiAction
     data object SearchClicked : CategoriesUiAction
     data class SearchChanged(val query: String) : CategoriesUiAction
     data class CategoryClicked(val categoryId: String) : CategoriesUiAction

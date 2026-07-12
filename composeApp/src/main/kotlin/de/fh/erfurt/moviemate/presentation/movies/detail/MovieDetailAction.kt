@@ -1,9 +1,11 @@
 package de.fh.erfurt.moviemate.presentation.movies.detail
 
 /**
- * User intents emitted by the detail UI and handled by the route state holder.
+ * User intents emitted by the detail UI and handled by MovieDetailScreenViewModel.
  */
 sealed interface MovieDetailAction {
+    data class LoadRequested(val movieId: String) : MovieDetailAction
+    data object RetryClicked : MovieDetailAction
     data object EditClicked : MovieDetailAction
     data object SaveEditClicked : MovieDetailAction
     data object CancelEditClicked : MovieDetailAction

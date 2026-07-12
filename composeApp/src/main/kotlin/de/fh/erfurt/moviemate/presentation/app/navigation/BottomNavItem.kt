@@ -1,7 +1,7 @@
 package de.fh.erfurt.moviemate.presentation.app.navigation
 
 // Einträge der unteren Navigation.
-// Das Enum kann später direkt für die echte Navigation verwendet werden.
+// Semantische Einträge der Bottom-Navigation; konkrete Routen werden separat zugeordnet.
 enum class BottomNavItem(
     val label: String,
     val icon: BottomNavIconType

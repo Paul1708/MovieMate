@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="movie_mate_screen_background">#060A13</color>
-    <color name="movie_mate_screen_background_top">#121A28</color>
 </resources>

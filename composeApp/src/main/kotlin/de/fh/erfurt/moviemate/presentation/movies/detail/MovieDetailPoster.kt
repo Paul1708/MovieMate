@@ -40,9 +40,9 @@ import kotlinx.coroutines.withContext
 @Composable
 fun MovieDetailPoster(
     posterUrl: String?,
+    modifier: Modifier = Modifier,
     onClick: (() -> Unit)? = null,
     showPlaceholderIcon: Boolean = false,
-    modifier: Modifier = Modifier
 ) {
     val description = if (posterUrl.isNullOrBlank()) {
         "Movie poster placeholder"

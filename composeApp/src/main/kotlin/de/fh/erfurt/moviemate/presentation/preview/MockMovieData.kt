@@ -6,8 +6,7 @@ import de.fh.erfurt.moviemate.movies.domain.model.movie.Movie
 /**
  * Gemeinsame Sample-Daten für die Presentation-Schicht.
  *
- * Die Filme sind Domain-Objekte, damit Home, Kategorien und spätere Screens
- * dieselbe Struktur nutzen wie später die Backend-Anbindung.
+ * Zentrale Domain-Beispieldaten für Compose-Previews.
  */
 fun sampleMovies(): List<Movie> {
     return listOf(

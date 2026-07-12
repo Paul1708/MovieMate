@@ -41,7 +41,7 @@ import de.fh.erfurt.moviemate.presentation.theme.MovieMateIcons
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateSpacing
 
 /**
- * Stateless add-movie form. Persistence is handled by AddMovieRoute.
+ * Stateless add-movie form. Persistence is coordinated by AddMovieViewModel.
  */
 @Composable
 fun AddMovieScreen(

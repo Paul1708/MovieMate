@@ -19,7 +19,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.tooling.preview.Preview
 import de.fh.erfurt.moviemate.presentation.app.MovieMateApp
 import de.fh.erfurt.moviemate.presentation.app.opening.MovieMateOpeningScreen
 import de.fh.erfurt.moviemate.presentation.app.startup.MovieMateStartupRunner
@@ -176,12 +175,6 @@ private suspend fun fadeOpening(
     }
 
     onOpeningAlphaChanged(0f)
-}
-
-@Preview
-@Composable
-fun AppAndroidPreview() {
-    App()
 }
 
 private fun MovieMateStartupState.startupMessage(): String {

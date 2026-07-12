@@ -101,5 +101,3 @@ class SqlDelightMovieLocalDataSource(
         return copy(id = idPolicy.nextId(existingIds))
     }
 }
-
-

@@ -1,13 +1,16 @@
 package de.fh.erfurt.moviemate.presentation.movies.add
 
 /**
- * User intents emitted by the add movie UI and handled by the route state holder.
+ * User intents emitted by the add movie UI and handled by AddMovieViewModel.
  */
 sealed interface AddMovieAction {
+    data object LoadRequested : AddMovieAction
     data object CancelClicked : AddMovieAction
     data object SaveClicked : AddMovieAction
     data object PosterClicked : AddMovieAction
     data class PosterSelected(val uri: String) : AddMovieAction
+
+    /** Reserved for the planned external movie-metadata lookup. */
     data object FetchMovieDataClicked : AddMovieAction
 
     data class TitleChanged(val value: String) : AddMovieAction

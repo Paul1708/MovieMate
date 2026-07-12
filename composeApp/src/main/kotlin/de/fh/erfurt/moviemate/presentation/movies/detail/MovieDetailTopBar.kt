@@ -20,11 +20,11 @@ import de.fh.erfurt.moviemate.presentation.theme.MovieMateIcons
  */
 @Composable
 fun MovieDetailTopBar(
-    title: String = "",
     onBackClicked: () -> Unit,
+    modifier: Modifier = Modifier,
+    title: String = "",
     actionLabel: String? = null,
     onActionClicked: (() -> Unit)? = null,
-    modifier: Modifier = Modifier
 ) {
     Box(
         modifier = modifier

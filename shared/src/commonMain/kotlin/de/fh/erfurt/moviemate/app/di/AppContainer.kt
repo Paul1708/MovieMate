@@ -19,13 +19,6 @@ import de.fh.erfurt.moviemate.movies.domain.usecase.movie.SearchMoviesUseCase
 import de.fh.erfurt.moviemate.movies.domain.usecase.movie.UpdateMovieUseCase
 import de.fh.erfurt.moviemate.movies.domain.usecase.movie.UpdateMovieUserRatingUseCase
 import de.fh.erfurt.moviemate.movies.domain.usecase.movie.UpdateMovieWatchedStatusUseCase
-import de.fh.erfurt.moviemate.movies.presentation.backup.BackupViewModel
-import de.fh.erfurt.moviemate.movies.presentation.detail.CategoryDetailViewModel
-import de.fh.erfurt.moviemate.movies.presentation.detail.MovieDetailViewModel
-import de.fh.erfurt.moviemate.movies.presentation.edit.CategoryEditViewModel
-import de.fh.erfurt.moviemate.movies.presentation.edit.MovieEditViewModel
-import de.fh.erfurt.moviemate.movies.presentation.list.CategoriesListViewModel
-import de.fh.erfurt.moviemate.movies.presentation.list.MoviesListViewModel
 
 class AppContainer(
     movieRepository: MovieRepository,
@@ -37,20 +30,6 @@ class AppContainer(
     val addCategoryUseCase = AddCategoryUseCase(categoryRepository)
     val updateCategoryUseCase = UpdateCategoryUseCase(categoryRepository)
     val deleteCategoryUseCase = DeleteCategoryUseCase(categoryRepository)
-
-    val categoriesListViewModel = CategoriesListViewModel(
-        getCategoriesUseCase = getCategoriesUseCase,
-        deleteCategoryUseCase = deleteCategoryUseCase,
-    )
-    val categoryDetailViewModel = CategoryDetailViewModel(
-        getCategoryUseCase = getCategoryUseCase,
-        deleteCategoryUseCase = deleteCategoryUseCase,
-    )
-    val categoryEditViewModel = CategoryEditViewModel(
-        addCategoryUseCase = addCategoryUseCase,
-        updateCategoryUseCase = updateCategoryUseCase,
-        getCategoryUseCase = getCategoryUseCase,
-    )
 
     // Movies layer
     val getMoviesUseCase = GetMoviesUseCase(movieRepository)
@@ -64,36 +43,8 @@ class AppContainer(
     val updateMovieWatchedStatusUseCase = UpdateMovieWatchedStatusUseCase(movieRepository)
     val updateMovieUserRatingUseCase = UpdateMovieUserRatingUseCase(movieRepository)
 
-    val moviesListViewModel = MoviesListViewModel(
-        deleteMovieUseCase = deleteMovieUseCase,
-        searchMoviesUseCase = searchMoviesUseCase,
-        getMoviesByCategoryUseCase = getMoviesByCategoryUseCase,
-        getMoviesSortedUseCase = getMoviesSortedUseCase,
-        getCategoriesUseCase = getCategoriesUseCase,
-    )
-
-    val movieDetailViewModel = MovieDetailViewModel(
-        getMovieUseCase = getMovieUseCase,
-        updateMovieWatchedStatusUseCase = updateMovieWatchedStatusUseCase,
-        updateMovieUserRatingUseCase = updateMovieUserRatingUseCase,
-        deleteMovieUseCase = deleteMovieUseCase,
-        updateMovieUseCase = updateMovieUseCase,
-        getCategoryUseCase = getCategoryUseCase,
-    )
-
-    val movieEditViewModel = MovieEditViewModel(
-        addMovieUseCase = addMovieUseCase,
-        updateMovieUseCase = updateMovieUseCase,
-        getMovieUseCase = getMovieUseCase,
-        getCategoriesUseCase = getCategoriesUseCase,
-    )
-
     // Backup layer
     val exportBackupUseCase = ExportBackupUseCase(movieRepository)
     val importBackupUseCase = ImportBackupUseCase(movieRepository)
 
-    val backupViewModel = BackupViewModel(
-        exportBackupUseCase = exportBackupUseCase,
-        importBackupUseCase = importBackupUseCase,
-    )
 }

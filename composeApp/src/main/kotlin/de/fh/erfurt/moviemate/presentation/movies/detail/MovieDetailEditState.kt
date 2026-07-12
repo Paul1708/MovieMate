@@ -4,7 +4,7 @@ import de.fh.erfurt.moviemate.movies.presentation.detail.MovieDetailUiModel
 import de.fh.erfurt.moviemate.presentation.movies.categories.CategoryUiModel
 
 /**
- * Local form state for the detail edit mode.
+ * Draft form state owned by MovieDetailScreenViewModel while editing.
  */
 data class MovieDetailEditState(
     val title: String = "",

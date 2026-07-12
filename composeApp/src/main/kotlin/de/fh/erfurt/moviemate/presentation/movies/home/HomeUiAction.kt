@@ -2,8 +2,9 @@ package de.fh.erfurt.moviemate.presentation.movies.home
 
 import de.fh.erfurt.moviemate.movies.domain.repository.movie.SortBy
 
-// Aktionen, die der Homescreen an ein späteres ViewModel melden kann.
+// Aktionen, die der Homescreen an HomeViewModel meldet.
 sealed interface HomeUiAction {
+    data class LoadRequested(val selectedCategoryId: String? = null) : HomeUiAction
     data class TabSelected(val tab: HomeTab) : HomeUiAction
     data object SearchClicked : HomeUiAction
     data class SearchChanged(val query: String) : HomeUiAction

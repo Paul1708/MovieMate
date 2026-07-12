@@ -44,7 +44,8 @@ fun MovieDetailScreen(
     onAction: (MovieDetailAction) -> Unit,
     onBackClicked: () -> Unit,
     onRetryClicked: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isSaving: Boolean = false,
 ) {
     val errorMessage = state.errorMessage
     val movie = state.movie
@@ -115,7 +116,8 @@ fun MovieDetailScreen(
                         editState = editState,
                         availableCategories = availableCategories,
                         onAction = onAction,
-                        modifier = Modifier.fillMaxSize()
+                        modifier = Modifier.fillMaxSize(),
+                        isSaving = isSaving,
                     )
                 }
             }

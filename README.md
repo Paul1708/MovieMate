@@ -1,54 +1,53 @@
-This is a Kotlin Multiplatform project targeting Android, iOS, Server.
+# MovieMate
 
-* [/composeApp](./composeApp/src) is for code that will be shared across your Compose Multiplatform applications.
-  It contains several subfolders:
-  - [commonMain](./composeApp/src/commonMain/kotlin) is for code that’s common for all targets.
-  - Other folders are for Kotlin code that will be compiled for only the platform indicated in the folder name.
-    For example, if you want to use Apple’s CoreCrypto for the iOS part of your Kotlin app,
-    the [iosMain](./composeApp/src/iosMain/kotlin) folder would be the right place for such calls.
-    Similarly, if you want to edit the Desktop (JVM) specific part, the [jvmMain](./composeApp/src/jvmMain/kotlin)
-    folder is the appropriate location.
+MovieMate ist ein Kotlin-Multiplatform-Projekt zur lokalen Verwaltung von Filmen
+und Kategorien. Die produktive Benutzeroberfläche wird aktuell für Android mit
+Jetpack Compose umgesetzt.
 
-* [/iosApp](./iosApp/iosApp) contains iOS applications. Even if you’re sharing your UI with Compose Multiplatform,
-  you need this entry point for your iOS app. This is also where you should add SwiftUI code for your project.
+## Module
 
-* [/server](./server/src/main/kotlin) is for the Ktor server application.
+- `composeApp`: Android-App und Compose-Presentation-Schicht.
+- `shared`: gemeinsame Domain-, UseCase-, Repository- und SQLDelight-Schicht.
+- `server`: Ktor-Servermodul.
+- `iosApp`: minimaler iOS-Einstieg; derzeit nicht Teil der produktiven UI.
 
-* [/shared](./shared/src) is for the code that will be shared between all targets in the project.
-  The most important subfolder is [commonMain](./shared/src/commonMain/kotlin). If preferred, you
-  can add code to the platform-specific folders here too.
+## Android-UI-Architektur
 
-### Build and Run Android Application
+Jedes größere Feature ist in drei Verantwortungen getrennt:
 
-To build and run the development version of the Android app, use the run configuration from the run widget
-in your IDE’s toolbar or build it directly from the terminal:
-- on macOS/Linux
-  ```shell
-  ./gradlew :composeApp:assembleDebug
-  ```
-- on Windows
-  ```shell
-  .\gradlew.bat :composeApp:assembleDebug
-  ```
+```text
+Route -> ViewModel -> UseCase
+  |          |
+  |          +-> StateFlow / SharedFlow
+  +-> stateless Screen
+```
 
-### Build and Run Server
+- Routes erzeugen screen-spezifische AndroidX-ViewModels, sammeln State
+  lifecycle-aware und führen Navigation oder Android-Plattformaktionen aus.
+- ViewModels verarbeiten Actions, koordinieren UseCases und veröffentlichen
+  unveränderlichen UI-State sowie einmalige Effects.
+- Screens rendern ausschließlich aus ihrem State und melden Nutzeraktionen zurück.
 
-To build and run the development version of the server, use the run configuration from the run widget
-in your IDE’s toolbar or run it directly from the terminal:
-- on macOS/Linux
-  ```shell
-  ./gradlew :server:run
-  ```
-- on Windows
-  ```shell
-  .\gradlew.bat :server:run
-  ```
+Weitere Details stehen in [`docs/global-ui-guide.md`](docs/global-ui-guide.md).
 
-### Build and Run iOS Application
+## Bauen und testen
 
-To build and run the development version of the iOS app, use the run configuration from the run widget
-in your IDE’s toolbar or open the [/iosApp](./iosApp) directory in Xcode and run it from there.
+Windows:
 
----
+```powershell
+.\gradlew.bat :composeApp:assembleDebug
+.\gradlew.bat :composeApp:testDebugUnitTest
+```
 
-Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html)…
+macOS/Linux:
+
+```shell
+./gradlew :composeApp:assembleDebug
+./gradlew :composeApp:testDebugUnitTest
+```
+
+Server starten:
+
+```shell
+./gradlew :server:run
+```
