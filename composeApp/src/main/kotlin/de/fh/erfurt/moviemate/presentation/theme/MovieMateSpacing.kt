@@ -24,15 +24,16 @@ object MovieMateSpacing {
     val sectionSpacing = 16.dp
     val titleSpacing = 12.dp
 
-    val titleHeight = 42.dp
-    val topBarHeight = 44.dp
+    val topBarHeight = 48.dp
     val dividerThickness = 1.dp
     val noElevation = 0.dp
-    val topBarIconSize = 36.dp
-    val topBarGlyphSize = 18.dp
+    val topBarTouchTargetSize = 48.dp
+    val topBarIconSize = 38.dp
+    val topBarGlyphSize = 20.dp
     val bottomBarHeight = 72.dp
     val bottomBarIconSize = 26.dp
-    val navigationContentBottomPadding = 72.dp
+    val fabIconSize = 24.dp
+    val fabContentBottomPadding = 72.dp
     val detailControlHorizontalPadding = 12.dp
     val detailControlVerticalPadding = 10.dp
     val detailCardPadding = 12.dp
@@ -67,10 +68,13 @@ object MovieMateSpacing {
     val movieCardTextSpacing = 8.dp
     val movieCardRatingMetaSpacing = 7.dp
     val movieCardMetaSpacing = 5.dp
-    val movieCardTrailingIconStartPadding = 8.dp
+    val movieCardTitleBadgeSpacing = 8.dp
     val movieCardMetadataIconSpacing = 6.dp
     val movieCardMetadataGroupSpacing = 8.dp
     val movieCardMetadataIconSize = 16.dp
+    val movieCardStatusIconSize = 14.dp
+    val movieCardStatusHorizontalPadding = 7.dp
+    val movieCardStatusVerticalPadding = 3.dp
 
     val homeTabHorizontalPadding = 16.dp
     val homeTabVerticalPadding = 10.dp

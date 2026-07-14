@@ -1,5 +1,6 @@
 package de.fh.erfurt.moviemate.presentation.movies.backup
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -37,7 +38,6 @@ import de.fh.erfurt.moviemate.presentation.components.MovieMateScreenBackground
 import de.fh.erfurt.moviemate.presentation.components.MovieMateScreenDefaults
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateColors
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateIcon
-import de.fh.erfurt.moviemate.presentation.theme.MovieMateIconType
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateIcons
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateShapes
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateSpacing
@@ -65,13 +65,13 @@ fun BackupScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
-                    .padding(bottom = MovieMateSpacing.navigationContentBottomPadding),
+                    .padding(bottom = MovieMateSpacing.sectionSpacing),
                 verticalArrangement = Arrangement.spacedBy(MovieMateSpacing.itemSpacing)
             ) {
                 BackupActionCard(
                     title = "Export",
                     subtitle = "Export your movie list as a backup file.",
-                    icon = MovieMateIcons.exportBackup,
+                    icon = MovieMateIcons.uploadFile,
                     contentDescription = "Export backup",
                     enabled = !state.isLoading,
                     onClick = onExportClicked
@@ -80,7 +80,7 @@ fun BackupScreen(
                 BackupActionCard(
                     title = "Import",
                     subtitle = "Import a previous backup.",
-                    icon = MovieMateIcons.importBackup,
+                    icon = MovieMateIcons.download,
                     contentDescription = "Import backup",
                     enabled = !state.isLoading,
                     onClick = onImportClicked
@@ -112,7 +112,7 @@ private fun BackupTopBar() {
 private fun BackupActionCard(
     title: String,
     subtitle: String,
-    icon: MovieMateIconType,
+    @DrawableRes icon: Int,
     contentDescription: String,
     enabled: Boolean,
     onClick: () -> Unit
@@ -176,7 +176,7 @@ private fun BackupActionCard(
 
 @Composable
 private fun BackupActionIcon(
-    icon: MovieMateIconType
+    @DrawableRes icon: Int,
 ) {
     Box(
         modifier = Modifier
@@ -187,7 +187,6 @@ private fun BackupActionIcon(
         MovieMateIcon(
             icon = icon,
             tint = MovieMateColors.PrimaryText,
-            secondaryTint = MovieMateColors.PrimaryText.copy(alpha = BackupSecondaryIconAlpha),
             modifier = Modifier.size(MovieMateSpacing.backupActionGlyphSize)
         )
     }
@@ -280,4 +279,3 @@ private fun BackupScreenErrorPreview() {
 }
 
 private const val DisabledActionAlpha = 0.58f
-private const val BackupSecondaryIconAlpha = 0.78f

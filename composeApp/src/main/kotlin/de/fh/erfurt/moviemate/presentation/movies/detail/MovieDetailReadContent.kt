@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -28,6 +29,8 @@ import androidx.compose.ui.text.font.FontWeight
 import de.fh.erfurt.moviemate.movies.presentation.detail.MovieDetailUiModel
 import de.fh.erfurt.moviemate.presentation.components.MovieMateScreenDefaults
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateColors
+import de.fh.erfurt.moviemate.presentation.theme.MovieMateIcon
+import de.fh.erfurt.moviemate.presentation.theme.MovieMateIcons
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateShapes
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateSpacing
 
@@ -114,10 +117,11 @@ internal fun MovieDetailReadContent(
             containerColor = MovieMateColors.Accent,
             contentColor = MovieMateColors.PrimaryText
         ) {
-            Text(
-                text = "Edit",
-                style = MaterialTheme.typography.labelMedium,
-                fontWeight = FontWeight.Bold
+            MovieMateIcon(
+                icon = MovieMateIcons.edit,
+                tint = MovieMateColors.PrimaryText,
+                contentDescription = "Edit movie",
+                modifier = Modifier.size(MovieMateSpacing.fabIconSize),
             )
         }
     }

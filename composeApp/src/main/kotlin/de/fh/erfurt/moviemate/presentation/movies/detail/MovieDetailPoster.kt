@@ -107,7 +107,6 @@ fun MovieDetailPoster(
                 MovieMateIcon(
                     icon = MovieMateIcons.image,
                     tint = MovieMateColors.PrimaryText,
-                    secondaryTint = MovieMateColors.AccentLight,
                     modifier = Modifier.size(MovieMateSpacing.posterPlaceholderIconSize)
                 )
             }

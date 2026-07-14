@@ -1,7 +1,7 @@
 package de.fh.erfurt.moviemate.presentation.movies.components
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.MaterialTheme
@@ -14,99 +14,44 @@ import androidx.compose.ui.text.font.FontWeight
 import de.fh.erfurt.moviemate.presentation.components.MovieMateScreenDefaults
 import de.fh.erfurt.moviemate.presentation.components.TopBarIconButton
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateColors
-import de.fh.erfurt.moviemate.presentation.theme.MovieMateIconType
 
-/**
- * Shared top bar for add/edit movie forms.
- *
- * The parent screen owns horizontal and top padding, which keeps add and edit
- * forms aligned to the same content width.
- */
+/** Shared top bar for add and edit movie forms. */
 @Composable
 fun MovieFormTopBar(
     title: String,
-    navigationIcon: String,
+    @DrawableRes navigationIcon: Int,
     navigationContentDescription: String,
     onNavigationClicked: () -> Unit,
     modifier: Modifier = Modifier,
     actionLabel: String? = null,
     actionEnabled: Boolean = true,
-    onActionClicked: (() -> Unit)? = null
-) {
-    MovieFormTopBarContent(
-        title = title,
-        navigationButton = {
-            TopBarIconButton(
-                text = navigationIcon,
-                contentDescription = navigationContentDescription,
-                onClick = onNavigationClicked,
-                modifier = Modifier.align(Alignment.CenterStart)
-            )
-        },
-        modifier = modifier,
-        actionLabel = actionLabel,
-        actionEnabled = actionEnabled,
-        onActionClicked = onActionClicked
-    )
-}
-
-@Composable
-fun MovieFormTopBar(
-    title: String,
-    navigationIcon: MovieMateIconType,
-    navigationContentDescription: String,
-    onNavigationClicked: () -> Unit,
-    modifier: Modifier = Modifier,
-    actionLabel: String? = null,
-    actionEnabled: Boolean = true,
-    onActionClicked: (() -> Unit)? = null
-) {
-    MovieFormTopBarContent(
-        title = title,
-        navigationButton = {
-            TopBarIconButton(
-                icon = navigationIcon,
-                contentDescription = navigationContentDescription,
-                onClick = onNavigationClicked,
-                modifier = Modifier.align(Alignment.CenterStart)
-            )
-        },
-        modifier = modifier,
-        actionLabel = actionLabel,
-        actionEnabled = actionEnabled,
-        onActionClicked = onActionClicked
-    )
-}
-
-@Composable
-private fun MovieFormTopBarContent(
-    title: String,
-    navigationButton: @Composable BoxScope.() -> Unit,
-    modifier: Modifier = Modifier,
-    actionLabel: String? = null,
-    actionEnabled: Boolean = true,
-    onActionClicked: (() -> Unit)? = null
+    onActionClicked: (() -> Unit)? = null,
 ) {
     Box(
         modifier = modifier
             .fillMaxWidth()
             .height(MovieMateScreenDefaults.TopBarHeight),
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
     ) {
-        navigationButton()
+        TopBarIconButton(
+            icon = navigationIcon,
+            contentDescription = navigationContentDescription,
+            onClick = onNavigationClicked,
+            modifier = Modifier.align(Alignment.CenterStart),
+        )
 
         Text(
             text = title,
             style = MaterialTheme.typography.titleMedium,
             color = MovieMateColors.PrimaryText,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
         )
 
         if (actionLabel != null && onActionClicked != null) {
             TextButton(
                 onClick = onActionClicked,
                 enabled = actionEnabled,
-                modifier = Modifier.align(Alignment.CenterEnd)
+                modifier = Modifier.align(Alignment.CenterEnd),
             ) {
                 Text(actionLabel)
             }

@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -67,7 +66,7 @@ fun DeleteBadge(
             contentAlignment = Alignment.Center
         ) {
             MovieMateIcon(
-                icon = MovieMateIcons.remove,
+                icon = MovieMateIcons.delete,
                 tint = MovieMateColors.PrimaryText,
                 modifier = Modifier.size(MovieMateSpacing.deleteBadgeIconSize)
             )

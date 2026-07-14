@@ -1,5 +1,10 @@
 package de.fh.erfurt.moviemate.presentation.app
 
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -54,7 +59,11 @@ fun MovieMateApp(
         NavHost(
             navController = navController,
             startDestination = MovieMateDestination.HomeRoute,
-            modifier = Modifier.padding(paddingValues)
+            modifier = Modifier.padding(paddingValues),
+            enterTransition = { movieMateEnterTransition() },
+            exitTransition = { movieMateExitTransition() },
+            popEnterTransition = { movieMateEnterTransition() },
+            popExitTransition = { movieMateExitTransition() },
         ) {
             composable(
                 route = MovieMateDestination.HomeRoute,
@@ -141,3 +150,21 @@ fun MovieMateApp(
         }
     }
 }
+
+private fun movieMateEnterTransition(): EnterTransition {
+    return fadeIn(
+        animationSpec = tween(
+            durationMillis = NavigationFadeInDurationMillis,
+            delayMillis = NavigationFadeOutDurationMillis,
+        )
+    )
+}
+
+private fun movieMateExitTransition(): ExitTransition {
+    return fadeOut(
+        animationSpec = tween(durationMillis = NavigationFadeOutDurationMillis)
+    )
+}
+
+private const val NavigationFadeOutDurationMillis = 90
+private const val NavigationFadeInDurationMillis = 140

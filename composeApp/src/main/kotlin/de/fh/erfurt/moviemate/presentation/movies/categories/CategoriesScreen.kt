@@ -53,6 +53,7 @@ import de.fh.erfurt.moviemate.presentation.components.TopBarIconButton
 import de.fh.erfurt.moviemate.presentation.components.deleteModeWiggle
 import de.fh.erfurt.moviemate.presentation.preview.previewCategoriesUiState
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateColors
+import de.fh.erfurt.moviemate.presentation.theme.MovieMateIcon
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateIcons
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateShapes
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateSpacing
@@ -132,10 +133,10 @@ fun CategoriesScreen(
                 containerColor = MovieMateColors.Accent,
                 contentColor = MovieMateColors.PrimaryText
             ) {
-                Text(
-                    text = MovieMateIcons.add,
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Medium
+                MovieMateIcon(
+                    icon = MovieMateIcons.add,
+                    tint = MovieMateColors.PrimaryText,
+                    modifier = Modifier.size(MovieMateSpacing.fabIconSize),
                 )
             }
         }
@@ -227,7 +228,7 @@ private fun CategoriesGrid(
         columns = GridCells.Fixed(2),
         verticalArrangement = Arrangement.spacedBy(MovieMateSpacing.categoryGridSpacing),
         horizontalArrangement = Arrangement.spacedBy(MovieMateSpacing.categoryGridSpacing),
-        contentPadding = PaddingValues(bottom = MovieMateSpacing.navigationContentBottomPadding),
+        contentPadding = PaddingValues(bottom = MovieMateSpacing.fabContentBottomPadding),
         modifier = Modifier.fillMaxSize()
     ) {
         items(categories, key = { it.id }) { category ->

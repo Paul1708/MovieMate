@@ -10,16 +10,16 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import de.fh.erfurt.moviemate.presentation.components.DeleteBadge
 import de.fh.erfurt.moviemate.presentation.components.DeleteConfirmationDialog
@@ -33,6 +33,8 @@ import de.fh.erfurt.moviemate.presentation.components.deleteModeWiggle
 import de.fh.erfurt.moviemate.presentation.movies.components.MovieCard
 import de.fh.erfurt.moviemate.presentation.preview.previewHomeUiState
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateColors
+import de.fh.erfurt.moviemate.presentation.theme.MovieMateIcon
+import de.fh.erfurt.moviemate.presentation.theme.MovieMateIcons
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateSpacing
 
 /**
@@ -88,7 +90,7 @@ fun HomeScreen(
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(MovieMateSpacing.itemSpacing),
                     contentPadding = PaddingValues(
-                        bottom = MovieMateSpacing.navigationContentBottomPadding
+                        bottom = MovieMateSpacing.fabContentBottomPadding
                     ),
                     modifier = Modifier
                         .fillMaxSize()
@@ -139,15 +141,16 @@ fun HomeScreen(
                     .padding(
                         end = MovieMateScreenDefaults.HorizontalPadding,
                         bottom = MovieMateSpacing.detailLargeSpacing
-                    ),
+                    )
+                    .semantics { contentDescription = "Add movie" },
                 shape = CircleShape,
                 containerColor = MovieMateColors.Accent,
                 contentColor = MovieMateColors.PrimaryText
             ) {
-                Text(
-                    text = "+",
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Medium
+                MovieMateIcon(
+                    icon = MovieMateIcons.add,
+                    tint = MovieMateColors.PrimaryText,
+                    modifier = Modifier.size(MovieMateSpacing.fabIconSize),
                 )
             }
         }

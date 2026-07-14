@@ -83,7 +83,12 @@ internal fun WatchProvidersEditor(
                 onClick = onAddClicked,
                 enabled = input.isNotBlank()
             ) {
-                Text(MovieMateIcons.add)
+                MovieMateIcon(
+                    icon = MovieMateIcons.add,
+                    tint = MovieMateColors.PrimaryText,
+                    contentDescription = "Add provider",
+                    modifier = Modifier.size(MovieMateSpacing.inlineActionIconSize),
+                )
             }
         }
     }
@@ -120,7 +125,7 @@ private fun WatchProviderChip(
                 fontWeight = FontWeight.SemiBold
             )
             MovieMateIcon(
-                icon = MovieMateIcons.remove,
+                icon = MovieMateIcons.close,
                 tint = MovieMateColors.SecondaryText,
                 modifier = Modifier
                     .size(MovieMateSpacing.detailChipIconSize)

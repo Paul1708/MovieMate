@@ -19,6 +19,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -55,7 +56,8 @@ fun MovieCard(
             )
             .semantics {
                 contentDescription =
-                    "Movie ${movie.title}, rating ${movie.ratingText}, category ${movie.categoryText}, year ${movie.yearText}"
+                    "Movie ${movie.title}, ${if (movie.isWatched) "watched" else "watch later"}, " +
+                    "rating ${movie.ratingText}, category ${movie.categoryText}, year ${movie.yearText}"
             },
         shape = RoundedCornerShape(MovieMateShapes.cardRadius),
         colors = CardDefaults.cardColors(containerColor = MovieMateColors.CardBackground),
@@ -82,14 +84,24 @@ fun MovieCard(
                     .fillMaxHeight(),
                 verticalArrangement = Arrangement.Center
             ) {
-                Text(
-                    text = movie.title,
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MovieMateColors.PrimaryText,
-                    fontWeight = FontWeight.Bold,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(MovieMateSpacing.movieCardTitleBadgeSpacing),
+                ) {
+                    Text(
+                        text = movie.title,
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MovieMateColors.PrimaryText,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f),
+                    )
+
+                    if (movie.isWatched) {
+                        WatchedBadge()
+                    }
+                }
 
                 Spacer(modifier = Modifier.height(MovieMateSpacing.movieCardTextSpacing))
 
@@ -107,12 +119,6 @@ fun MovieCard(
                 )
             }
 
-            Text(
-                text = MovieMateIcons.more,
-                style = MaterialTheme.typography.titleMedium,
-                color = MovieMateColors.SecondaryText,
-                modifier = Modifier.padding(start = MovieMateSpacing.movieCardTrailingIconStartPadding)
-            )
         }
     }
 }
@@ -153,7 +159,6 @@ private fun MoviePoster(
             MovieMateIcon(
                 icon = MovieMateIcons.image,
                 tint = MovieMateColors.AccentLight,
-                secondaryTint = MovieMateColors.Accent,
                 modifier = Modifier.size(MovieMateSpacing.posterPlaceholderIconSize)
             )
         } else {
@@ -173,10 +178,10 @@ private fun MovieRatingRow(text: String) {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(MovieMateSpacing.movieCardMetadataIconSpacing)
     ) {
-        Text(
-            text = MovieMateIcons.rating,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MovieMateColors.Rating
+        MovieMateIcon(
+            icon = MovieMateIcons.rating,
+            tint = MovieMateColors.Rating,
+            modifier = Modifier.size(MovieMateSpacing.movieCardMetadataIconSize),
         )
         Text(
             text = text,
@@ -185,6 +190,36 @@ private fun MovieRatingRow(text: String) {
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )
+    }
+}
+
+@Composable
+private fun WatchedBadge() {
+    Surface(
+        shape = RoundedCornerShape(MovieMateShapes.chipRadius),
+        color = MovieMateColors.AccentContainer,
+        contentColor = MovieMateColors.AccentLight,
+    ) {
+        Row(
+            modifier = Modifier.padding(
+                horizontal = MovieMateSpacing.movieCardStatusHorizontalPadding,
+                vertical = MovieMateSpacing.movieCardStatusVerticalPadding,
+            ),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(MovieMateSpacing.detailMicroSpacing),
+        ) {
+            MovieMateIcon(
+                icon = MovieMateIcons.watched,
+                tint = MovieMateColors.AccentLight,
+                modifier = Modifier.size(MovieMateSpacing.movieCardStatusIconSize),
+            )
+            Text(
+                text = "Watched",
+                style = MaterialTheme.typography.labelSmall,
+                fontWeight = FontWeight.SemiBold,
+                maxLines = 1,
+            )
+        }
     }
 }
 

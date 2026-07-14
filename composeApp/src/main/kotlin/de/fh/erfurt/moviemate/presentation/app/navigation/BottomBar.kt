@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -15,8 +14,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateColors
+import de.fh.erfurt.moviemate.presentation.theme.MovieMateIcon
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateSpacing
 
 /**
@@ -50,9 +49,9 @@ fun BottomBar(
                     selected = selectedItem == item,
                     onClick = { onItemSelected(item) },
                     icon = {
-                        BottomNavIcon(
+                        MovieMateIcon(
                             icon = item.icon,
-                            color = iconColor,
+                            tint = iconColor,
                             modifier = Modifier.size(MovieMateSpacing.bottomBarIconSize)
                         )
                     },
@@ -60,7 +59,6 @@ fun BottomBar(
                         Text(
                             text = item.label,
                             style = MaterialTheme.typography.labelSmall,
-                            modifier = Modifier.offset(y = (-2).dp)
                         )
                     },
                     colors = NavigationBarItemDefaults.colors(

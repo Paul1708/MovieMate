@@ -129,7 +129,7 @@ internal fun MovieDetailEditContent(
         )
 
         DetailReadOnlyInfo(
-            label = "${MovieMateIcons.updated} Last edited",
+            label = "Last edited",
             value = movie.updatedAtLabel.ifBlank { "Unknown" }
         )
 
@@ -176,7 +176,6 @@ private fun EditablePosterPicker(
             MovieMateIcon(
                 icon = MovieMateIcons.image,
                 tint = MovieMateColors.AccentLight,
-                secondaryTint = MovieMateColors.Accent,
                 modifier = Modifier.size(MovieMateSpacing.posterActionIconSize)
             )
             Text(

@@ -60,7 +60,7 @@ fun AddMovieScreen(
             ) {
                 MovieFormTopBar(
                     title = "Add movie",
-                    navigationIcon = MovieMateIcons.remove,
+                    navigationIcon = MovieMateIcons.close,
                     navigationContentDescription = "Cancel add movie",
                     onNavigationClicked = { onAction(AddMovieAction.CancelClicked) },
                     actionLabel = "Save",
@@ -285,7 +285,6 @@ private fun AddPosterPicker(
             MovieMateIcon(
                 icon = MovieMateIcons.image,
                 tint = MovieMateColors.AccentLight,
-                secondaryTint = MovieMateColors.Accent,
                 modifier = Modifier.size(MovieMateSpacing.posterActionIconSize)
             )
             Text(

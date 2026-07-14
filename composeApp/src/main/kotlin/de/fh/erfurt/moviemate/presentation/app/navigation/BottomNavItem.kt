@@ -1,13 +1,14 @@
 package de.fh.erfurt.moviemate.presentation.app.navigation
 
-// Einträge der unteren Navigation.
-// Semantische Einträge der Bottom-Navigation; konkrete Routen werden separat zugeordnet.
+import de.fh.erfurt.moviemate.presentation.theme.MovieMateIcons
+
+/** Semantische Einträge der Bottom-Navigation; Routen werden separat zugeordnet. */
 enum class BottomNavItem(
     val label: String,
-    val icon: BottomNavIconType
+    val icon: Int,
 ) {
-    Home("Home", BottomNavIconType.Home),
-    Categories("Categories", BottomNavIconType.Categories),
-    Add("Add", BottomNavIconType.Add),
-    Backup("Backup", BottomNavIconType.Backup)
+    Home("Home", MovieMateIcons.home),
+    Categories("Categories", MovieMateIcons.category),
+    Add("Add", MovieMateIcons.addCircle),
+    Backup("Backup", MovieMateIcons.backup),
 }

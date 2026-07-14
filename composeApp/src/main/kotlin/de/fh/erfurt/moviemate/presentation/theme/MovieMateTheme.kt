@@ -1,18 +1,35 @@
 package de.fh.erfurt.moviemate.presentation.theme
 
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Shapes
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.foundation.shape.RoundedCornerShape
 
 private val MovieMateColorScheme = darkColorScheme(
     background = MovieMateColors.ScreenBackground,
+    onBackground = MovieMateColors.PrimaryText,
     surface = MovieMateColors.CardBackground,
     onSurface = MovieMateColors.PrimaryText,
     primary = MovieMateColors.Accent,
     onPrimary = MovieMateColors.PrimaryText,
-    secondary = MovieMateColors.SecondaryText,
+    primaryContainer = MovieMateColors.AccentContainer,
+    onPrimaryContainer = MovieMateColors.PrimaryText,
+    secondary = MovieMateColors.AccentLight,
+    onSecondary = MovieMateColors.ScreenBackground,
+    secondaryContainer = MovieMateColors.SoftControl,
+    onSecondaryContainer = MovieMateColors.PrimaryText,
     surfaceVariant = MovieMateColors.SoftControl,
-    outline = MovieMateColors.Divider
+    onSurfaceVariant = MovieMateColors.SecondaryText,
+    outline = MovieMateColors.SoftControlBorder,
+    outlineVariant = MovieMateColors.Divider,
+)
+
+private val MovieMateMaterialShapes = Shapes(
+    extraSmall = RoundedCornerShape(MovieMateShapes.chipRadius),
+    small = RoundedCornerShape(MovieMateShapes.controlRadius),
+    medium = RoundedCornerShape(MovieMateShapes.cardRadius),
+    large = RoundedCornerShape(MovieMateShapes.cardRadius),
 )
 
 /**
@@ -24,6 +41,7 @@ fun MovieMateTheme(
 ) {
     MaterialTheme(
         colorScheme = MovieMateColorScheme,
+        shapes = MovieMateMaterialShapes,
         content = content
     )
 }

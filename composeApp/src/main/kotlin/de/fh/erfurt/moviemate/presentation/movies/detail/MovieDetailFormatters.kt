@@ -32,12 +32,13 @@ internal fun MovieDetailUiModel.metaItems(): List<MovieDetailMetaItem> {
  */
 internal fun Double.starText(): String {
     val filledStars = (coerceIn(0.0, 10.0) / 2.0).roundToInt().coerceIn(0, 5)
-    return MovieMateIcons.rating.repeat(filledStars) + MovieMateIcons.ratingEmpty.repeat(5 - filledStars)
+    return MovieMateIcons.ratingFilledText.repeat(filledStars) +
+        MovieMateIcons.ratingEmptyText.repeat(5 - filledStars)
 }
 
 /**
  * Leere Sterneanzeige für fehlende Bewertungen.
  */
 internal fun emptyStarText(): String {
-    return MovieMateIcons.ratingEmpty.repeat(5)
+    return MovieMateIcons.ratingEmptyText.repeat(5)
 }
