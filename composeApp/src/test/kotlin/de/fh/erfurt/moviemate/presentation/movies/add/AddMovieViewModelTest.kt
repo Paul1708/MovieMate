@@ -9,6 +9,7 @@ import de.fh.erfurt.moviemate.movies.domain.repository.category.CategoryReposito
 import de.fh.erfurt.moviemate.movies.domain.repository.movie.MovieMetadataRepository
 import de.fh.erfurt.moviemate.movies.domain.repository.movie.MovieRepository
 import de.fh.erfurt.moviemate.movies.domain.repository.movie.SortBy
+import de.fh.erfurt.moviemate.movies.domain.usecase.category.AddCategoryUseCase
 import de.fh.erfurt.moviemate.movies.domain.usecase.category.GetCategoriesUseCase
 import de.fh.erfurt.moviemate.movies.domain.usecase.movie.AddMovieUseCase
 import de.fh.erfurt.moviemate.movies.domain.usecase.movie.FetchMovieDataUseCase
@@ -25,10 +26,12 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class AddMovieViewModelTest {
     private lateinit var dispatcher: TestDispatcher
+    private lateinit var categoryRepository: InMemoryCategoryRepository
     private lateinit var metadataRepository: StubMovieMetadataRepository
     private lateinit var viewModel: AddMovieViewModel
 
@@ -36,10 +39,12 @@ class AddMovieViewModelTest {
     fun setUp() {
         dispatcher = UnconfinedTestDispatcher()
         Dispatchers.setMain(dispatcher)
+        categoryRepository = InMemoryCategoryRepository()
         metadataRepository = StubMovieMetadataRepository()
         viewModel = AddMovieViewModel(
-            getCategoriesUseCase = GetCategoriesUseCase(EmptyCategoryRepository()),
+            getCategoriesUseCase = GetCategoriesUseCase(categoryRepository),
             addMovieUseCase = AddMovieUseCase(EmptyMovieRepository()),
+            addCategoryUseCase = AddCategoryUseCase(categoryRepository),
             fetchMovieDataUseCase = FetchMovieDataUseCase(metadataRepository),
             ioDispatcher = dispatcher,
         )
@@ -85,6 +90,49 @@ class AddMovieViewModelTest {
         assertEquals("Please enter a movie title first.", viewModel.uiState.value.errorMessage)
         assertFalse(viewModel.uiState.value.isFetching)
     }
+
+    @Test
+    fun fetchSelectsAnExistingCategoryFromAnyFetchedGenre() = runTest(dispatcher) {
+        categoryRepository.seed(
+            Category(
+                id = "science-fiction",
+                name = "Science Fiction",
+                iconKey = "sci_fi",
+                updatedAtEpochMillis = 1,
+            )
+        )
+        viewModel.onAction(AddMovieAction.LoadRequested)
+        metadataRepository.result = fetchedMovieData(genres = listOf("Horror", "Sci-Fi"))
+
+        viewModel.onAction(AddMovieAction.TitleChanged("Alien"))
+        viewModel.onAction(AddMovieAction.FetchMovieDataClicked)
+
+        assertEquals("science-fiction", viewModel.uiState.value.categoryId)
+        assertFalse(viewModel.uiState.value.isAddCategoryDialogVisible)
+    }
+
+    @Test
+    fun fetchOffersMissingGenreAndSelectsCreatedCategory() = runTest(dispatcher) {
+        metadataRepository.result = fetchedMovieData(genres = listOf("Horror", "Sci-Fi"))
+
+        viewModel.onAction(AddMovieAction.TitleChanged("Alien"))
+        viewModel.onAction(AddMovieAction.FetchMovieDataClicked)
+
+        assertTrue(viewModel.uiState.value.isAddCategoryDialogVisible)
+        assertEquals("Horror", viewModel.uiState.value.addCategoryName)
+        assertEquals("horror", viewModel.uiState.value.addCategoryIconKey)
+
+        viewModel.onAction(AddMovieAction.AddCategoryIconSelected("drama"))
+        viewModel.onAction(AddMovieAction.AddCategoryConfirmed)
+
+        val state = viewModel.uiState.value
+        val createdCategory = state.availableCategories.single()
+        assertEquals(createdCategory.id, state.categoryId)
+        assertEquals("Horror", createdCategory.name)
+        assertEquals("drama", createdCategory.iconKey)
+        assertFalse(state.isAddCategoryDialogVisible)
+        assertFalse(state.isAddingCategory)
+    }
 }
 
 private class StubMovieMetadataRepository : MovieMetadataRepository {
@@ -97,10 +145,23 @@ private class StubMovieMetadataRepository : MovieMetadataRepository {
     }
 }
 
-private class EmptyCategoryRepository : CategoryRepository {
-    override suspend fun getCategories(): List<Category> = emptyList()
-    override suspend fun getCategory(categoryId: String): Category? = null
-    override suspend fun addCategory(draft: CategoryDraft): Category = error("Not needed in this test")
+private class InMemoryCategoryRepository : CategoryRepository {
+    private val categories = mutableListOf<Category>()
+
+    fun seed(category: Category) {
+        categories += category
+    }
+
+    override suspend fun getCategories(): List<Category> = categories.toList()
+    override suspend fun getCategory(categoryId: String): Category? = categories.find { it.id == categoryId }
+    override suspend fun addCategory(draft: CategoryDraft): Category {
+        return Category(
+            id = "category-${categories.size + 1}",
+            name = draft.name,
+            iconKey = draft.iconKey,
+            updatedAtEpochMillis = draft.updatedAtEpochMillis,
+        ).also(categories::add)
+    }
     override suspend fun updateCategory(category: Category): Category = error("Not needed in this test")
     override suspend fun deleteCategory(categoryId: String) = Unit
 }
@@ -116,4 +177,16 @@ private class EmptyMovieRepository : MovieRepository {
     override suspend fun getMoviesSorted(sortBy: SortBy, ascending: Boolean): List<Movie> = emptyList()
     override suspend fun exportBackup(): String = "{}"
     override suspend fun importBackup(jsonString: String) = Unit
+}
+
+private fun fetchedMovieData(genres: List<String>): FetchedMovieData {
+    return FetchedMovieData(
+        title = "Alien",
+        description = "A space horror classic.",
+        releaseYear = 1979,
+        posterUrl = "https://example.com/alien.jpg",
+        runtimeMinutes = 117,
+        imdbRating = 8.5,
+        genres = genres,
+    )
 }

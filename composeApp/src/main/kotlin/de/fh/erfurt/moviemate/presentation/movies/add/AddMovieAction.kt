@@ -12,6 +12,10 @@ sealed interface AddMovieAction {
 
     /** Fetches movie metadata for the current title from the configured provider. */
     data object FetchMovieDataClicked : AddMovieAction
+    data class AddCategoryNameChanged(val value: String) : AddMovieAction
+    data class AddCategoryIconSelected(val iconKey: String) : AddMovieAction
+    data object AddCategoryConfirmed : AddMovieAction
+    data object AddCategoryDismissed : AddMovieAction
 
     data class TitleChanged(val value: String) : AddMovieAction
     data class DescriptionChanged(val value: String) : AddMovieAction

@@ -38,6 +38,7 @@ fun AddMovieRoute(
             AddMovieViewModel(
                 getCategoriesUseCase = appContainer.getCategoriesUseCase,
                 addMovieUseCase = appContainer.addMovieUseCase,
+                addCategoryUseCase = appContainer.addCategoryUseCase,
                 fetchMovieDataUseCase = appContainer.fetchMovieDataUseCase,
                 ioDispatcher = ioDispatcher,
             )

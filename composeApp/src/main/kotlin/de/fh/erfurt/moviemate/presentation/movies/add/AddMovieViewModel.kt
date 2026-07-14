@@ -3,13 +3,17 @@ package de.fh.erfurt.moviemate.presentation.movies.add
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import de.fh.erfurt.moviemate.movies.domain.model.category.Category
+import de.fh.erfurt.moviemate.movies.domain.model.category.CategoryDraft
+import de.fh.erfurt.moviemate.movies.domain.model.movie.FetchedMovieData
 import de.fh.erfurt.moviemate.movies.domain.model.movie.MovieDraft
+import de.fh.erfurt.moviemate.movies.domain.usecase.category.AddCategoryUseCase
 import de.fh.erfurt.moviemate.movies.domain.usecase.category.GetCategoriesUseCase
 import de.fh.erfurt.moviemate.movies.domain.usecase.movie.AddMovieUseCase
 import de.fh.erfurt.moviemate.movies.domain.usecase.movie.FetchMovieDataUseCase
+import de.fh.erfurt.moviemate.presentation.app.throwIfCancellation
+import de.fh.erfurt.moviemate.presentation.movies.categories.CategoryIconOptions
 import de.fh.erfurt.moviemate.presentation.movies.categories.CategoryUiModel
 import de.fh.erfurt.moviemate.presentation.movies.categories.DefaultCategoryIconKey
-import de.fh.erfurt.moviemate.presentation.app.throwIfCancellation
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -25,6 +29,7 @@ import kotlinx.coroutines.withContext
 class AddMovieViewModel(
     private val getCategoriesUseCase: GetCategoriesUseCase,
     private val addMovieUseCase: AddMovieUseCase,
+    private val addCategoryUseCase: AddCategoryUseCase,
     private val fetchMovieDataUseCase: FetchMovieDataUseCase,
     private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
@@ -45,6 +50,14 @@ class AddMovieViewModel(
             AddMovieAction.PosterClicked -> emitEffect(AddMovieEffect.PickPoster)
             is AddMovieAction.PosterSelected -> updateState { copy(posterUrl = action.uri, errorMessage = null) }
             AddMovieAction.FetchMovieDataClicked -> fetchMovieData()
+            is AddMovieAction.AddCategoryNameChanged -> updateState {
+                copy(addCategoryName = action.value, addCategoryError = null)
+            }
+            is AddMovieAction.AddCategoryIconSelected -> updateState {
+                copy(addCategoryIconKey = action.iconKey, addCategoryError = null)
+            }
+            AddMovieAction.AddCategoryConfirmed -> addFetchedCategory()
+            AddMovieAction.AddCategoryDismissed -> dismissAddCategoryDialog()
             is AddMovieAction.TitleChanged -> updateState { copy(title = action.value, errorMessage = null) }
             is AddMovieAction.DescriptionChanged -> updateState { copy(description = action.value, errorMessage = null) }
             is AddMovieAction.CategoryChanged -> updateState { copy(categoryId = action.value, errorMessage = null) }
@@ -136,18 +149,7 @@ class AddMovieViewModel(
                             isFetching = false,
                             errorMessage = "Movie not found.",
                         )
-                    } else {
-                        state.copy(
-                            title = fetchedMovie.title,
-                            description = fetchedMovie.description,
-                            releaseYear = fetchedMovie.releaseYear?.toString().orEmpty(),
-                            posterUrl = fetchedMovie.posterUrl,
-                            runtimeMinutes = fetchedMovie.runtimeMinutes?.toString().orEmpty(),
-                            imdbRating = fetchedMovie.imdbRating?.toString().orEmpty(),
-                            isFetching = false,
-                            errorMessage = null,
-                        )
-                    }
+                    } else state.withFetchedMovieData(fetchedMovie)
                 }
             }.onFailure { throwable ->
                 throwable.throwIfCancellation()
@@ -159,6 +161,113 @@ class AddMovieViewModel(
                 }
             }
         }
+    }
+
+    private fun addFetchedCategory() {
+        val state = _uiState.value
+        val categoryName = state.addCategoryName.trim()
+        if (categoryName.isBlank()) {
+            updateState { copy(addCategoryError = "Name is required") }
+            return
+        }
+
+        val existingCategory = state.availableCategories.firstOrNull { category ->
+            category.name.matchesCategoryName(categoryName)
+        }
+        if (existingCategory != null) {
+            _uiState.update {
+                it.copy(
+                    categoryId = existingCategory.id,
+                    isAddCategoryDialogVisible = false,
+                    addCategoryName = "",
+                    addCategoryIconKey = DefaultCategoryIconKey,
+                    addCategoryError = null,
+                )
+            }
+            return
+        }
+
+        viewModelScope.launch {
+            _uiState.update { it.copy(isAddingCategory = true, addCategoryError = null) }
+            runCatching {
+                withContext(ioDispatcher) {
+                    addCategoryUseCase(
+                        CategoryDraft(
+                            name = categoryName,
+                            iconKey = state.addCategoryIconKey,
+                            updatedAtEpochMillis = System.currentTimeMillis(),
+                        )
+                    )
+                }
+            }.onSuccess { category ->
+                val categoryUiModel = category.toAddMovieCategoryUiModel()
+                _uiState.update {
+                    it.copy(
+                        categoryId = category.id,
+                        availableCategories = (it.availableCategories + categoryUiModel)
+                            .distinctBy(CategoryUiModel::id)
+                            .sortedBy { item -> item.name.lowercase() },
+                        isAddingCategory = false,
+                        isAddCategoryDialogVisible = false,
+                        addCategoryName = "",
+                        addCategoryIconKey = DefaultCategoryIconKey,
+                        addCategoryError = null,
+                        errorMessage = null,
+                    )
+                }
+            }.onFailure { throwable ->
+                throwable.throwIfCancellation()
+                _uiState.update {
+                    it.copy(
+                        isAddingCategory = false,
+                        addCategoryError = throwable.message ?: "Category could not be saved.",
+                    )
+                }
+            }
+        }
+    }
+
+    private fun dismissAddCategoryDialog() {
+        if (_uiState.value.isAddingCategory) return
+        _uiState.update {
+            it.copy(
+                isAddCategoryDialogVisible = false,
+                addCategoryName = "",
+                addCategoryIconKey = DefaultCategoryIconKey,
+                addCategoryError = null,
+            )
+        }
+    }
+
+    private fun AddMovieUiState.withFetchedMovieData(fetchedMovie: FetchedMovieData): AddMovieUiState {
+        val matchedCategory = fetchedMovie.genres
+            .asSequence()
+            .mapNotNull { genre ->
+                availableCategories.firstOrNull { category -> category.name.matchesCategoryName(genre) }
+            }
+            .firstOrNull()
+        val suggestedGenre = fetchedMovie.genres.firstOrNull()
+        val shouldCreateCategory = matchedCategory == null && suggestedGenre != null
+
+        return copy(
+            title = fetchedMovie.title,
+            description = fetchedMovie.description,
+            releaseYear = fetchedMovie.releaseYear?.toString().orEmpty(),
+            posterUrl = fetchedMovie.posterUrl,
+            runtimeMinutes = fetchedMovie.runtimeMinutes?.toString().orEmpty(),
+            imdbRating = fetchedMovie.imdbRating?.toString().orEmpty(),
+            categoryId = matchedCategory?.id ?: categoryId,
+            isFetching = false,
+            isAddCategoryDialogVisible = shouldCreateCategory,
+            addCategoryName = if (shouldCreateCategory) suggestedGenre.orEmpty() else "",
+            addCategoryIconKey = if (shouldCreateCategory) {
+                suggestedGenre.orEmpty().suggestedCategoryIconKey()
+            } else {
+                DefaultCategoryIconKey
+            },
+            addCategoryError = null,
+            errorMessage = null,
+        )
     }
 
     private fun AddMovieUiState.toMovieDraftOrNull(): MovieDraft? {
@@ -219,6 +328,24 @@ private fun Category.toAddMovieCategoryUiModel(): CategoryUiModel {
         name = name,
         iconKey = iconKey ?: DefaultCategoryIconKey,
     )
+}
+
+private fun String.matchesCategoryName(other: String): Boolean {
+    return normalizedCategoryName() == other.normalizedCategoryName()
+}
+
+private fun String.suggestedCategoryIconKey(): String {
+    return CategoryIconOptions.firstOrNull { option ->
+        matchesCategoryName(option.label) || matchesCategoryName(option.key)
+    }?.key ?: DefaultCategoryIconKey
+}
+
+private fun String.normalizedCategoryName(): String {
+    val compactName = lowercase().filter(Char::isLetterOrDigit)
+    return when (compactName) {
+        "scifi", "sciencefiction" -> "sciencefiction"
+        else -> compactName
+    }
 }
 
 private fun String.parseOptionalInt(fieldName: String): Int? {

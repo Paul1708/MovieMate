@@ -1,6 +1,7 @@
 package de.fh.erfurt.moviemate.presentation.movies.add
 
 import de.fh.erfurt.moviemate.presentation.movies.categories.CategoryUiModel
+import de.fh.erfurt.moviemate.presentation.movies.categories.DefaultCategoryIconKey
 
 /**
  * Draft form state owned by AddMovieViewModel.
@@ -22,9 +23,20 @@ data class AddMovieUiState(
     val availableCategories: List<CategoryUiModel> = emptyList(),
     val isLoading: Boolean = false,
     val isFetching: Boolean = false,
+    val isAddingCategory: Boolean = false,
     val isSaving: Boolean = false,
+    val isAddCategoryDialogVisible: Boolean = false,
+    val addCategoryName: String = "",
+    val addCategoryIconKey: String = DefaultCategoryIconKey,
+    val addCategoryError: String? = null,
     val errorMessage: String? = null,
 ) {
     val canSave: Boolean
-        get() = title.isNotBlank() && description.isNotBlank() && !isLoading && !isFetching && !isSaving
+        get() = title.isNotBlank() &&
+            description.isNotBlank() &&
+            !isLoading &&
+            !isFetching &&
+            !isAddingCategory &&
+            !isAddCategoryDialogVisible &&
+            !isSaving
 }

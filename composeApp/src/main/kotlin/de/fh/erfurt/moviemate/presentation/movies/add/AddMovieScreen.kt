@@ -28,6 +28,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import de.fh.erfurt.moviemate.presentation.components.MovieMateScreenBackground
 import de.fh.erfurt.moviemate.presentation.components.MovieMateScreenDefaults
 import de.fh.erfurt.moviemate.presentation.components.ScreenLoadingState
+import de.fh.erfurt.moviemate.presentation.movies.categories.AddCategoryDialog
 import de.fh.erfurt.moviemate.presentation.movies.components.MovieFormTopBar
 import de.fh.erfurt.moviemate.presentation.movies.detail.CategorySelector
 import de.fh.erfurt.moviemate.presentation.movies.detail.DetailTextField
@@ -82,7 +83,13 @@ fun AddMovieScreen(
                 }
             }
 
-            if (!state.isLoading && !state.isFetching && !state.isSaving) {
+            if (
+                !state.isLoading &&
+                !state.isFetching &&
+                !state.isAddingCategory &&
+                !state.isSaving &&
+                !state.isAddCategoryDialogVisible
+            ) {
                 ExtendedFloatingActionButton(
                     onClick = { onAction(AddMovieAction.FetchMovieDataClicked) },
                     modifier = Modifier
@@ -114,6 +121,19 @@ fun AddMovieScreen(
             }
         }
     }
+
+    if (state.isAddCategoryDialogVisible) {
+        AddCategoryDialog(
+            name = state.addCategoryName,
+            selectedIconKey = state.addCategoryIconKey,
+            errorMessage = state.addCategoryError,
+            isSaving = state.isAddingCategory,
+            onNameChanged = { onAction(AddMovieAction.AddCategoryNameChanged(it)) },
+            onIconSelected = { onAction(AddMovieAction.AddCategoryIconSelected(it)) },
+            onConfirm = { onAction(AddMovieAction.AddCategoryConfirmed) },
+            onDismiss = { onAction(AddMovieAction.AddCategoryDismissed) },
+        )
+    }
 }
 
 @Composable
@@ -122,6 +142,7 @@ private fun AddMovieStatus(
 ) {
     val message = when {
         state.isSaving -> "Saving movie..."
+        state.isAddingCategory -> "Creating category..."
         state.isFetching -> "Fetching movie data..."
         state.errorMessage != null -> state.errorMessage
         else -> null

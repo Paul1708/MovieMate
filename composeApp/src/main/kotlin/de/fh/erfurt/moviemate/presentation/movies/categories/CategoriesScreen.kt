@@ -146,6 +146,7 @@ fun CategoriesScreen(
             name = state.addCategoryName,
             selectedIconKey = state.selectedIconKey,
             errorMessage = state.addCategoryError,
+            isSaving = state.isLoading,
             onNameChanged = { onAction(CategoriesUiAction.AddNameChanged(it)) },
             onIconSelected = { onAction(CategoriesUiAction.AddIconSelected(it)) },
             onConfirm = { onAction(CategoriesUiAction.AddConfirmed) },
@@ -318,17 +319,18 @@ private fun CategoryTile(
 }
 
 @Composable
-private fun AddCategoryDialog(
+internal fun AddCategoryDialog(
     name: String,
     selectedIconKey: String,
     errorMessage: String?,
+    isSaving: Boolean = false,
     onNameChanged: (String) -> Unit,
     onIconSelected: (String) -> Unit,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
 ) {
     AlertDialog(
-        onDismissRequest = onDismiss,
+        onDismissRequest = { if (!isSaving) onDismiss() },
         containerColor = MovieMateColors.CardBackground,
         titleContentColor = MovieMateColors.PrimaryText,
         textContentColor = MovieMateColors.SecondaryText,
@@ -368,12 +370,18 @@ private fun AddCategoryDialog(
             }
         },
         confirmButton = {
-            TextButton(onClick = onConfirm) {
-                Text("Save")
+            TextButton(
+                onClick = onConfirm,
+                enabled = !isSaving,
+            ) {
+                Text(if (isSaving) "Saving..." else "Save")
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) {
+            TextButton(
+                onClick = onDismiss,
+                enabled = !isSaving,
+            ) {
                 Text("Cancel")
             }
         }

@@ -13,5 +13,11 @@ fun OmdbMovieDto.toFetchedMovieData(): FetchedMovieData {
             ?.replace(" min", "")
             ?.toIntOrNull(),
         imdbRating = imdbRating?.toDoubleOrNull(),
+        genres = genre
+            .orEmpty()
+            .split(",")
+            .map(String::trim)
+            .filter { value -> value.isNotBlank() && value != "N/A" }
+            .distinct(),
     )
 }

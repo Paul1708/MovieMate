@@ -7,4 +7,5 @@ data class FetchedMovieData(
     val posterUrl: String?,
     val runtimeMinutes: Int?,
     val imdbRating: Double?,
+    val genres: List<String> = emptyList(),
 )
