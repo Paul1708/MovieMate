@@ -10,7 +10,7 @@ sealed interface AddMovieAction {
     data object PosterClicked : AddMovieAction
     data class PosterSelected(val uri: String) : AddMovieAction
 
-    /** Reserved for the planned external movie-metadata lookup. */
+    /** Fetches movie metadata for the current title from the configured provider. */
     data object FetchMovieDataClicked : AddMovieAction
 
     data class TitleChanged(val value: String) : AddMovieAction

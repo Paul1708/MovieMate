@@ -82,7 +82,7 @@ fun AddMovieScreen(
                 }
             }
 
-            if (!state.isLoading && !state.isSaving) {
+            if (!state.isLoading && !state.isFetching && !state.isSaving) {
                 ExtendedFloatingActionButton(
                     onClick = { onAction(AddMovieAction.FetchMovieDataClicked) },
                     modifier = Modifier
@@ -122,6 +122,7 @@ private fun AddMovieStatus(
 ) {
     val message = when {
         state.isSaving -> "Saving movie..."
+        state.isFetching -> "Fetching movie data..."
         state.errorMessage != null -> state.errorMessage
         else -> null
     } ?: return

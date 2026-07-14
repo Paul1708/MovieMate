@@ -33,6 +33,7 @@ import de.fh.erfurt.moviemate.presentation.theme.MovieMateShapes
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateSpacing
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.net.URL
 
 /**
  * Poster surface for detail and form screens. Local content URIs are rendered when available.
@@ -58,8 +59,14 @@ fun MovieDetailPoster(
             ?.let { url ->
                 withContext(Dispatchers.IO) {
                     runCatching {
-                        context.contentResolver.openInputStream(Uri.parse(url))?.use { stream ->
-                            BitmapFactory.decodeStream(stream)?.asImageBitmap()
+                        if (url.startsWith("http")) {
+                            URL(url).openStream().use { stream ->
+                                BitmapFactory.decodeStream(stream)?.asImageBitmap()
+                            }
+                        } else {
+                            context.contentResolver.openInputStream(Uri.parse(url))?.use { stream ->
+                                BitmapFactory.decodeStream(stream)?.asImageBitmap()
+                            }
                         }
                     }.getOrNull()
                 }

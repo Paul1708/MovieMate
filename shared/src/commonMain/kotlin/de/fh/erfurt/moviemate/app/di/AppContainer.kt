@@ -1,6 +1,7 @@
 package de.fh.erfurt.moviemate.app.di
 
 import de.fh.erfurt.moviemate.movies.domain.repository.category.CategoryRepository
+import de.fh.erfurt.moviemate.movies.domain.repository.movie.MovieMetadataRepository
 import de.fh.erfurt.moviemate.movies.domain.repository.movie.MovieRepository
 import de.fh.erfurt.moviemate.movies.domain.usecase.backup.ExportBackupUseCase
 import de.fh.erfurt.moviemate.movies.domain.usecase.backup.ImportBackupUseCase
@@ -11,6 +12,7 @@ import de.fh.erfurt.moviemate.movies.domain.usecase.category.GetCategoryUseCase
 import de.fh.erfurt.moviemate.movies.domain.usecase.category.UpdateCategoryUseCase
 import de.fh.erfurt.moviemate.movies.domain.usecase.movie.AddMovieUseCase
 import de.fh.erfurt.moviemate.movies.domain.usecase.movie.DeleteMovieUseCase
+import de.fh.erfurt.moviemate.movies.domain.usecase.movie.FetchMovieDataUseCase
 import de.fh.erfurt.moviemate.movies.domain.usecase.movie.GetMovieUseCase
 import de.fh.erfurt.moviemate.movies.domain.usecase.movie.GetMoviesByCategoryUseCase
 import de.fh.erfurt.moviemate.movies.domain.usecase.movie.GetMoviesSortedUseCase
@@ -23,6 +25,7 @@ import de.fh.erfurt.moviemate.movies.domain.usecase.movie.UpdateMovieWatchedStat
 class AppContainer(
     movieRepository: MovieRepository,
     categoryRepository: CategoryRepository,
+    movieMetadataRepository: MovieMetadataRepository,
 ) {
     // Categories layer
     val getCategoriesUseCase = GetCategoriesUseCase(categoryRepository)
@@ -42,6 +45,7 @@ class AppContainer(
     val getMoviesSortedUseCase = GetMoviesSortedUseCase(movieRepository)
     val updateMovieWatchedStatusUseCase = UpdateMovieWatchedStatusUseCase(movieRepository)
     val updateMovieUserRatingUseCase = UpdateMovieUserRatingUseCase(movieRepository)
+    val fetchMovieDataUseCase = FetchMovieDataUseCase(movieMetadataRepository)
 
     // Backup layer
     val exportBackupUseCase = ExportBackupUseCase(movieRepository)

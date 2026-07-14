@@ -6,6 +6,7 @@ import de.fh.erfurt.moviemate.movies.domain.model.category.Category
 import de.fh.erfurt.moviemate.movies.domain.model.movie.MovieDraft
 import de.fh.erfurt.moviemate.movies.domain.usecase.category.GetCategoriesUseCase
 import de.fh.erfurt.moviemate.movies.domain.usecase.movie.AddMovieUseCase
+import de.fh.erfurt.moviemate.movies.domain.usecase.movie.FetchMovieDataUseCase
 import de.fh.erfurt.moviemate.presentation.movies.categories.CategoryUiModel
 import de.fh.erfurt.moviemate.presentation.movies.categories.DefaultCategoryIconKey
 import de.fh.erfurt.moviemate.presentation.app.throwIfCancellation
@@ -24,9 +25,11 @@ import kotlinx.coroutines.withContext
 class AddMovieViewModel(
     private val getCategoriesUseCase: GetCategoriesUseCase,
     private val addMovieUseCase: AddMovieUseCase,
+    private val fetchMovieDataUseCase: FetchMovieDataUseCase,
     private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
     private var loadJob: Job? = null
+    private var fetchJob: Job? = null
 
     private val _uiState = MutableStateFlow(AddMovieUiState(isLoading = true))
     val uiState: StateFlow<AddMovieUiState> = _uiState.asStateFlow()
@@ -41,9 +44,7 @@ class AddMovieViewModel(
             AddMovieAction.SaveClicked -> saveMovie()
             AddMovieAction.PosterClicked -> emitEffect(AddMovieEffect.PickPoster)
             is AddMovieAction.PosterSelected -> updateState { copy(posterUrl = action.uri, errorMessage = null) }
-            AddMovieAction.FetchMovieDataClicked -> updateState {
-                copy(errorMessage = "Movie data fetch is not connected yet.")
-            }
+            AddMovieAction.FetchMovieDataClicked -> fetchMovieData()
             is AddMovieAction.TitleChanged -> updateState { copy(title = action.value, errorMessage = null) }
             is AddMovieAction.DescriptionChanged -> updateState { copy(description = action.value, errorMessage = null) }
             is AddMovieAction.CategoryChanged -> updateState { copy(categoryId = action.value, errorMessage = null) }
@@ -110,6 +111,50 @@ class AddMovieViewModel(
                     it.copy(
                         isSaving = false,
                         errorMessage = throwable.message ?: "Movie could not be saved.",
+                    )
+                }
+            }
+        }
+    }
+
+    private fun fetchMovieData() {
+        val title = _uiState.value.title.trim()
+        if (title.isBlank()) {
+            updateState { copy(errorMessage = "Please enter a movie title first.") }
+            return
+        }
+
+        fetchJob?.cancel()
+        fetchJob = viewModelScope.launch {
+            _uiState.update { it.copy(isFetching = true, errorMessage = null) }
+            runCatching {
+                withContext(ioDispatcher) { fetchMovieDataUseCase(title) }
+            }.onSuccess { fetchedMovie ->
+                _uiState.update { state ->
+                    if (fetchedMovie == null) {
+                        state.copy(
+                            isFetching = false,
+                            errorMessage = "Movie not found.",
+                        )
+                    } else {
+                        state.copy(
+                            title = fetchedMovie.title,
+                            description = fetchedMovie.description,
+                            releaseYear = fetchedMovie.releaseYear?.toString().orEmpty(),
+                            posterUrl = fetchedMovie.posterUrl,
+                            runtimeMinutes = fetchedMovie.runtimeMinutes?.toString().orEmpty(),
+                            imdbRating = fetchedMovie.imdbRating?.toString().orEmpty(),
+                            isFetching = false,
+                            errorMessage = null,
+                        )
+                    }
+                }
+            }.onFailure { throwable ->
+                throwable.throwIfCancellation()
+                _uiState.update {
+                    it.copy(
+                        isFetching = false,
+                        errorMessage = throwable.message ?: "Movie data could not be fetched.",
                     )
                 }
             }

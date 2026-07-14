@@ -30,6 +30,19 @@ Route -> ViewModel -> UseCase
 
 Weitere Details stehen in [`docs/global-ui-guide.md`](docs/global-ui-guide.md).
 
+## OMDb-Konfiguration
+
+Der Abruf externer Filmdaten benötigt einen OMDb-API-Schlüssel. Lege ihn lokal
+in der nicht versionierten Datei `local.properties` ab:
+
+```properties
+OMDB_API_KEY=your_api_key
+```
+
+Alternativ kann der Schlüssel beim Build über die Umgebungsvariable
+`OMDB_API_KEY` bereitgestellt werden. Ohne Schlüssel bricht der Build mit einer
+entsprechenden Fehlermeldung ab.
+
 ## Bauen und testen
 
 Windows:

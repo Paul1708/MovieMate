@@ -21,9 +21,10 @@ data class AddMovieUiState(
     val comment: String = "",
     val availableCategories: List<CategoryUiModel> = emptyList(),
     val isLoading: Boolean = false,
+    val isFetching: Boolean = false,
     val isSaving: Boolean = false,
     val errorMessage: String? = null,
 ) {
     val canSave: Boolean
-        get() = title.isNotBlank() && description.isNotBlank() && !isLoading && !isSaving
+        get() = title.isNotBlank() && description.isNotBlank() && !isLoading && !isFetching && !isSaving
 }
