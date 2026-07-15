@@ -58,6 +58,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtimeCompose)
     implementation(libs.androidx.lifecycle.viewmodelCompose)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.google.play.services.auth)
 
     testImplementation(libs.kotlin.test)
     testImplementation(libs.coroutines.test)

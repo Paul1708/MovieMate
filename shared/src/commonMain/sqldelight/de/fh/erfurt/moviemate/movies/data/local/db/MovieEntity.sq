@@ -56,6 +56,11 @@ deleteMovie:
 DELETE FROM movieEntity
 WHERE id = ?;
 
+clearCategoryFromMovies:
+UPDATE movieEntity
+SET categoryId = NULL
+WHERE categoryId = ?;
+
 searchMovies:
 SELECT *
 FROM movieEntity

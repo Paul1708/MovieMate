@@ -9,6 +9,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import de.fh.erfurt.moviemate.app.di.AppContainer
 import de.fh.erfurt.moviemate.presentation.app.movieMateViewModelFactory
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.drop
 
 @Composable
 fun HomeRoute(
@@ -42,6 +43,14 @@ fun HomeRoute(
 
     LaunchedEffect(viewModel, initialCategoryId) {
         viewModel.onAction(HomeUiAction.LoadRequested(initialCategoryId))
+    }
+
+    LaunchedEffect(viewModel, appContainer) {
+        appContainer.dataChangeRevision.drop(1).collect {
+            viewModel.onAction(
+                HomeUiAction.LoadRequested(viewModel.uiState.value.selectedCategoryId)
+            )
+        }
     }
 
     LaunchedEffect(viewModel) {

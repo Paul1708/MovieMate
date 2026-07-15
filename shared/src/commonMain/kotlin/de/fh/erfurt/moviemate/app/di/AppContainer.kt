@@ -3,6 +3,8 @@ package de.fh.erfurt.moviemate.app.di
 import de.fh.erfurt.moviemate.movies.domain.repository.category.CategoryRepository
 import de.fh.erfurt.moviemate.movies.domain.repository.movie.MovieMetadataRepository
 import de.fh.erfurt.moviemate.movies.domain.repository.movie.MovieRepository
+import de.fh.erfurt.moviemate.movies.domain.sync.CloudSyncRepository
+import de.fh.erfurt.moviemate.movies.domain.sync.DataChangeNotifier
 import de.fh.erfurt.moviemate.movies.domain.usecase.backup.ExportBackupUseCase
 import de.fh.erfurt.moviemate.movies.domain.usecase.backup.ImportBackupUseCase
 import de.fh.erfurt.moviemate.movies.domain.usecase.category.AddCategoryUseCase
@@ -21,11 +23,14 @@ import de.fh.erfurt.moviemate.movies.domain.usecase.movie.SearchMoviesUseCase
 import de.fh.erfurt.moviemate.movies.domain.usecase.movie.UpdateMovieUseCase
 import de.fh.erfurt.moviemate.movies.domain.usecase.movie.UpdateMovieUserRatingUseCase
 import de.fh.erfurt.moviemate.movies.domain.usecase.movie.UpdateMovieWatchedStatusUseCase
+import de.fh.erfurt.moviemate.movies.domain.usecase.sync.SyncWithGoogleDriveUseCase
 
 class AppContainer(
     movieRepository: MovieRepository,
     categoryRepository: CategoryRepository,
     movieMetadataRepository: MovieMetadataRepository,
+    cloudSyncRepository: CloudSyncRepository,
+    dataChangeNotifier: DataChangeNotifier,
 ) {
     // Categories layer
     val getCategoriesUseCase = GetCategoriesUseCase(categoryRepository)
@@ -50,5 +55,9 @@ class AppContainer(
     // Backup layer
     val exportBackupUseCase = ExportBackupUseCase(movieRepository)
     val importBackupUseCase = ImportBackupUseCase(movieRepository)
+
+    // Cloud sync layer
+    val syncWithGoogleDriveUseCase = SyncWithGoogleDriveUseCase(cloudSyncRepository)
+    val dataChangeRevision = dataChangeNotifier.revision
 
 }

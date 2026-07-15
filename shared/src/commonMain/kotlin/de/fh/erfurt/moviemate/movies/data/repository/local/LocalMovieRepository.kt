@@ -11,10 +11,13 @@ import de.fh.erfurt.moviemate.movies.data.mapper.local.toLocalEntity
 import de.fh.erfurt.moviemate.movies.data.remote.dto.BackupDataDto
 import de.fh.erfurt.moviemate.movies.data.remote.dto.CategoryDto
 import de.fh.erfurt.moviemate.movies.data.remote.dto.MovieDto
+import de.fh.erfurt.moviemate.movies.data.sync.local.LocalDataLock
+import de.fh.erfurt.moviemate.movies.data.sync.local.SyncDeletionTracker
 import de.fh.erfurt.moviemate.movies.domain.model.movie.Movie
 import de.fh.erfurt.moviemate.movies.domain.model.movie.MovieDraft
 import de.fh.erfurt.moviemate.movies.domain.repository.movie.MovieRepository
 import de.fh.erfurt.moviemate.movies.domain.repository.movie.SortBy
+import de.fh.erfurt.moviemate.movies.domain.sync.DataChangeNotifier
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.builtins.MapSerializer
 import kotlinx.serialization.builtins.serializer
@@ -24,6 +27,12 @@ class LocalMovieRepository(
     private val localDataSource: MovieLocalDataSource,
     private val categoryDataSource: CategoryLocalDataSource,
     private val idPolicy: LocalIdPolicy = MovieLocalIdPolicy,
+    private val syncDeletionTracker: SyncDeletionTracker? = null,
+    private val dataChangeNotifier: DataChangeNotifier = DataChangeNotifier(),
+    private val localDataLock: LocalDataLock = LocalDataLock(),
+    private val mutationTimestampProvider: (lastUpdatedEpochMillis: Long) -> Long = { lastUpdated ->
+        lastUpdated.nextTimestamp()
+    },
 ) : MovieRepository {
 
     private val jsonSerializer = Json {
@@ -40,19 +49,67 @@ class LocalMovieRepository(
     }
 
     override suspend fun addMovie(draft: MovieDraft): Movie {
-        val existingIds = localDataSource.getMovies().map { it.id }
-        val storedMovie = localDataSource.insertMovie(
-            draft.toLocalEntity(idPolicy.nextId(existingIds)),
-        )
+        val storedMovie = localDataLock.withLock {
+            val existingIds = localDataSource.getMovies().map { it.id }
+            localDataSource.insertMovie(
+                draft.toLocalEntity(idPolicy.nextId(existingIds)).copy(version = InitialLocalVersion),
+            )
+        }
+        dataChangeNotifier.notifyDataChanged()
         return storedMovie.toDomainModel()
     }
 
     override suspend fun updateMovie(movie: Movie): Movie {
-        return localDataSource.updateMovie(movie.toLocalEntity()).toDomainModel()
+        val result = localDataLock.withLock {
+            val existing = localDataSource.getMovie(movie.id)
+            val requested = movie.toLocalEntity()
+            if (existing == null) {
+                throw NoSuchElementException("Movie not found: ${movie.id}")
+            } else {
+                val contentChanged = requested.copy(
+                    updatedAtEpochMillis = existing.updatedAtEpochMillis,
+                    version = existing.version,
+                ) != existing
+                if (!contentChanged) {
+                    existing to false
+                } else {
+                    val resolvedTimestamp = if (requested.updatedAtEpochMillis > existing.updatedAtEpochMillis) {
+                        requested.updatedAtEpochMillis
+                    } else {
+                        mutationTimestampProvider(existing.updatedAtEpochMillis)
+                            .coerceAtLeast(existing.updatedAtEpochMillis.nextTimestamp())
+                    }
+                    val resolvedVersion = maxOf(
+                        requested.version ?: 0L,
+                        existing.version ?: 0L,
+                    ).nextVersion()
+                    localDataSource.updateMovie(
+                        requested.copy(
+                            updatedAtEpochMillis = resolvedTimestamp,
+                            version = resolvedVersion,
+                        ),
+                    ) to true
+                }
+            }
+        }
+        if (result.second) dataChangeNotifier.notifyDataChanged()
+        return result.first.toDomainModel()
     }
 
     override suspend fun deleteMovie(movieId: String) {
-        localDataSource.deleteMovie(movieId)
+        val deleted = localDataLock.withLock {
+            val existing = localDataSource.getMovie(movieId) ?: return@withLock false
+            val deletedAt = mutationTimestampProvider(existing.updatedAtEpochMillis)
+                .coerceAtLeast(existing.updatedAtEpochMillis.nextTimestamp())
+            val deletionTracker = syncDeletionTracker
+            if (deletionTracker == null) {
+                localDataSource.deleteMovie(movieId)
+            } else {
+                deletionTracker.deleteMovieWithTombstone(movieId, deletedAt)
+            }
+            true
+        }
+        if (deleted) dataChangeNotifier.notifyDataChanged()
     }
 
     override suspend fun searchMovies(query: String): List<Movie> {
@@ -77,11 +134,23 @@ class LocalMovieRepository(
     }
 
     suspend fun updateMovieWatchedStatus(movieId: String, isWatched: Boolean, updatedAtEpochMillis: Long) {
-        localDataSource.updateMovieWatchedStatus(movieId, isWatched, updatedAtEpochMillis)
+        val movie = getMovie(movieId) ?: return
+        updateMovie(
+            movie.copy(
+                isWatched = isWatched,
+                updatedAtEpochMillis = updatedAtEpochMillis,
+            ),
+        )
     }
 
     suspend fun updateMovieUserRating(movieId: String, userRating: Int?, updatedAtEpochMillis: Long) {
-        localDataSource.updateMovieUserRating(movieId, userRating, updatedAtEpochMillis)
+        val movie = getMovie(movieId) ?: return
+        updateMovie(
+            movie.copy(
+                userRating = userRating,
+                updatedAtEpochMillis = updatedAtEpochMillis,
+            ),
+        )
     }
 
     override suspend fun exportBackup(): String {
@@ -121,49 +190,57 @@ class LocalMovieRepository(
 
     override suspend fun importBackup(jsonString: String) {
         val backup = jsonSerializer.decodeFromString(BackupDataDto.serializer(), jsonString)
+        localDataLock.withLock {
+            backup.categories.forEach { dto ->
+                val entity = LocalCategoryEntity(
+                    id = dto.id,
+                    name = dto.name,
+                    iconKey = dto.iconKey,
+                    updatedAtEpochMillis = dto.updatedAtEpochMillis,
+                    version = dto.version,
+                )
+                if (categoryDataSource.getCategory(entity.id) != null) {
+                    categoryDataSource.updateCategory(entity)
+                } else {
+                    categoryDataSource.insertCategory(entity)
+                }
+            }
 
-        backup.categories.forEach { dto ->
-            val entity = LocalCategoryEntity(
-                id = dto.id,
-                name = dto.name,
-                iconKey = dto.iconKey,
-                updatedAtEpochMillis = dto.updatedAtEpochMillis,
-                version = dto.version,
-            )
-            if (categoryDataSource.getCategory(entity.id) != null) {
-                categoryDataSource.updateCategory(entity)
-            } else {
-                categoryDataSource.insertCategory(entity)
+            backup.movies.forEach { dto ->
+                val entity = LocalMovieEntity(
+                    id = dto.id,
+                    title = dto.title,
+                    description = dto.description,
+                    releaseYear = dto.releaseYear?.toLong(),
+                    categoryId = dto.categoryId,
+                    posterUrl = dto.posterUrl,
+                    runtimeMinutes = dto.runtimeMinutes?.toLong(),
+                    isWatched = if (dto.isWatched) 1L else 0L,
+                    comment = dto.comment,
+                    userRating = dto.userRating?.toLong(),
+                    imdbRating = dto.imdbRating,
+                    externalIds = dto.externalIds?.let {
+                        jsonSerializer.encodeToString(MapSerializer(String.serializer(), String.serializer()), it)
+                    },
+                    watchProviders = dto.watchProviders?.let {
+                        jsonSerializer.encodeToString(ListSerializer(String.serializer()), it)
+                    },
+                    updatedAtEpochMillis = dto.updatedAtEpochMillis,
+                    version = dto.version,
+                )
+                if (localDataSource.getMovie(entity.id) != null) {
+                    localDataSource.updateMovie(entity)
+                } else {
+                    localDataSource.insertMovie(entity)
+                }
             }
         }
-
-        backup.movies.forEach { dto ->
-            val entity = LocalMovieEntity(
-                id = dto.id,
-                title = dto.title,
-                description = dto.description,
-                releaseYear = dto.releaseYear?.toLong(),
-                categoryId = dto.categoryId,
-                posterUrl = dto.posterUrl,
-                runtimeMinutes = dto.runtimeMinutes?.toLong(),
-                isWatched = if (dto.isWatched) 1L else 0L,
-                comment = dto.comment,
-                userRating = dto.userRating?.toLong(),
-                imdbRating = dto.imdbRating,
-                externalIds = dto.externalIds?.let {
-                    jsonSerializer.encodeToString(MapSerializer(String.serializer(), String.serializer()), it)
-                },
-                watchProviders = dto.watchProviders?.let {
-                    jsonSerializer.encodeToString(ListSerializer(String.serializer()), it)
-                },
-                updatedAtEpochMillis = dto.updatedAtEpochMillis,
-                version = dto.version,
-            )
-            if (localDataSource.getMovie(entity.id) != null) {
-                localDataSource.updateMovie(entity)
-            } else {
-                localDataSource.insertMovie(entity)
-            }
-        }
+        dataChangeNotifier.notifyDataChanged()
     }
 }
+
+private fun Long.nextTimestamp(): Long = if (this == Long.MAX_VALUE) this else this + 1L
+
+private fun Long.nextVersion(): Long = if (this == Long.MAX_VALUE) this else this + 1L
+
+private const val InitialLocalVersion = 1L

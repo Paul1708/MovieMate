@@ -9,6 +9,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import de.fh.erfurt.moviemate.app.di.AppContainer
 import de.fh.erfurt.moviemate.presentation.app.movieMateViewModelFactory
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.drop
 
 @Composable
 fun CategoriesRoute(
@@ -41,6 +42,12 @@ fun CategoriesRoute(
 
     LaunchedEffect(viewModel) {
         viewModel.onAction(CategoriesUiAction.LoadRequested)
+    }
+
+    LaunchedEffect(viewModel, appContainer) {
+        appContainer.dataChangeRevision.drop(1).collect {
+            viewModel.onAction(CategoriesUiAction.LoadRequested)
+        }
     }
 
     LaunchedEffect(viewModel) {

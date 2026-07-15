@@ -31,6 +31,7 @@ import de.fh.erfurt.moviemate.presentation.theme.MovieMateIcon
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateIcons
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateShapes
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateSpacing
+import de.fh.erfurt.moviemate.presentation.movies.poster.decodePosterDataUri
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.net.URL
@@ -59,13 +60,23 @@ fun MovieDetailPoster(
             ?.let { url ->
                 withContext(Dispatchers.IO) {
                     runCatching {
-                        if (url.startsWith("http")) {
-                            URL(url).openStream().use { stream ->
-                                BitmapFactory.decodeStream(stream)?.asImageBitmap()
+                        when {
+                            url.startsWith("data:image/") -> {
+                                decodePosterDataUri(url)?.let { bytes ->
+                                    BitmapFactory.decodeByteArray(bytes, 0, bytes.size)?.asImageBitmap()
+                                }
                             }
-                        } else {
-                            context.contentResolver.openInputStream(Uri.parse(url))?.use { stream ->
-                                BitmapFactory.decodeStream(stream)?.asImageBitmap()
+
+                            url.startsWith("http") -> {
+                                URL(url).openStream().use { stream ->
+                                    BitmapFactory.decodeStream(stream)?.asImageBitmap()
+                                }
+                            }
+
+                            else -> {
+                                context.contentResolver.openInputStream(Uri.parse(url))?.use { stream ->
+                                    BitmapFactory.decodeStream(stream)?.asImageBitmap()
+                                }
                             }
                         }
                     }.getOrNull()

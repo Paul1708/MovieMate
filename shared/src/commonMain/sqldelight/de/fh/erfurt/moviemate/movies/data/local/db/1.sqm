@@ -1,0 +1,11 @@
+CREATE TABLE syncMetadata (
+    key TEXT NOT NULL PRIMARY KEY,
+    value TEXT NOT NULL
+);
+
+CREATE TABLE syncTombstone (
+    entityType TEXT NOT NULL,
+    entityId TEXT NOT NULL,
+    deletedAtEpochMillis INTEGER NOT NULL,
+    PRIMARY KEY (entityType, entityId)
+);

@@ -19,11 +19,15 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -33,6 +37,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import de.fh.erfurt.moviemate.movies.presentation.backup.BackupAccountState
 import de.fh.erfurt.moviemate.movies.presentation.backup.BackupUiState
 import de.fh.erfurt.moviemate.presentation.components.MovieMateScreenBackground
 import de.fh.erfurt.moviemate.presentation.components.MovieMateScreenDefaults
@@ -41,13 +46,14 @@ import de.fh.erfurt.moviemate.presentation.theme.MovieMateIcon
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateIcons
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateShapes
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateSpacing
+import java.text.DateFormat
+import java.util.Date
 
 @Composable
 fun BackupScreen(
     state: BackupUiState,
-    onExportClicked: () -> Unit,
-    onImportClicked: () -> Unit,
-    modifier: Modifier = Modifier
+    onAction: (BackupAction) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     MovieMateScreenBackground(modifier = modifier) {
         Column(
@@ -55,7 +61,7 @@ fun BackupScreen(
                 .fillMaxSize()
                 .padding(horizontal = MovieMateScreenDefaults.HorizontalPadding)
                 .padding(top = MovieMateScreenDefaults.VerticalPadding),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             BackupTopBar()
 
@@ -66,27 +72,34 @@ fun BackupScreen(
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
                     .padding(bottom = MovieMateSpacing.sectionSpacing),
-                verticalArrangement = Arrangement.spacedBy(MovieMateSpacing.itemSpacing)
+                verticalArrangement = Arrangement.spacedBy(MovieMateSpacing.itemSpacing),
             ) {
+                GoogleDriveAccountCard(
+                    state = state,
+                    onAction = onAction,
+                )
+
+                BackupSectionTitle(text = "Manual backup")
+
                 BackupActionCard(
                     title = "Export",
-                    subtitle = "Export your movie list as a backup file.",
+                    subtitle = "Export your movie list and categories as a backup file.",
                     icon = MovieMateIcons.uploadFile,
                     contentDescription = "Export backup",
-                    enabled = !state.isLoading,
-                    onClick = onExportClicked
+                    enabled = !state.isBusy,
+                    onClick = { onAction(BackupAction.ExportClicked) },
                 )
 
                 BackupActionCard(
                     title = "Import",
-                    subtitle = "Import a previous backup.",
+                    subtitle = "Import a previous MovieMate backup.",
                     icon = MovieMateIcons.download,
                     contentDescription = "Import backup",
-                    enabled = !state.isLoading,
-                    onClick = onImportClicked
+                    enabled = !state.isBusy,
+                    onClick = { onAction(BackupAction.ImportClicked) },
                 )
 
-                BackupStatus(state = state)
+                ManualBackupStatus(state = state)
             }
         }
     }
@@ -95,17 +108,261 @@ fun BackupScreen(
 @Composable
 private fun BackupTopBar() {
     Row(
-        modifier = Modifier
-            .fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            text = "Backup & Import",
+            text = "Backup & Sync",
             style = MaterialTheme.typography.headlineSmall,
             color = MovieMateColors.PrimaryText,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
         )
     }
+}
+
+@Composable
+private fun GoogleDriveAccountCard(
+    state: BackupUiState,
+    onAction: (BackupAction) -> Unit,
+) {
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(MovieMateShapes.cardRadius),
+        color = MovieMateColors.CardBackgroundElevated,
+        border = BorderStroke(
+            width = MovieMateSpacing.dividerThickness,
+            color = MovieMateColors.CardBorder,
+        ),
+    ) {
+        Column(
+            modifier = Modifier.padding(MovieMateSpacing.detailCardPadding),
+            verticalArrangement = Arrangement.spacedBy(MovieMateSpacing.compactSpacing),
+        ) {
+            GoogleDriveAccountHeader(state = state)
+
+            when (state.accountState) {
+                BackupAccountState.SignedOut -> SignedOutContent(
+                    errorMessage = state.syncErrorMessage,
+                    onSignInClicked = { onAction(BackupAction.SignInClicked) },
+                )
+
+                BackupAccountState.SigningIn -> SigningInContent()
+                BackupAccountState.SignedIn -> SignedInContent(
+                    state = state,
+                    onSyncClicked = { onAction(BackupAction.SyncClicked) },
+                    onSignOutClicked = { onAction(BackupAction.SignOutClicked) },
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun GoogleDriveAccountHeader(state: BackupUiState) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Box(
+            modifier = Modifier
+                .size(MovieMateSpacing.backupActionIconSize)
+                .background(MovieMateColors.Accent, CircleShape),
+            contentAlignment = Alignment.Center,
+        ) {
+            MovieMateIcon(
+                icon = MovieMateIcons.backup,
+                tint = MovieMateColors.PrimaryText,
+                modifier = Modifier.size(MovieMateSpacing.backupActionGlyphSize),
+                contentDescription = "Google Drive sync",
+            )
+        }
+
+        Spacer(modifier = Modifier.width(MovieMateSpacing.detailMediumSpacing))
+
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = "Google Drive",
+                style = MaterialTheme.typography.titleSmall,
+                color = MovieMateColors.PrimaryText,
+                fontWeight = FontWeight.Bold,
+            )
+            Text(
+                text = state.accountStatusText(),
+                style = MaterialTheme.typography.bodySmall,
+                color = state.accountStatusColor(),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
+    }
+}
+
+@Composable
+private fun SignedOutContent(
+    errorMessage: String?,
+    onSignInClicked: () -> Unit,
+) {
+    Text(
+        text = "Connect your Google account to keep movies, categories, and their contents in sync across devices.",
+        style = MaterialTheme.typography.bodySmall,
+        color = MovieMateColors.SecondaryText,
+    )
+
+    if (errorMessage != null) {
+        SyncErrorText(message = errorMessage)
+    }
+
+    Button(
+        onClick = onSignInClicked,
+        modifier = Modifier.fillMaxWidth(),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = MovieMateColors.Accent,
+            contentColor = MovieMateColors.PrimaryText,
+        ),
+    ) {
+        Text("Connect Google Drive")
+    }
+}
+
+@Composable
+private fun SigningInContent() {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = MovieMateSpacing.compactSpacing),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        CircularProgressIndicator(
+            modifier = Modifier.size(SmallProgressSize),
+            color = MovieMateColors.AccentLight,
+            strokeWidth = SmallProgressStroke,
+        )
+        Spacer(modifier = Modifier.width(MovieMateSpacing.compactSpacing))
+        Text(
+            text = "Connecting to Google Drive...",
+            style = MaterialTheme.typography.bodySmall,
+            color = MovieMateColors.SecondaryText,
+        )
+    }
+}
+
+@Composable
+private fun SignedInContent(
+    state: BackupUiState,
+    onSyncClicked: () -> Unit,
+    onSignOutClicked: () -> Unit,
+) {
+    val accountEmail = state.accountEmail
+    val syncErrorMessage = state.syncErrorMessage
+    val lastSyncEpochMillis = state.lastSyncEpochMillis
+    val accountLabel = state.accountDisplayName
+        ?.takeIf(String::isNotBlank)
+        ?: accountEmail
+        ?.takeIf(String::isNotBlank)
+        ?: "Google account"
+    Text(
+        text = accountLabel,
+        style = MaterialTheme.typography.bodyMedium,
+        color = MovieMateColors.PrimaryText,
+        fontWeight = FontWeight.SemiBold,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+    )
+    if (!accountEmail.isNullOrBlank() && accountEmail != accountLabel) {
+        Text(
+            text = accountEmail,
+            style = MaterialTheme.typography.bodySmall,
+            color = MovieMateColors.SecondaryText,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+    }
+
+    when {
+        state.isSyncing -> InlineProgress(message = "Syncing movies and categories...")
+        syncErrorMessage != null -> SyncErrorText(message = syncErrorMessage)
+        lastSyncEpochMillis != null -> Text(
+            text = "Last sync: ${formatSyncTime(lastSyncEpochMillis)}",
+            style = MaterialTheme.typography.bodySmall,
+            color = MovieMateColors.SecondaryText,
+        )
+        else -> Text(
+            text = "Ready to sync",
+            style = MaterialTheme.typography.bodySmall,
+            color = MovieMateColors.SecondaryText,
+        )
+    }
+
+    Button(
+        onClick = onSyncClicked,
+        enabled = !state.isSyncing && !state.isSigningOut,
+        modifier = Modifier.fillMaxWidth(),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = MovieMateColors.Accent,
+            contentColor = MovieMateColors.PrimaryText,
+        ),
+    ) {
+        Text(if (state.isSyncing) "Syncing..." else "Sync now")
+    }
+
+    Text(
+        text = "Disconnecting stops sync, but this library remains linked to its original Google account.",
+        style = MaterialTheme.typography.labelSmall,
+        color = MovieMateColors.MutedText,
+    )
+
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.End,
+    ) {
+        TextButton(
+            onClick = onSignOutClicked,
+            enabled = !state.isSyncing && !state.isSigningOut,
+        ) {
+            Text(if (state.isSigningOut) "Disconnecting..." else "Disconnect Google Drive")
+        }
+    }
+}
+
+@Composable
+private fun InlineProgress(message: String) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        CircularProgressIndicator(
+            modifier = Modifier.size(SmallProgressSize),
+            color = MovieMateColors.AccentLight,
+            strokeWidth = SmallProgressStroke,
+        )
+        Spacer(modifier = Modifier.width(MovieMateSpacing.compactSpacing))
+        Text(
+            text = message,
+            style = MaterialTheme.typography.bodySmall,
+            color = MovieMateColors.SecondaryText,
+        )
+    }
+}
+
+@Composable
+private fun SyncErrorText(message: String) {
+    Text(
+        text = message,
+        style = MaterialTheme.typography.bodySmall,
+        color = MovieMateColors.Rating,
+        modifier = Modifier.fillMaxWidth(),
+    )
+}
+
+@Composable
+private fun BackupSectionTitle(text: String) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.titleSmall,
+        color = MovieMateColors.SecondaryText,
+        fontWeight = FontWeight.SemiBold,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = MovieMateSpacing.detailTinySpacing),
+    )
 }
 
 @Composable
@@ -115,7 +372,7 @@ private fun BackupActionCard(
     @DrawableRes icon: Int,
     contentDescription: String,
     enabled: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     Surface(
         modifier = Modifier
@@ -128,14 +385,14 @@ private fun BackupActionCard(
         color = MovieMateColors.CardBackgroundElevated,
         border = BorderStroke(
             width = MovieMateSpacing.dividerThickness,
-            color = MovieMateColors.CardBorder
-        )
+            color = MovieMateColors.CardBorder,
+        ),
     ) {
         Row(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(horizontal = MovieMateSpacing.detailCardPadding),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             BackupActionIcon(icon = icon)
 
@@ -143,7 +400,7 @@ private fun BackupActionCard(
 
             Column(
                 modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.Center
+                verticalArrangement = Arrangement.Center,
             ) {
                 Text(
                     text = title,
@@ -151,7 +408,7 @@ private fun BackupActionCard(
                     color = MovieMateColors.PrimaryText,
                     fontWeight = FontWeight.Bold,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
                 )
                 Text(
                     text = subtitle,
@@ -159,7 +416,7 @@ private fun BackupActionCard(
                     color = MovieMateColors.SecondaryText,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.padding(top = MovieMateSpacing.detailMicroSpacing)
+                    modifier = Modifier.padding(top = MovieMateSpacing.detailMicroSpacing),
                 )
             }
 
@@ -168,84 +425,70 @@ private fun BackupActionCard(
             MovieMateIcon(
                 icon = MovieMateIcons.chevronRight,
                 tint = MovieMateColors.PrimaryText,
-                modifier = Modifier.size(MovieMateSpacing.backupChevronIconSize)
+                modifier = Modifier.size(MovieMateSpacing.backupChevronIconSize),
             )
         }
     }
 }
 
 @Composable
-private fun BackupActionIcon(
-    @DrawableRes icon: Int,
-) {
+private fun BackupActionIcon(@DrawableRes icon: Int) {
     Box(
         modifier = Modifier
             .size(MovieMateSpacing.backupActionIconSize)
             .background(MovieMateColors.Accent, CircleShape),
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
     ) {
         MovieMateIcon(
             icon = icon,
             tint = MovieMateColors.PrimaryText,
-            modifier = Modifier.size(MovieMateSpacing.backupActionGlyphSize)
+            modifier = Modifier.size(MovieMateSpacing.backupActionGlyphSize),
         )
     }
 }
 
 @Composable
-private fun BackupStatus(
-    state: BackupUiState
-) {
+private fun ManualBackupStatus(state: BackupUiState) {
     val errorMessage = state.errorMessage
 
     when {
-        state.isLoading -> {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = MovieMateSpacing.compactSpacing),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(18.dp),
-                    color = MovieMateColors.Accent,
-                    strokeWidth = 2.dp
-                )
-                Spacer(modifier = Modifier.width(MovieMateSpacing.compactSpacing))
-                Text(
-                    text = "Working with backup file...",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MovieMateColors.SecondaryText
-                )
-            }
-        }
-
-        errorMessage != null -> BackupStatusText(
-            message = errorMessage,
-            isError = true
-        )
-
-        state.isSuccess -> BackupStatusText(
-            message = "Backup action completed.",
-            isError = false
-        )
+        state.isLoading -> InlineProgress(message = "Working with backup file...")
+        errorMessage != null -> BackupStatusText(message = errorMessage, isError = true)
+        state.isSuccess -> BackupStatusText(message = "Backup action completed.", isError = false)
     }
 }
 
 @Composable
 private fun BackupStatusText(
     message: String,
-    isError: Boolean
+    isError: Boolean,
 ) {
     Text(
         text = message,
         style = MaterialTheme.typography.bodySmall,
         color = if (isError) MovieMateColors.Rating else MovieMateColors.AccentLight,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = MovieMateSpacing.compactSpacing)
+        modifier = Modifier.fillMaxWidth(),
     )
+}
+
+@Composable
+private fun formatSyncTime(epochMillis: Long): String {
+    val formatter = remember { DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT) }
+    return remember(epochMillis, formatter) { formatter.format(Date(epochMillis)) }
+}
+
+private fun BackupUiState.accountStatusText(): String {
+    return when (accountState) {
+        BackupAccountState.SignedOut -> "Not connected"
+        BackupAccountState.SigningIn -> "Connecting..."
+        BackupAccountState.SignedIn -> if (isSyncing) "Syncing" else "Sync active"
+    }
+}
+
+private fun BackupUiState.accountStatusColor() = when (accountState) {
+    BackupAccountState.SignedOut -> MovieMateColors.SecondaryText
+    BackupAccountState.SigningIn -> MovieMateColors.AccentLight
+    BackupAccountState.SignedIn -> MovieMateColors.AccentLight
 }
 
 @Preview
@@ -253,8 +496,30 @@ private fun BackupStatusText(
 private fun BackupScreenPreview() {
     BackupScreen(
         state = BackupUiState(),
-        onExportClicked = {},
-        onImportClicked = {}
+        onAction = {},
+    )
+}
+
+@Preview
+@Composable
+private fun BackupScreenSigningInPreview() {
+    BackupScreen(
+        state = BackupUiState(accountState = BackupAccountState.SigningIn),
+        onAction = {},
+    )
+}
+
+@Preview
+@Composable
+private fun BackupScreenSignedInPreview() {
+    BackupScreen(
+        state = BackupUiState(
+            accountState = BackupAccountState.SignedIn,
+            accountDisplayName = "Ada Lovelace",
+            accountEmail = "ada@example.com",
+            lastSyncEpochMillis = 1_720_000_000_000,
+        ),
+        onAction = {},
     )
 }
 
@@ -263,8 +528,7 @@ private fun BackupScreenPreview() {
 private fun BackupScreenLoadingPreview() {
     BackupScreen(
         state = BackupUiState(isLoading = true),
-        onExportClicked = {},
-        onImportClicked = {}
+        onAction = {},
     )
 }
 
@@ -272,10 +536,11 @@ private fun BackupScreenLoadingPreview() {
 @Composable
 private fun BackupScreenErrorPreview() {
     BackupScreen(
-        state = BackupUiState(errorMessage = "Backup file could not be imported."),
-        onExportClicked = {},
-        onImportClicked = {}
+        state = BackupUiState(syncErrorMessage = "Google Drive authorization failed."),
+        onAction = {},
     )
 }
 
+private val SmallProgressSize = 18.dp
+private val SmallProgressStroke = 2.dp
 private const val DisabledActionAlpha = 0.58f

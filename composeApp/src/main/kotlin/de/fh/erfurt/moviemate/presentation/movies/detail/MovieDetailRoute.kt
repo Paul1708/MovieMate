@@ -8,6 +8,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -15,7 +16,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import de.fh.erfurt.moviemate.app.di.AppContainer
 import de.fh.erfurt.moviemate.movies.presentation.detail.MovieDetailUiState
 import de.fh.erfurt.moviemate.presentation.app.movieMateViewModelFactory
+import de.fh.erfurt.moviemate.presentation.movies.poster.posterDataUri
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.launch
 
 @Composable
 fun MovieDetailRoute(
@@ -52,17 +56,31 @@ fun MovieDetailRoute(
         }
     )
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val posterScope = rememberCoroutineScope()
 
     val posterLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocument()
     ) { uri ->
         if (uri == null) return@rememberLauncherForActivityResult
         context.persistReadPermission(uri)
-        viewModel.onAction(MovieDetailAction.PosterSelected(uri.toString()))
+        posterScope.launch {
+            val portablePoster = runCatching { context.posterDataUri(uri, ioDispatcher) }
+                .getOrElse { uri.toString() }
+            viewModel.onAction(MovieDetailAction.PosterSelected(portablePoster))
+        }
     }
 
     LaunchedEffect(viewModel, movieId) {
         viewModel.onAction(MovieDetailAction.LoadRequested(movieId))
+    }
+
+    LaunchedEffect(viewModel, appContainer, movieId) {
+        appContainer.dataChangeRevision.drop(1).collect {
+            val currentState = viewModel.uiState.value
+            if (currentState.mode == MovieDetailMode.View && !currentState.isSaving) {
+                viewModel.onAction(MovieDetailAction.LoadRequested(movieId))
+            }
+        }
     }
 
     LaunchedEffect(viewModel, posterLauncher) {

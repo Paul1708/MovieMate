@@ -1,8 +1,10 @@
 package de.fh.erfurt.moviemate.presentation.movies.backup
 
+import android.app.Activity
 import android.content.Context
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -24,14 +26,15 @@ import kotlinx.coroutines.withContext
 @Composable
 fun BackupRoute(
     appContainer: AppContainer?,
+    syncCoordinator: BackupSyncCoordinator?,
+    authorizationHandler: GoogleDriveAuthorizationHandler?,
     modifier: Modifier = Modifier,
     ioDispatcher: CoroutineDispatcher,
 ) {
-    if (appContainer == null) {
+    if (appContainer == null || syncCoordinator == null || authorizationHandler == null) {
         BackupScreen(
             state = BackupUiState(errorMessage = PreviewUnavailableMessage),
-            onExportClicked = {},
-            onImportClicked = {},
+            onAction = {},
             modifier = modifier,
         )
         return
@@ -43,6 +46,7 @@ fun BackupRoute(
             BackupScreenViewModel(
                 exportBackupUseCase = appContainer.exportBackupUseCase,
                 importBackupUseCase = appContainer.importBackupUseCase,
+                syncCoordinator = syncCoordinator,
                 ioDispatcher = ioDispatcher,
             )
         }
@@ -56,22 +60,96 @@ fun BackupRoute(
     val exportDocumentLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.CreateDocument(BackupMimeType)
     ) { uri ->
-        pendingExportUri = uri
-        if (uri == null) pendingExportJson = null
+        if (uri == null) {
+            pendingExportJson = null
+            pendingExportUri = null
+            viewModel.onAction(BackupAction.ExportCancelled)
+        } else {
+            pendingExportUri = uri
+        }
     }
 
     val importDocumentLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocument()
     ) { uri -> pendingImportUri = uri }
 
-    LaunchedEffect(viewModel, exportDocumentLauncher, importDocumentLauncher) {
+    val authorizationLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartIntentSenderForResult()
+    ) { activityResult ->
+        val intent = activityResult.data
+        if (activityResult.resultCode != Activity.RESULT_OK || intent == null) {
+            viewModel.onAction(BackupAction.AuthorizationCancelled)
+            return@rememberLauncherForActivityResult
+        }
+
+        authorizationHandler.authorizationResult(intent)
+            .onSuccess { account ->
+                viewModel.onAction(BackupAction.AuthorizationSucceeded(account))
+            }
+            .onFailure { throwable ->
+                viewModel.onAction(
+                    BackupAction.AuthorizationFailed(
+                        throwable.backupMessage("Google Drive authorization failed.")
+                    )
+                )
+            }
+    }
+
+    LaunchedEffect(
+        viewModel,
+        exportDocumentLauncher,
+        importDocumentLauncher,
+        authorizationLauncher,
+        authorizationHandler,
+    ) {
         viewModel.effect.collect { effect ->
             when (effect) {
+                BackupScreenEffect.AuthorizeGoogleDrive -> {
+                    authorizationHandler.authorize(
+                        preferredAccountName = null,
+                        forceAccountSelection = true,
+                        onResolutionRequired = { pendingIntent ->
+                            runCatching {
+                                authorizationLauncher.launch(
+                                    IntentSenderRequest.Builder(pendingIntent.intentSender).build()
+                                )
+                            }.onFailure { throwable ->
+                                viewModel.onAction(
+                                    BackupAction.AuthorizationFailed(
+                                        throwable.backupMessage("Google Drive authorization could not be opened.")
+                                    )
+                                )
+                            }
+                        },
+                        onAuthorized = { account ->
+                            viewModel.onAction(BackupAction.AuthorizationSucceeded(account))
+                        },
+                        onFailure = { message ->
+                            viewModel.onAction(BackupAction.AuthorizationFailed(message))
+                        },
+                    )
+                }
+
+                is BackupScreenEffect.RevokeGoogleDriveAccess -> {
+                    authorizationHandler.revoke(
+                        accountName = effect.accountName,
+                        onSuccess = {
+                            viewModel.onAction(BackupAction.SignOutCompleted)
+                        },
+                        onFailure = { message ->
+                            viewModel.onAction(BackupAction.SignOutFailed(message))
+                        },
+                    )
+                }
+
                 is BackupScreenEffect.CreateExportDocument -> {
                     pendingExportJson = effect.json
                     exportDocumentLauncher.launch(DefaultBackupFileName)
                 }
-                BackupScreenEffect.OpenImportDocument -> importDocumentLauncher.launch(BackupImportMimeTypes)
+
+                BackupScreenEffect.OpenImportDocument -> {
+                    importDocumentLauncher.launch(BackupImportMimeTypes)
+                }
             }
         }
     }
@@ -110,8 +188,7 @@ fun BackupRoute(
 
     BackupScreen(
         state = state,
-        onExportClicked = { viewModel.onAction(BackupAction.ExportClicked) },
-        onImportClicked = { viewModel.onAction(BackupAction.ImportClicked) },
+        onAction = viewModel::onAction,
         modifier = modifier,
     )
 }
