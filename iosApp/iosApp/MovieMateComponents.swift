@@ -1,3 +1,4 @@
+import Foundation
 import SwiftUI
 import UIKit
 
@@ -123,45 +124,64 @@ struct MoviePosterView: View {
     var cornerRadius: CGFloat = 10
 
     var body: some View {
-        Group {
-            if let image = decodedImage {
-                Image(uiImage: image)
-                    .resizable()
-                    .scaledToFill()
-            } else if let url = remoteURL {
-                AsyncImage(url: url) { phase in
-                    switch phase {
-                    case .success(let image):
-                        image.resizable().scaledToFill()
-                    case .failure:
-                        placeholder
-                    case .empty:
-                        ZStack {
+        GeometryReader { proxy in
+            Group {
+                if let image = decodedImage {
+                    Image(uiImage: image)
+                        .resizable()
+                        .interpolation(.medium)
+                        .scaledToFill()
+                } else if let url = remoteURL {
+                    AsyncImage(url: url) { phase in
+                        switch phase {
+                        case .success(let image):
+                            image
+                                .resizable()
+                                .interpolation(.medium)
+                                .scaledToFill()
+                        case .failure:
                             placeholder
-                            ProgressView().tint(MovieMateTheme.accentLight)
+                        case .empty:
+                            ZStack {
+                                placeholder
+                                ProgressView().tint(MovieMateTheme.accentLight)
+                            }
+                        @unknown default:
+                            placeholder
                         }
-                    @unknown default:
-                        placeholder
                     }
+                } else {
+                    placeholder
                 }
-            } else {
-                placeholder
             }
+            .frame(width: proxy.size.width, height: proxy.size.height)
+            .clipped()
         }
-        .clipped()
+        .background(MovieMateTheme.posterPlaceholder)
         .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
     }
 
     private var decodedImage: UIImage? {
+        if let cached = MoviePosterImageCache.shared.image(for: source) {
+            return cached
+        }
+
+        let image: UIImage?
         if source.hasPrefix("data:image"), let comma = source.firstIndex(of: ",") {
             let encoded = String(source[source.index(after: comma)...])
-            return Data(base64Encoded: encoded).flatMap(UIImage.init(data:))
+            image = Data(base64Encoded: encoded, options: .ignoreUnknownCharacters)
+                .flatMap(UIImage.init(data:))
+        } else if source.hasPrefix("file://"), let url = URL(string: source),
+                  let data = try? Data(contentsOf: url) {
+            image = UIImage(data: data)
+        } else {
+            image = nil
         }
-        if source.hasPrefix("file://"), let url = URL(string: source),
-           let data = try? Data(contentsOf: url) {
-            return UIImage(data: data)
+
+        if let image {
+            MoviePosterImageCache.shared.insert(image, for: source)
         }
-        return nil
+        return image
     }
 
     private var remoteURL: URL? {
@@ -179,14 +199,38 @@ struct MoviePosterView: View {
     }
 }
 
+private final class MoviePosterImageCache {
+    static let shared = MoviePosterImageCache()
+
+    private let cache = NSCache<NSString, UIImage>()
+
+    private init() {
+        cache.countLimit = 80
+    }
+
+    func image(for source: String) -> UIImage? {
+        cache.object(forKey: source as NSString)
+    }
+
+    func insert(_ image: UIImage, for source: String) {
+        cache.setObject(image, forKey: source as NSString)
+    }
+}
+
 struct MovieCardView: View {
     let movie: MovieItem
     let category: CategoryItem?
 
     var body: some View {
-        HStack(spacing: 14) {
+        HStack(spacing: 12) {
             MoviePosterView(source: movie.posterURL)
-                .frame(width: 86, height: 126)
+                .frame(width: 96, height: 142)
+                .overlay {
+                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                        .stroke(MovieMateTheme.border, lineWidth: 1)
+                }
+                .padding(.leading, 8)
+                .padding(.vertical, 8)
 
             VStack(alignment: .leading, spacing: 8) {
                 HStack(alignment: .top, spacing: 8) {
@@ -230,10 +274,11 @@ struct MovieCardView: View {
                 .font(.caption2.weight(.semibold))
                 .foregroundStyle(MovieMateTheme.secondaryText)
             }
-            .padding(.vertical, 13)
-            .padding(.trailing, 13)
+            .frame(maxWidth: .infinity, minHeight: 142, alignment: .leading)
+            .padding(.vertical, 9)
+            .padding(.trailing, 12)
         }
-        .frame(maxWidth: .infinity, minHeight: 146, alignment: .leading)
+        .frame(maxWidth: .infinity, minHeight: 158, alignment: .leading)
         .movieMateCard()
     }
 }

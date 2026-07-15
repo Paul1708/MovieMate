@@ -84,39 +84,26 @@ struct MovieDetailView: View {
     }
 
     private func readContent(movie: MovieItem) -> some View {
-        VStack(alignment: .leading, spacing: 20) {
-            ZStack(alignment: .bottomLeading) {
-                MoviePosterView(source: movie.posterURL, cornerRadius: 0)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 390)
-
-                LinearGradient(
-                    colors: [.clear, MovieMateTheme.background.opacity(0.96)],
-                    startPoint: .center,
-                    endPoint: .bottom
-                )
-
-                VStack(alignment: .leading, spacing: 10) {
-                    Text(movie.title)
-                        .font(.largeTitle.bold())
-                        .foregroundStyle(MovieMateTheme.primaryText)
-                    HStack(spacing: 14) {
-                        if !movie.releaseYear.isEmpty {
-                            Label(movie.releaseYear, systemImage: "calendar")
-                        }
-                        if !movie.runtimeMinutes.isEmpty {
-                            Label("\(movie.runtimeMinutes) min", systemImage: "clock")
-                        }
-                        Label(movie.preferredRating, systemImage: "star.fill")
-                            .foregroundStyle(MovieMateTheme.rating)
+        VStack(alignment: .leading, spacing: 0) {
+            VStack {
+                MoviePosterView(source: movie.posterURL, cornerRadius: MovieMateTheme.cardRadius)
+                    .frame(width: 210, height: 315)
+                    .overlay {
+                        RoundedRectangle(cornerRadius: MovieMateTheme.cardRadius, style: .continuous)
+                            .stroke(MovieMateTheme.border, lineWidth: 1)
                     }
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(MovieMateTheme.secondaryText)
-                }
-                .padding(MovieMateTheme.horizontalPadding)
+                    .shadow(color: .black.opacity(0.35), radius: 18, y: 10)
             }
+            .frame(maxWidth: .infinity)
+            .padding(.top, 18)
+            .padding(.bottom, 26)
 
             VStack(alignment: .leading, spacing: 18) {
+                Text(movie.title)
+                    .font(.largeTitle.bold())
+                    .foregroundStyle(MovieMateTheme.primaryText)
+                    .fixedSize(horizontal: false, vertical: true)
+
                 if let category = store.category(id: movie.categoryID) {
                     Label(category.name, systemImage: categorySymbol(for: category.iconKey))
                         .font(.subheadline.bold())
@@ -125,6 +112,49 @@ struct MovieDetailView: View {
                         .frame(height: 36)
                         .background(MovieMateTheme.accentContainer)
                         .clipShape(Capsule())
+                }
+
+                if !movie.releaseYear.isEmpty ||
+                    !movie.runtimeMinutes.isEmpty ||
+                    !movie.userRating.isEmpty ||
+                    !movie.imdbRating.isEmpty {
+                    LazyVGrid(
+                        columns: [GridItem(.adaptive(minimum: 125), spacing: 10)],
+                        spacing: 10
+                    ) {
+                        if !movie.releaseYear.isEmpty {
+                            infoTile(
+                                title: "Release year",
+                                value: movie.releaseYear,
+                                symbol: "calendar",
+                                tint: MovieMateTheme.accentLight
+                            )
+                        }
+                        if !movie.runtimeMinutes.isEmpty {
+                            infoTile(
+                                title: "Runtime",
+                                value: "\(movie.runtimeMinutes) min",
+                                symbol: "clock.fill",
+                                tint: MovieMateTheme.accentLight
+                            )
+                        }
+                        if !movie.userRating.isEmpty {
+                            infoTile(
+                                title: "My rating",
+                                value: "\(movie.userRating) / 10",
+                                symbol: "star.fill",
+                                tint: MovieMateTheme.rating
+                            )
+                        }
+                        if !movie.imdbRating.isEmpty {
+                            infoTile(
+                                title: "IMDb",
+                                value: "\(movie.imdbRating) / 10",
+                                symbol: "star.leadinghalf.filled",
+                                tint: MovieMateTheme.rating
+                            )
+                        }
+                    }
                 }
 
                 Button {
@@ -171,6 +201,27 @@ struct MovieDetailView: View {
             .padding(.horizontal, MovieMateTheme.horizontalPadding)
             .padding(.bottom, 38)
         }
+    }
+
+    private func infoTile(
+        title: String,
+        value: String,
+        symbol: String,
+        tint: Color
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 7) {
+            Label(title, systemImage: symbol)
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(tint)
+            Text(value)
+                .font(.headline)
+                .foregroundStyle(MovieMateTheme.primaryText)
+                .lineLimit(1)
+        }
+        .frame(maxWidth: .infinity, minHeight: 66, alignment: .leading)
+        .padding(.horizontal, 13)
+        .padding(.vertical, 8)
+        .movieMateCard()
     }
 
     private func editContent(movie: MovieItem) -> some View {
