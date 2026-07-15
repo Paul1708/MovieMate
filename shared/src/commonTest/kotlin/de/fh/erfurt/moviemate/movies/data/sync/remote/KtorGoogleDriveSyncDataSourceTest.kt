@@ -1,6 +1,7 @@
 package de.fh.erfurt.moviemate.movies.data.sync.remote
 
 import de.fh.erfurt.moviemate.movies.data.remote.client.MoviesHttpClientFactory
+import de.fh.erfurt.moviemate.movies.domain.sync.CloudSyncException
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
 import io.ktor.client.request.HttpRequestData
@@ -10,6 +11,7 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.headersOf
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertNull
 import kotlinx.coroutines.test.runTest
 
@@ -75,6 +77,48 @@ class KtorGoogleDriveSyncDataSourceTest {
         requests.forEach { request ->
             assertEquals("Bearer token", request.headers[HttpHeaders.Authorization])
         }
+    }
+
+    @Test
+    fun `service-disabled response reports disabled Drive API`() = runTest {
+        val engine = MockEngine {
+            respond(
+                content = """{"error":{"status":"PERMISSION_DENIED","details":[{"reason":"SERVICE_DISABLED"}]}}""",
+                status = HttpStatusCode.Forbidden,
+                headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
+            )
+        }
+        val client = MoviesHttpClientFactory().create(engine)
+
+        val error = assertFailsWith<CloudSyncException> {
+            KtorGoogleDriveSyncDataSource(client).getCurrentAccountId("token")
+        }
+
+        assertEquals(
+            "Google Drive API is not enabled for this app's Google Cloud project.",
+            error.message,
+        )
+    }
+
+    @Test
+    fun `forbidden response includes Google error message`() = runTest {
+        val engine = MockEngine {
+            respond(
+                content = """{"error":{"code":403,"message":"Request had insufficient authentication scopes."}}""",
+                status = HttpStatusCode.Forbidden,
+                headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
+            )
+        }
+        val client = MoviesHttpClientFactory().create(engine)
+
+        val error = assertFailsWith<CloudSyncException> {
+            KtorGoogleDriveSyncDataSource(client).getCurrentAccountId("token")
+        }
+
+        assertEquals(
+            "Google Drive denied access: Request had insufficient authentication scopes.",
+            error.message,
+        )
     }
 }
 

@@ -6,9 +6,11 @@ import android.content.Context
 import android.content.Intent
 import com.google.android.gms.auth.api.identity.AuthorizationRequest
 import com.google.android.gms.auth.api.identity.AuthorizationResult
+import com.google.android.gms.auth.api.identity.ClearTokenRequest
 import com.google.android.gms.auth.api.identity.Identity
 import com.google.android.gms.auth.api.identity.RevokeAccessRequest
 import com.google.android.gms.common.api.Scope
+import com.google.android.gms.common.Scopes
 import de.fh.erfurt.moviemate.movies.domain.sync.SyncAccountMismatchException
 import de.fh.erfurt.moviemate.movies.presentation.backup.BackupAccountState
 import de.fh.erfurt.moviemate.presentation.app.throwIfCancellation
@@ -213,7 +215,11 @@ class GoogleDriveSyncController(
 
 class GoogleDriveAuthorizationHandler(context: Context) {
     private val authorizationClient = Identity.getAuthorizationClient(context.applicationContext)
-    private val requestedScopes = listOf(Scope(GoogleDriveAppDataScope))
+    private val requestedScopes = listOf(
+        Scope(GoogleDriveAppDataScope),
+        Scope(Scopes.EMAIL),
+    )
+    private var lastAccessToken: String? = null
 
     fun authorize(
         preferredAccountName: String?,
@@ -243,7 +249,10 @@ class GoogleDriveAuthorizationHandler(context: Context) {
                     }
                 } else {
                     runCatching { result.toAuthorizedAccount() }
-                        .onSuccess(onAuthorized)
+                        .onSuccess { account ->
+                            lastAccessToken = account.accessToken
+                            onAuthorized(account)
+                        }
                         .onFailure { throwable ->
                             onFailure(throwable.authorizationMessage())
                         }
@@ -257,7 +266,7 @@ class GoogleDriveAuthorizationHandler(context: Context) {
     fun authorizationResult(intent: Intent): Result<GoogleDriveAuthorizedAccount> {
         return runCatching {
             authorizationClient.getAuthorizationResultFromIntent(intent).toAuthorizedAccount()
-        }
+        }.onSuccess { account -> lastAccessToken = account.accessToken }
     }
 
     fun revoke(
@@ -266,7 +275,21 @@ class GoogleDriveAuthorizationHandler(context: Context) {
         onFailure: (String) -> Unit,
     ) {
         if (accountName.isNullOrBlank()) {
-            onSuccess()
+            val token = lastAccessToken
+            if (token == null) {
+                onSuccess()
+                return
+            }
+            authorizationClient.clearToken(
+                ClearTokenRequest.builder().setToken(token).build(),
+            )
+                .addOnSuccessListener {
+                    lastAccessToken = null
+                    onSuccess()
+                }
+                .addOnFailureListener { throwable ->
+                    onFailure(throwable.authorizationMessage("Google Drive token could not be cleared."))
+                }
             return
         }
 
@@ -275,7 +298,10 @@ class GoogleDriveAuthorizationHandler(context: Context) {
             .setScopes(requestedScopes)
             .build()
         authorizationClient.revokeAccess(request)
-            .addOnSuccessListener { onSuccess() }
+            .addOnSuccessListener {
+                lastAccessToken = null
+                onSuccess()
+            }
             .addOnFailureListener { throwable ->
                 onFailure(throwable.authorizationMessage("Google Drive could not be disconnected."))
             }

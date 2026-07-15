@@ -18,6 +18,10 @@ import io.ktor.http.content.TextContent
 import io.ktor.http.contentType
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 
 class KtorGoogleDriveSyncDataSource(
     private val httpClient: HttpClient,
@@ -119,13 +123,42 @@ class KtorGoogleDriveSyncDataSource(
 
 private suspend fun HttpResponse.requireSuccess(operation: String) {
     when {
-        status == HttpStatusCode.Unauthorized || status == HttpStatusCode.Forbidden -> {
+        status == HttpStatusCode.Unauthorized -> {
             throw CloudSyncAuthenticationException()
+        }
+        status == HttpStatusCode.Forbidden -> {
+            val responseText = bodyAsText()
+            val normalizedResponse = responseText.lowercase()
+            if (normalizedResponse.contains("service_disabled") ||
+                normalizedResponse.contains("accessnotconfigured") ||
+                normalizedResponse.contains("api has not been used")
+            ) {
+                throw CloudSyncException(
+                    "Google Drive API is not enabled for this app's Google Cloud project.",
+                )
+            }
+            val googleMessage = responseText.googleApiErrorMessage()
+            throw CloudSyncException(
+                googleMessage?.let { "Google Drive denied access: ${it.take(MaxGoogleErrorLength)}" }
+                    ?: "$operation was denied by Google Drive (HTTP 403).",
+            )
         }
         status.value !in 200..299 -> {
             throw CloudSyncException("$operation failed with HTTP ${status.value}.")
         }
     }
+}
+
+private fun String.googleApiErrorMessage(): String? {
+    return runCatching {
+        Json.parseToJsonElement(this)
+            .jsonObject["error"]
+            ?.jsonObject
+            ?.get("message")
+            ?.jsonPrimitive
+            ?.contentOrNull
+            ?.takeIf(String::isNotBlank)
+    }.getOrNull()
 }
 
 @Serializable
@@ -163,3 +196,4 @@ private const val DriveUploadFilesUrl = "https://www.googleapis.com/upload/drive
 private const val DriveAboutUrl = "https://www.googleapis.com/drive/v3/about"
 private const val AppDataFolder = "appDataFolder"
 private const val DriveListPageSize = 100
+private const val MaxGoogleErrorLength = 300

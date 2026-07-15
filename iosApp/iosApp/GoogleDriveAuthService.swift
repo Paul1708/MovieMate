@@ -31,7 +31,11 @@ final class GoogleDriveAuthService {
             hint: nil,
             additionalScopes: [driveAppDataScope]
         )
-        return try await refreshedAccount(from: result.user)
+        let user = try await ensureDriveAppDataScope(
+            for: result.user,
+            presenting: presenter
+        )
+        return try await refreshedAccount(from: user)
     }
 
     func refreshCurrentAccount() async throws -> GoogleAccount {
@@ -66,6 +70,9 @@ final class GoogleDriveAuthService {
 
     private func refreshedAccount(from user: GIDGoogleUser) async throws -> GoogleAccount {
         let refreshedUser = try await user.refreshTokensIfNeeded()
+        guard refreshedUser.grantedScopes?.contains(driveAppDataScope) == true else {
+            throw GoogleAuthError.missingDriveAppDataScope
+        }
         guard let stableAccountID = refreshedUser.userID?.nilIfEmpty else {
             throw GoogleAuthError.missingAccountID
         }
@@ -76,6 +83,24 @@ final class GoogleDriveAuthService {
             email: profile?.email ?? "",
             accessToken: refreshedUser.accessToken.tokenString
         )
+    }
+
+    private func ensureDriveAppDataScope(
+        for user: GIDGoogleUser,
+        presenting presenter: UIViewController
+    ) async throws -> GIDGoogleUser {
+        if user.grantedScopes?.contains(driveAppDataScope) == true {
+            return user
+        }
+
+        let result = try await user.addScopes(
+            [driveAppDataScope],
+            presenting: presenter
+        )
+        guard result.user.grantedScopes?.contains(driveAppDataScope) == true else {
+            throw GoogleAuthError.missingDriveAppDataScope
+        }
+        return result.user
     }
 
     private static func presentingViewController() -> UIViewController? {
@@ -101,6 +126,7 @@ enum GoogleAuthError: LocalizedError {
     case missingConfiguration
     case missingPresenter
     case missingAccountID
+    case missingDriveAppDataScope
     case notSignedIn
 
     var errorDescription: String? {
@@ -111,6 +137,8 @@ enum GoogleAuthError: LocalizedError {
             return "Google Sign-In cannot be presented right now."
         case .missingAccountID:
             return "Google did not return a stable account identifier."
+        case .missingDriveAppDataScope:
+            return "Google Drive app-data access was not granted. Disconnect MovieMate from Google and sign in again."
         case .notSignedIn:
             return "No Google account is signed in."
         }
