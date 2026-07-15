@@ -164,7 +164,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cd \"$SRCROOT/..\"\n./gradlew :shared:embedAndSignAppleFrameworkForXcode\n";
+			shellScript = "cd \"$SRCROOT/..\"\n\n# Xcode does not inherit Android Studio's shell environment. Use the standard\n# macOS SDK location automatically when ANDROID_HOME is not configured.\nif [ -z \"${ANDROID_HOME:-}\" ] && [ -d \"$HOME/Library/Android/sdk\" ]; then\n    export ANDROID_HOME=\"$HOME/Library/Android/sdk\"\nfi\nif [ -z \"${ANDROID_SDK_ROOT:-}\" ] && [ -n \"${ANDROID_HOME:-}\" ]; then\n    export ANDROID_SDK_ROOT=\"$ANDROID_HOME\"\nfi\n\n./gradlew :shared:embedAndSignAppleFrameworkForXcode\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */

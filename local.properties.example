@@ -1,0 +1,9 @@
+# Copy this file to local.properties. Never commit local.properties.
+
+OMDB_API_KEY=your_api_key
+
+# Use exactly one SDK path for your operating system:
+# macOS:
+# sdk.dir=/Users/your-user/Library/Android/sdk
+# Windows:
+# sdk.dir=C:/Users/your-user/AppData/Local/Android/Sdk

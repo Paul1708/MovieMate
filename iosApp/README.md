@@ -19,19 +19,26 @@ Google Cloud project used by Android, enable the Google Drive API, and make the
 `drive.appdata` scope available on the OAuth consent screen. Never commit the real client
 values or a downloaded `GoogleService-Info.plist`.
 
-The shared build also requires `OMDB_API_KEY` in the repository's ignored
-`local.properties` file:
+The shared build also requires a repository-local `local.properties` file. Start by
+copying `local.properties.example`, then set the OMDb key and the Android SDK installed
+on the Mac:
 
 ```properties
 OMDB_API_KEY=your_api_key
+sdk.dir=/Users/your-user/Library/Android/sdk
 ```
+
+Even an Xcode build needs this Android SDK entry because the build script invokes the
+Gradle/Kotlin Multiplatform project before creating `Shared.framework`.
 
 ## Build on macOS
 
 1. Open `iosApp.xcodeproj` in Xcode 16.2 or newer.
-2. Wait for Swift Package Manager to resolve `GoogleSignIn` 9.0.0.
-3. Select an Apple development team if it is not set in the local xcconfig.
-4. Run the `iosApp` scheme on an iOS 17+ simulator or signed device.
+2. Verify that `$HOME/Library/Android/sdk` exists (install the Android SDK with Android
+   Studio first if it does not).
+3. Wait for Swift Package Manager to resolve `GoogleSignIn` 9.0.0.
+4. Select an Apple development team if it is not set in the local xcconfig.
+5. Run the `iosApp` scheme on an iOS 17+ simulator or signed device.
 
 Google Sign-In needs an Apple-signed build when credentials are persisted in Keychain.
 The Windows Gradle build can validate shared JVM code, but the Kotlin/Native framework and
