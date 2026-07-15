@@ -20,7 +20,11 @@ final class MovieMateStore: ObservableObject {
     private var didStart = false
     private var refreshGeneration = 0
 
-    init(api: IosMovieMateApi, googleAuth: GoogleDriveAuthService = GoogleDriveAuthService()) {
+    convenience init(api: IosMovieMateApi) {
+        self.init(api: api, googleAuth: GoogleDriveAuthService())
+    }
+
+    init(api: IosMovieMateApi, googleAuth: GoogleDriveAuthService) {
         self.api = api
         self.googleAuth = googleAuth
         googleConfigurationMissing = !googleAuth.isConfigured
