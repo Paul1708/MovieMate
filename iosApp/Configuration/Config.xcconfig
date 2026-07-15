@@ -7,6 +7,8 @@ PRODUCT_BUNDLE_IDENTIFIER=de.fh.erfurt.moviemate
 CURRENT_PROJECT_VERSION=1
 MARKETING_VERSION=1.0
 
+OTHER_LDFLAGS=$(inherited) -lsqlite3
+
 // Non-secret placeholders keep the committed project buildable without OAuth credentials.
 GOOGLE_CLIENT_ID=MOVIEMATE_GOOGLE_CLIENT_ID_NOT_CONFIGURED
 GOOGLE_REVERSED_CLIENT_ID=moviemate-google-signin-not-configured
