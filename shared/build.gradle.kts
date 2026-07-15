@@ -71,7 +71,13 @@ abstract class GenerateSecretsTask : DefaultTask() {
 }
 
 val generateSecrets by tasks.registering(GenerateSecretsTask::class) {
-    localPropertiesFile.set(rootProject.layout.projectDirectory.file("local.properties"))
+    val localPropertiesCandidates = listOf(
+        rootProject.layout.projectDirectory.file("local.properties"),
+        rootProject.layout.projectDirectory.file("iosApp/local.properties")
+    )
+    localPropertiesCandidates.firstOrNull { it.asFile.exists() }?.let {
+        localPropertiesFile.set(it)
+    }
     outputDir.set(generatedSecretsDir)
     outputs.upToDateWhen { false }
 }
