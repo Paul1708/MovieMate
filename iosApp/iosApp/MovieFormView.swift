@@ -387,6 +387,17 @@ private extension UIImage {
         let rendered = renderer.image { _ in
             draw(in: CGRect(origin: .zero, size: targetSize))
         }
-        return rendered.jpegData(compressionQuality: quality)
+
+        var currentQuality = quality
+        while currentQuality >= 0.42 {
+            guard let data = rendered.jpegData(compressionQuality: currentQuality) else {
+                return nil
+            }
+            if data.count <= 3 * 1024 * 1024 {
+                return data
+            }
+            currentQuality -= 0.08
+        }
+        return nil
     }
 }

@@ -43,19 +43,10 @@ suspend fun Context.posterDataUri(
     } ?: error("Selected poster could not be decoded.")
 
     val scaled = decoded.scaledToFit(PosterMaxDimensionPixels)
-    val bytes = ByteArrayOutputStream().use { output ->
-        check(scaled.compress(Bitmap.CompressFormat.JPEG, PosterJpegQuality, output)) {
-            "Selected poster could not be compressed."
-        }
-        output.toByteArray()
-    }
+    val bytes = scaled.compressToPortableJpeg()
 
     if (scaled !== decoded) scaled.recycle()
     decoded.recycle()
-
-    require(bytes.size <= PosterMaxEncodedBytes) {
-        "Selected poster is too large after compression."
-    }
 
     val encoded = Base64.encodeToString(bytes, Base64.NO_WRAP)
     "data:image/jpeg;base64,$encoded"
@@ -89,7 +80,24 @@ private fun Bitmap.scaledToFit(maxDimension: Int): Bitmap {
     )
 }
 
+private fun Bitmap.compressToPortableJpeg(): ByteArray {
+    var quality = PosterJpegQuality
+    while (quality >= PosterMinJpegQuality) {
+        val bytes = ByteArrayOutputStream().use { output ->
+            check(compress(Bitmap.CompressFormat.JPEG, quality, output)) {
+                "Selected poster could not be compressed."
+            }
+            output.toByteArray()
+        }
+        if (bytes.size <= PosterMaxEncodedBytes) return bytes
+        quality -= PosterJpegQualityStep
+    }
+    error("Selected poster is too large to synchronize.")
+}
+
 private const val PosterDataUriPrefix = "data:image/"
 private const val PosterMaxDimensionPixels = 1_600
 private const val PosterJpegQuality = 82
+private const val PosterMinJpegQuality = 42
+private const val PosterJpegQualityStep = 8
 private const val PosterMaxEncodedBytes = 3 * 1024 * 1024

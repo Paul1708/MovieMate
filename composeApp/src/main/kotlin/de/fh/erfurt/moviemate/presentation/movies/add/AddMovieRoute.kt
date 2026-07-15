@@ -3,6 +3,7 @@ package de.fh.erfurt.moviemate.presentation.movies.add
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
@@ -56,9 +57,13 @@ fun AddMovieRoute(
         if (uri == null) return@rememberLauncherForActivityResult
         context.persistReadPermission(uri)
         posterScope.launch {
-            val portablePoster = runCatching { context.posterDataUri(uri, ioDispatcher) }
-                .getOrElse { uri.toString() }
-            viewModel.onAction(AddMovieAction.PosterSelected(portablePoster))
+            runCatching { context.posterDataUri(uri, ioDispatcher) }
+                .onSuccess { portablePoster ->
+                    viewModel.onAction(AddMovieAction.PosterSelected(portablePoster))
+                }
+                .onFailure {
+                    Toast.makeText(context, PosterPreparationError, Toast.LENGTH_LONG).show()
+                }
         }
     }
 
@@ -89,3 +94,4 @@ private fun Context.persistReadPermission(uri: Uri) {
 }
 
 private val ImageMimeTypes = arrayOf("image/*")
+private const val PosterPreparationError = "Poster could not be prepared for device sync."

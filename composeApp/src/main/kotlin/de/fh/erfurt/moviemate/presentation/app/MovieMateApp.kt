@@ -1,5 +1,7 @@
 package de.fh.erfurt.moviemate.presentation.app
 
+import android.content.Context
+import android.net.Uri
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.tween
@@ -41,9 +43,12 @@ import de.fh.erfurt.moviemate.presentation.movies.backup.GoogleDriveSyncControll
 import de.fh.erfurt.moviemate.presentation.movies.categories.CategoriesRoute
 import de.fh.erfurt.moviemate.presentation.movies.detail.MovieDetailRoute
 import de.fh.erfurt.moviemate.presentation.movies.home.HomeRoute
+import de.fh.erfurt.moviemate.presentation.movies.poster.posterDataUri
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateColors
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.withContext
 
 @Composable
 fun MovieMateApp(
@@ -68,6 +73,11 @@ fun MovieMateApp(
     val authorizationHandler = remember(appContainer, applicationContext) {
         appContainer?.let { GoogleDriveAuthorizationHandler(applicationContext) }
     }
+    LegacyPosterMigrationEffect(
+        appContainer = appContainer,
+        applicationContext = applicationContext,
+        ioDispatcher = dispatchers.io,
+    )
     GoogleDriveAppSyncEffects(
         appContainer = appContainer,
         syncCoordinator = syncCoordinator,
@@ -193,6 +203,38 @@ fun MovieMateApp(
 }
 
 @Composable
+private fun LegacyPosterMigrationEffect(
+    appContainer: AppContainer?,
+    applicationContext: Context,
+    ioDispatcher: CoroutineDispatcher,
+) {
+    if (appContainer == null) return
+
+    LaunchedEffect(appContainer, applicationContext, ioDispatcher) {
+        val movies = withContext(ioDispatcher) { appContainer.getMoviesUseCase() }
+        movies.forEach { movie ->
+            val legacyPoster = movie.posterUrl
+                ?.takeIf { value -> value.startsWith(LegacyContentUriPrefix) }
+                ?: return@forEach
+            runCatching {
+                val portablePoster = applicationContext.posterDataUri(
+                    uri = Uri.parse(legacyPoster),
+                    ioDispatcher = ioDispatcher,
+                )
+                withContext(ioDispatcher) {
+                    appContainer.updateMovieUseCase(
+                        movie.copy(
+                            posterUrl = portablePoster,
+                            updatedAtEpochMillis = System.currentTimeMillis(),
+                        )
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
 private fun GoogleDriveAppSyncEffects(
     appContainer: AppContainer?,
     syncCoordinator: GoogleDriveSyncController?,
@@ -280,3 +322,4 @@ private const val NavigationFadeOutDurationMillis = 90
 private const val NavigationFadeInDurationMillis = 140
 private const val AutoSyncDebounceMillis = 750L
 private const val ForegroundSyncIntervalMillis = 60_000L
+private const val LegacyContentUriPrefix = "content://"

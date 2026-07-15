@@ -184,7 +184,7 @@ let categoryIconOptions: [CategoryIconOption] = [
     .init(id: "animation", title: "Animation", symbol: "wand.and.stars"),
     .init(id: "biography", title: "Biography", symbol: "person.text.rectangle"),
     .init(id: "comedy", title: "Comedy", symbol: "theatermasks.fill"),
-    .init(id: "crime", title: "Crime", symbol: "handcuffs"),
+    .init(id: "crime", title: "Crime", symbol: "lock.shield.fill"),
     .init(id: "documentary", title: "Documentary", symbol: "video.fill"),
     .init(id: "drama", title: "Drama", symbol: "person.2.wave.2.fill"),
     .init(id: "family", title: "Family", symbol: "figure.2.and.child.holdinghands"),
