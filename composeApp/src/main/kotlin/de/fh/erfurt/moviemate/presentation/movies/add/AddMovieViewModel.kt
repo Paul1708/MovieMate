@@ -14,6 +14,7 @@ import de.fh.erfurt.moviemate.presentation.app.throwIfCancellation
 import de.fh.erfurt.moviemate.presentation.movies.categories.CategoryIconOptions
 import de.fh.erfurt.moviemate.presentation.movies.categories.CategoryUiModel
 import de.fh.erfurt.moviemate.presentation.movies.categories.DefaultCategoryIconKey
+import de.fh.erfurt.moviemate.presentation.movies.components.MovieLookup
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -30,17 +31,22 @@ class AddMovieViewModel(
     private val getCategoriesUseCase: GetCategoriesUseCase,
     private val addMovieUseCase: AddMovieUseCase,
     private val addCategoryUseCase: AddCategoryUseCase,
-    private val fetchMovieDataUseCase: FetchMovieDataUseCase,
+    fetchMovieDataUseCase: FetchMovieDataUseCase,
     private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
     private var loadJob: Job? = null
-    private var fetchJob: Job? = null
 
     private val _uiState = MutableStateFlow(AddMovieUiState(isLoading = true))
     val uiState: StateFlow<AddMovieUiState> = _uiState.asStateFlow()
 
     private val _effect = MutableSharedFlow<AddMovieEffect>()
     val effect: SharedFlow<AddMovieEffect> = _effect.asSharedFlow()
+
+    private val movieLookup = MovieLookup(
+        viewModelScope, ioDispatcher, fetchMovieDataUseCase,
+        update = { lookup -> updateState { copy(lookup = lookup) } },
+        applyDetails = { movie -> updateState { withFetchedMovieData(movie) } },
+    )
 
     fun onAction(action: AddMovieAction) {
         when (action) {
@@ -49,7 +55,17 @@ class AddMovieViewModel(
             AddMovieAction.SaveClicked -> saveMovie()
             AddMovieAction.PosterClicked -> emitEffect(AddMovieEffect.PickPoster)
             is AddMovieAction.PosterSelected -> updateState { copy(posterUrl = action.uri, errorMessage = null) }
-            AddMovieAction.FetchMovieDataClicked -> fetchMovieData()
+            AddMovieAction.FetchMovieDataClicked -> {
+                val state = _uiState.value
+                updateState { copy(errorMessage = null) }
+                movieLookup.search(state.title, state.releaseYear)
+            }
+            is AddMovieAction.MovieMatchSelected -> {
+                if (_uiState.value.lookup.results?.matches?.any { it.imdbId == action.imdbId } == true) {
+                    movieLookup.select(action.imdbId)
+                }
+            }
+            AddMovieAction.MovieMatchesDismissed -> movieLookup.clear()
             is AddMovieAction.AddCategoryNameChanged -> updateState {
                 copy(addCategoryName = action.value, addCategoryError = null)
             }
@@ -58,10 +74,16 @@ class AddMovieViewModel(
             }
             AddMovieAction.AddCategoryConfirmed -> addFetchedCategory()
             AddMovieAction.AddCategoryDismissed -> dismissAddCategoryDialog()
-            is AddMovieAction.TitleChanged -> updateState { copy(title = action.value, errorMessage = null) }
+            is AddMovieAction.TitleChanged -> {
+                movieLookup.clear()
+                updateState { copy(title = action.value, errorMessage = null) }
+            }
             is AddMovieAction.DescriptionChanged -> updateState { copy(description = action.value, errorMessage = null) }
             is AddMovieAction.CategoryChanged -> updateState { copy(categoryId = action.value, errorMessage = null) }
-            is AddMovieAction.ReleaseYearChanged -> updateState { copy(releaseYear = action.value, errorMessage = null) }
+            is AddMovieAction.ReleaseYearChanged -> {
+                movieLookup.clear()
+                updateState { copy(releaseYear = action.value, errorMessage = null) }
+            }
             is AddMovieAction.RuntimeChanged -> updateState { copy(runtimeMinutes = action.value, errorMessage = null) }
             is AddMovieAction.UserRatingChanged -> updateState { copy(userRating = action.value, errorMessage = null) }
             is AddMovieAction.ImdbRatingChanged -> updateState { copy(imdbRating = action.value, errorMessage = null) }
@@ -109,7 +131,9 @@ class AddMovieViewModel(
     }
 
     private fun saveMovie() {
-        val draft = _uiState.value.toMovieDraftOrNull() ?: return
+        val state = _uiState.value
+        if (!state.canSave) return
+        val draft = state.toMovieDraftOrNull() ?: return
 
         viewModelScope.launch {
             _uiState.update { it.copy(isSaving = true, errorMessage = null) }
@@ -124,39 +148,6 @@ class AddMovieViewModel(
                     it.copy(
                         isSaving = false,
                         errorMessage = throwable.message ?: "Movie could not be saved.",
-                    )
-                }
-            }
-        }
-    }
-
-    private fun fetchMovieData() {
-        val title = _uiState.value.title.trim()
-        if (title.isBlank()) {
-            updateState { copy(errorMessage = "Please enter a movie title first.") }
-            return
-        }
-
-        fetchJob?.cancel()
-        fetchJob = viewModelScope.launch {
-            _uiState.update { it.copy(isFetching = true, errorMessage = null) }
-            runCatching {
-                withContext(ioDispatcher) { fetchMovieDataUseCase(title) }
-            }.onSuccess { fetchedMovie ->
-                _uiState.update { state ->
-                    if (fetchedMovie == null) {
-                        state.copy(
-                            isFetching = false,
-                            errorMessage = "Movie not found.",
-                        )
-                    } else state.withFetchedMovieData(fetchedMovie)
-                }
-            }.onFailure { throwable ->
-                throwable.throwIfCancellation()
-                _uiState.update {
-                    it.copy(
-                        isFetching = false,
-                        errorMessage = throwable.message ?: "Movie data could not be fetched.",
                     )
                 }
             }
@@ -247,17 +238,16 @@ class AddMovieViewModel(
             }
             .firstOrNull()
         val suggestedGenre = fetchedMovie.genres.firstOrNull()
-        val shouldCreateCategory = matchedCategory == null && suggestedGenre != null
+        val shouldCreateCategory = categoryId.isBlank() && matchedCategory == null && suggestedGenre != null
 
         return copy(
             title = fetchedMovie.title,
-            description = fetchedMovie.description,
-            releaseYear = fetchedMovie.releaseYear?.toString().orEmpty(),
-            posterUrl = fetchedMovie.posterUrl,
-            runtimeMinutes = fetchedMovie.runtimeMinutes?.toString().orEmpty(),
-            imdbRating = fetchedMovie.imdbRating?.toString().orEmpty(),
-            categoryId = matchedCategory?.id ?: categoryId,
-            isFetching = false,
+            description = fetchedMovie.description.ifBlank { description },
+            releaseYear = fetchedMovie.releaseYear?.toString() ?: releaseYear,
+            posterUrl = fetchedMovie.posterUrl ?: posterUrl,
+            runtimeMinutes = fetchedMovie.runtimeMinutes?.toString() ?: runtimeMinutes,
+            imdbRating = fetchedMovie.imdbRating?.toString() ?: imdbRating,
+            categoryId = categoryId.ifBlank { matchedCategory?.id.orEmpty() },
             isAddCategoryDialogVisible = shouldCreateCategory,
             addCategoryName = if (shouldCreateCategory) suggestedGenre.orEmpty() else "",
             addCategoryIconKey = if (shouldCreateCategory) {

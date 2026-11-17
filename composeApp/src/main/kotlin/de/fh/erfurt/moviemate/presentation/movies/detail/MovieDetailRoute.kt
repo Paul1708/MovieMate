@@ -52,6 +52,7 @@ fun MovieDetailRoute(
                 getMovieUseCase = appContainer.getMovieUseCase,
                 updateMovieWatchedStatusUseCase = appContainer.updateMovieWatchedStatusUseCase,
                 updateMovieUseCase = appContainer.updateMovieUseCase,
+                fetchMovieDataUseCase = appContainer.fetchMovieDataUseCase,
                 ioDispatcher = ioDispatcher,
             )
         }
@@ -106,6 +107,7 @@ fun MovieDetailRoute(
         onRetryClicked = { viewModel.onAction(MovieDetailAction.RetryClicked) },
         modifier = modifier,
         isSaving = state.isSaving,
+        lookup = state.lookup,
     )
 }
 

@@ -11,6 +11,9 @@ sealed interface MovieDetailAction {
     data object CancelEditClicked : MovieDetailAction
     data object ImageClicked : MovieDetailAction
     data class PosterSelected(val uri: String) : MovieDetailAction
+    data object FetchMovieDataClicked : MovieDetailAction
+    data class MovieMatchSelected(val imdbId: String) : MovieDetailAction
+    data object MovieMatchesDismissed : MovieDetailAction
 
     data class WatchedChanged(val isWatched: Boolean) : MovieDetailAction
     data class TitleChanged(val value: String) : MovieDetailAction

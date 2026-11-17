@@ -12,6 +12,8 @@ sealed interface AddMovieAction {
 
     /** Fetches movie metadata for the current title from the configured provider. */
     data object FetchMovieDataClicked : AddMovieAction
+    data class MovieMatchSelected(val imdbId: String) : AddMovieAction
+    data object MovieMatchesDismissed : AddMovieAction
     data class AddCategoryNameChanged(val value: String) : AddMovieAction
     data class AddCategoryIconSelected(val iconKey: String) : AddMovieAction
     data object AddCategoryConfirmed : AddMovieAction

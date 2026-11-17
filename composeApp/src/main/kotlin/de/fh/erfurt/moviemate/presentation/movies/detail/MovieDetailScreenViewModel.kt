@@ -6,12 +6,15 @@ import de.fh.erfurt.moviemate.movies.domain.model.category.Category
 import de.fh.erfurt.moviemate.movies.domain.model.movie.Movie
 import de.fh.erfurt.moviemate.movies.domain.usecase.category.GetCategoriesUseCase
 import de.fh.erfurt.moviemate.movies.domain.usecase.movie.GetMovieUseCase
+import de.fh.erfurt.moviemate.movies.domain.usecase.movie.FetchMovieDataUseCase
 import de.fh.erfurt.moviemate.movies.domain.usecase.movie.UpdateMovieUseCase
 import de.fh.erfurt.moviemate.movies.domain.usecase.movie.UpdateMovieWatchedStatusUseCase
 import de.fh.erfurt.moviemate.movies.presentation.detail.MovieDetailUiModel
 import de.fh.erfurt.moviemate.movies.presentation.detail.MovieDetailUiState
 import de.fh.erfurt.moviemate.presentation.movies.categories.CategoryUiModel
 import de.fh.erfurt.moviemate.presentation.movies.categories.DefaultCategoryIconKey
+import de.fh.erfurt.moviemate.presentation.movies.components.MovieLookup
+import de.fh.erfurt.moviemate.presentation.movies.components.MovieLookupState
 import de.fh.erfurt.moviemate.presentation.movies.mapper.toDetailUiModel
 import de.fh.erfurt.moviemate.presentation.app.throwIfCancellation
 import kotlinx.coroutines.CoroutineDispatcher
@@ -31,6 +34,7 @@ class MovieDetailScreenViewModel(
     private val getMovieUseCase: GetMovieUseCase,
     private val updateMovieWatchedStatusUseCase: UpdateMovieWatchedStatusUseCase,
     private val updateMovieUseCase: UpdateMovieUseCase,
+    fetchMovieDataUseCase: FetchMovieDataUseCase,
     private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
     private var currentMovieId: String = ""
@@ -43,6 +47,23 @@ class MovieDetailScreenViewModel(
     private val _effect = MutableSharedFlow<MovieDetailScreenEffect>()
     val effect: SharedFlow<MovieDetailScreenEffect> = _effect.asSharedFlow()
 
+    private val movieLookup = MovieLookup(
+        viewModelScope, ioDispatcher, fetchMovieDataUseCase,
+        update = { lookup -> _uiState.update { it.copy(lookup = lookup) } },
+        applyDetails = { movie ->
+            updateEditState {
+                copy(
+                    title = movie.title.ifBlank { title },
+                    description = movie.description.ifBlank { description },
+                    releaseYear = movie.releaseYear?.toString() ?: releaseYear,
+                    posterUrl = movie.posterUrl ?: posterUrl,
+                    runtimeMinutes = movie.runtimeMinutes?.toString() ?: runtimeMinutes,
+                    imdbRating = movie.imdbRating?.toString() ?: imdbRating,
+                )
+            }
+        },
+    )
+
     fun onAction(action: MovieDetailAction) {
         when (action) {
             is MovieDetailAction.LoadRequested -> loadMovie(action.movieId)
@@ -52,6 +73,18 @@ class MovieDetailScreenViewModel(
             MovieDetailAction.CancelEditClicked -> cancelEditMode()
             MovieDetailAction.ImageClicked -> emitEffect(MovieDetailScreenEffect.PickPoster)
             is MovieDetailAction.PosterSelected -> updateEditState { copy(posterUrl = action.uri) }
+            MovieDetailAction.FetchMovieDataClicked -> {
+                val state = _uiState.value
+                if (state.mode == MovieDetailMode.Edit) {
+                    movieLookup.search(state.editState.title, state.editState.releaseYear)
+                }
+            }
+            is MovieDetailAction.MovieMatchSelected -> {
+                if (_uiState.value.lookup.results?.matches?.any { it.imdbId == action.imdbId } == true) {
+                    movieLookup.select(action.imdbId)
+                }
+            }
+            MovieDetailAction.MovieMatchesDismissed -> movieLookup.clear()
             is MovieDetailAction.WatchedChanged -> {
                 if (_uiState.value.mode == MovieDetailMode.Edit) {
                     updateEditState { copy(isWatched = action.isWatched) }
@@ -59,9 +92,15 @@ class MovieDetailScreenViewModel(
                     updateWatched(action.isWatched)
                 }
             }
-            is MovieDetailAction.TitleChanged -> updateEditState { copy(title = action.value) }
+            is MovieDetailAction.TitleChanged -> {
+                movieLookup.clear()
+                updateEditState { copy(title = action.value) }
+            }
             is MovieDetailAction.DescriptionChanged -> updateEditState { copy(description = action.value) }
-            is MovieDetailAction.ReleaseYearChanged -> updateEditState { copy(releaseYear = action.value) }
+            is MovieDetailAction.ReleaseYearChanged -> {
+                movieLookup.clear()
+                updateEditState { copy(releaseYear = action.value) }
+            }
             is MovieDetailAction.CategoryChanged -> updateEditState { copy(categoryId = action.value) }
             is MovieDetailAction.RuntimeChanged -> updateEditState { copy(runtimeMinutes = action.value) }
             is MovieDetailAction.UserRatingChanged -> updateEditState { copy(userRating = action.value) }
@@ -74,6 +113,7 @@ class MovieDetailScreenViewModel(
     }
 
     private fun loadMovie(movieId: String = currentMovieId) {
+        movieLookup.clear()
         currentMovieId = movieId
         loadJob?.cancel()
         loadJob = viewModelScope.launch {
@@ -125,6 +165,7 @@ class MovieDetailScreenViewModel(
     }
 
     private fun cancelEditMode() {
+        movieLookup.clear()
         val movie = _uiState.value.detail.movie
         _uiState.update {
             it.copy(
@@ -168,6 +209,7 @@ class MovieDetailScreenViewModel(
 
     private fun saveEditState() {
         val state = _uiState.value
+        if (state.isSaving || state.lookup.isLoading || state.lookup.results != null) return
         val originalMovie = currentMovie ?: return
         val currentDetailMovie = state.detail.movie ?: return
         val editedMovie = runCatching {
@@ -195,6 +237,7 @@ class MovieDetailScreenViewModel(
                         mode = MovieDetailMode.View,
                         editState = MovieDetailEditState.from(detailMovie),
                         isSaving = false,
+                        lookup = MovieLookupState(),
                     )
                 }
             }.onFailure { throwable ->
@@ -224,6 +267,7 @@ data class MovieDetailScreenState(
     val editState: MovieDetailEditState = MovieDetailEditState(),
     val availableCategories: List<CategoryUiModel> = emptyList(),
     val isSaving: Boolean = false,
+    val lookup: MovieLookupState = MovieLookupState(),
 )
 
 sealed interface MovieDetailScreenEffect {

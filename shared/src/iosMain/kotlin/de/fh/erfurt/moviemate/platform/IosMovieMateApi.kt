@@ -116,8 +116,19 @@ class IosMovieMateApi internal constructor(
     }
 
     @Throws(Exception::class)
-    suspend fun fetchMovieData(title: String): IosFetchedMovieRecord? {
-        val movie = appContainer.fetchMovieDataUseCase(title) ?: return null
+    suspend fun searchMovieMetadata(title: String, releaseYear: String): IosMovieSearchResults {
+        val result = appContainer.fetchMovieDataUseCase.search(title, releaseYear)
+        return IosMovieSearchResults(
+            matches = result.matches.map {
+                IosMovieSearchMatch(it.imdbId, it.title, it.year, it.posterUrl.orEmpty())
+            },
+            totalResults = result.totalResults,
+        )
+    }
+
+    @Throws(Exception::class)
+    suspend fun fetchMovieData(imdbId: String): IosFetchedMovieRecord? {
+        val movie = appContainer.fetchMovieDataUseCase.byImdbId(imdbId) ?: return null
         return IosFetchedMovieRecord(
             title = movie.title,
             description = movie.description,
@@ -191,6 +202,18 @@ data class IosMovieForm(
     val isWatched: Boolean,
     val comment: String,
     val watchProviders: List<String>,
+)
+
+data class IosMovieSearchResults(
+    val matches: List<IosMovieSearchMatch>,
+    val totalResults: Int,
+)
+
+data class IosMovieSearchMatch(
+    val imdbId: String,
+    val title: String,
+    val year: String,
+    val posterUrl: String,
 )
 
 data class IosFetchedMovieRecord(

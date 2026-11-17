@@ -137,6 +137,31 @@ struct MovieEditorState: Equatable {
     }
 }
 
+struct MovieSearchResults: Identifiable {
+    let id = UUID()
+    let matches: [MovieSearchMatch]
+    let totalResults: Int
+
+    init(record: IosMovieSearchResults) {
+        matches = record.matches.map(MovieSearchMatch.init(record:))
+        totalResults = Int(record.totalResults)
+    }
+}
+
+struct MovieSearchMatch: Identifiable {
+    let id: String
+    let title: String
+    let year: String
+    let posterURL: String
+
+    init(record: IosMovieSearchMatch) {
+        id = record.imdbId
+        title = record.title
+        year = record.year
+        posterURL = record.posterUrl
+    }
+}
+
 struct FetchedMovieData {
     let title: String
     let description: String

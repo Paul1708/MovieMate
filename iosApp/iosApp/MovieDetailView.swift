@@ -236,8 +236,7 @@ struct MovieDetailView: View {
             MovieFormView(
                 editor: $editor,
                 categories: store.categories,
-                isFetching: isFetching,
-                onFetch: fetchMetadata,
+                isFetching: $isFetching,
                 onAddCategory: store.addCategory
             )
 
@@ -245,7 +244,7 @@ struct MovieDetailView: View {
                 title: "Save changes",
                 symbol: "checkmark",
                 isLoading: isSaving,
-                isEnabled: editor.canSave,
+                isEnabled: editor.canSave && !isFetching,
                 action: { Task { await save(movie: movie) } }
             )
         }
@@ -265,30 +264,8 @@ struct MovieDetailView: View {
         }
     }
 
-    private func fetchMetadata() async {
-        let title = editor.title.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !title.isEmpty else { return }
-        isFetching = true
-        statusMessage = nil
-        defer { isFetching = false }
-        do {
-            guard let fetched = try await store.fetchMovieData(title: title) else {
-                statusMessage = "No movie data found for this title."
-                return
-            }
-            editor.title = fetched.title
-            editor.description = fetched.description
-            editor.releaseYear = fetched.releaseYear
-            editor.posterURL = fetched.posterURL
-            editor.runtimeMinutes = fetched.runtimeMinutes
-            editor.imdbRating = fetched.imdbRating
-        } catch {
-            statusMessage = MovieMateStore.message(for: error)
-        }
-    }
-
     private func save(movie: MovieItem) async {
-        guard editor.canSave else { return }
+        guard editor.canSave, !isFetching else { return }
         isSaving = true
         statusMessage = nil
         defer { isSaving = false }

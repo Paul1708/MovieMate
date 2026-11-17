@@ -5,6 +5,8 @@ import de.fh.erfurt.moviemate.movies.domain.model.category.CategoryDraft
 import de.fh.erfurt.moviemate.movies.domain.model.movie.FetchedMovieData
 import de.fh.erfurt.moviemate.movies.domain.model.movie.Movie
 import de.fh.erfurt.moviemate.movies.domain.model.movie.MovieDraft
+import de.fh.erfurt.moviemate.movies.domain.model.movie.MovieSearchMatch
+import de.fh.erfurt.moviemate.movies.domain.model.movie.MovieSearchResults
 import de.fh.erfurt.moviemate.movies.domain.repository.category.CategoryRepository
 import de.fh.erfurt.moviemate.movies.domain.repository.movie.MovieMetadataRepository
 import de.fh.erfurt.moviemate.movies.domain.repository.movie.MovieRepository
@@ -68,10 +70,13 @@ class AddMovieViewModelTest {
         )
 
         viewModel.onAction(AddMovieAction.TitleChanged("  Alien  "))
+        viewModel.onAction(AddMovieAction.ReleaseYearChanged("1979"))
         viewModel.onAction(AddMovieAction.FetchMovieDataClicked)
 
         val state = viewModel.uiState.value
         assertEquals("Alien", metadataRepository.requestedTitle)
+        assertEquals("1979", metadataRepository.requestedYear)
+        assertEquals("tt0078748", metadataRepository.requestedImdbId)
         assertEquals("Alien", state.title)
         assertEquals("A space horror classic.", state.description)
         assertEquals("1979", state.releaseYear)
@@ -87,8 +92,37 @@ class AddMovieViewModelTest {
         viewModel.onAction(AddMovieAction.FetchMovieDataClicked)
 
         assertNull(metadataRepository.requestedTitle)
-        assertEquals("Please enter a movie title first.", viewModel.uiState.value.errorMessage)
+        assertEquals("Please enter a movie title first.", viewModel.uiState.value.lookup.error)
         assertFalse(viewModel.uiState.value.isFetching)
+    }
+
+    @Test
+    fun multipleMatchesWaitForSelectionAndKeepPersonalFields() = runTest(dispatcher) {
+        metadataRepository.matches = listOf(
+            MovieSearchMatch("tt0087182", "Dune", "1984", null),
+            MovieSearchMatch("tt1160419", "Dune", "2021", null),
+        )
+        metadataRepository.result = fetchedMovieData(genres = emptyList()).copy(title = "Dune", releaseYear = 2021)
+
+        viewModel.onAction(AddMovieAction.TitleChanged("Dune"))
+        viewModel.onAction(AddMovieAction.UserRatingChanged("9"))
+        viewModel.onAction(AddMovieAction.CommentChanged("My note"))
+        viewModel.onAction(AddMovieAction.WatchedChanged(true))
+        viewModel.onAction(AddMovieAction.FetchMovieDataClicked)
+
+        assertEquals(metadataRepository.matches, viewModel.uiState.value.lookup.results?.matches)
+        assertNull(metadataRepository.requestedImdbId)
+        assertEquals("", viewModel.uiState.value.description)
+
+        viewModel.onAction(AddMovieAction.MovieMatchSelected("tt1160419"))
+
+        val state = viewModel.uiState.value
+        assertEquals("tt1160419", metadataRepository.requestedImdbId)
+        assertEquals("2021", state.releaseYear)
+        assertEquals("9", state.userRating)
+        assertEquals("My note", state.comment)
+        assertTrue(state.isWatched)
+        assertNull(state.lookup.results)
     }
 
     @Test
@@ -138,9 +172,18 @@ class AddMovieViewModelTest {
 private class StubMovieMetadataRepository : MovieMetadataRepository {
     var result: FetchedMovieData? = null
     var requestedTitle: String? = null
+    var requestedYear: String? = null
+    var requestedImdbId: String? = null
+    var matches = listOf(MovieSearchMatch("tt0078748", "Alien", "1979", null))
 
-    override suspend fun fetchMovieDataByTitle(title: String): FetchedMovieData? {
+    override suspend fun searchMovies(title: String, year: String?): MovieSearchResults {
         requestedTitle = title
+        requestedYear = year
+        return MovieSearchResults(matches)
+    }
+
+    override suspend fun fetchMovieDataByImdbId(imdbId: String): FetchedMovieData? {
+        requestedImdbId = imdbId
         return result
     }
 }

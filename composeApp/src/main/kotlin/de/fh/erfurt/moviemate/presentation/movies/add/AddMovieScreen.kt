@@ -30,6 +30,7 @@ import de.fh.erfurt.moviemate.presentation.components.MovieMateScreenDefaults
 import de.fh.erfurt.moviemate.presentation.components.ScreenLoadingState
 import de.fh.erfurt.moviemate.presentation.movies.categories.AddCategoryDialog
 import de.fh.erfurt.moviemate.presentation.movies.components.MovieFormTopBar
+import de.fh.erfurt.moviemate.presentation.movies.components.MovieMatchDialog
 import de.fh.erfurt.moviemate.presentation.movies.detail.CategorySelector
 import de.fh.erfurt.moviemate.presentation.movies.detail.DetailTextField
 import de.fh.erfurt.moviemate.presentation.movies.detail.MovieDetailPoster
@@ -86,6 +87,7 @@ fun AddMovieScreen(
             if (
                 !state.isLoading &&
                 !state.isFetching &&
+                state.lookup.results == null &&
                 !state.isAddingCategory &&
                 !state.isSaving &&
                 !state.isAddCategoryDialogVisible
@@ -122,6 +124,14 @@ fun AddMovieScreen(
         }
     }
 
+    state.lookup.results?.let { results ->
+        MovieMatchDialog(
+            results = results,
+            onSelect = { onAction(AddMovieAction.MovieMatchSelected(it)) },
+            onDismiss = { onAction(AddMovieAction.MovieMatchesDismissed) },
+        )
+    }
+
     if (state.isAddCategoryDialogVisible) {
         AddCategoryDialog(
             name = state.addCategoryName,
@@ -140,18 +150,18 @@ fun AddMovieScreen(
 private fun AddMovieStatus(
     state: AddMovieUiState,
 ) {
+    val error = state.lookup.error ?: state.errorMessage
     val message = when {
         state.isSaving -> "Saving movie..."
         state.isAddingCategory -> "Creating category..."
         state.isFetching -> "Fetching movie data..."
-        state.errorMessage != null -> state.errorMessage
-        else -> null
+        else -> error
     } ?: return
 
     Text(
         text = message,
         style = MaterialTheme.typography.bodySmall,
-        color = if (state.errorMessage != null) MovieMateColors.Rating else MovieMateColors.SecondaryText,
+        color = if (error != null) MovieMateColors.Rating else MovieMateColors.SecondaryText,
         modifier = Modifier
             .fillMaxWidth()
             .padding(bottom = MovieMateSpacing.compactSpacing)

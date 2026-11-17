@@ -24,6 +24,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import de.fh.erfurt.moviemate.movies.presentation.detail.MovieDetailUiModel
 import de.fh.erfurt.moviemate.presentation.movies.categories.CategoryUiModel
+import de.fh.erfurt.moviemate.presentation.movies.components.MovieLookupState
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateColors
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateIcon
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateIcons
@@ -41,6 +42,7 @@ internal fun MovieDetailEditContent(
     onAction: (MovieDetailAction) -> Unit,
     modifier: Modifier = Modifier,
     isSaving: Boolean = false,
+    lookup: MovieLookupState,
 ) {
     Column(
         modifier = modifier
@@ -53,11 +55,26 @@ internal fun MovieDetailEditContent(
             onClick = { onAction(MovieDetailAction.ImageClicked) }
         )
 
-        DetailTextField(
-            value = editState.title,
-            label = "Title",
-            onValueChange = { onAction(MovieDetailAction.TitleChanged(it)) }
-        )
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(MovieMateSpacing.fieldSpacing),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            DetailTextField(
+                value = editState.title,
+                label = "Title",
+                onValueChange = { onAction(MovieDetailAction.TitleChanged(it)) },
+                modifier = Modifier.weight(1f),
+            )
+            TextButton(
+                onClick = { onAction(MovieDetailAction.FetchMovieDataClicked) },
+                enabled = editState.title.isNotBlank() && !lookup.isLoading && !isSaving,
+            ) {
+                Text(if (lookup.isLoading) "Loading…" else "Fetch")
+            }
+        }
+        lookup.error?.let { message ->
+            Text(message, color = MovieMateColors.Rating, style = MaterialTheme.typography.bodySmall)
+        }
 
         CategorySelector(
             selectedCategoryId = editState.categoryId,
@@ -136,7 +153,7 @@ internal fun MovieDetailEditContent(
         Button(
             onClick = { onAction(MovieDetailAction.SaveEditClicked) },
             modifier = Modifier.fillMaxWidth(),
-            enabled = !isSaving,
+            enabled = !isSaving && !lookup.isLoading && lookup.results == null,
         ) {
             Text(if (isSaving) "Saving..." else "Save changes")
         }

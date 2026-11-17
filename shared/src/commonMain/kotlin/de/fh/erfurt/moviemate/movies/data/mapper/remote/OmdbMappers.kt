@@ -6,7 +6,7 @@ import de.fh.erfurt.moviemate.movies.domain.model.movie.FetchedMovieData
 fun OmdbMovieDto.toFetchedMovieData(): FetchedMovieData {
     return FetchedMovieData(
         title = title.orEmpty(),
-        description = description.orEmpty(),
+        description = description?.takeUnless { it == "N/A" }.orEmpty(),
         releaseYear = year?.take(4)?.toIntOrNull(),
         posterUrl = poster?.takeIf { it != "N/A" },
         runtimeMinutes = runtime

@@ -126,8 +126,13 @@ final class MovieMateStore: ObservableObject {
         }
     }
 
-    func fetchMovieData(title: String) async throws -> FetchedMovieData? {
-        guard let record = try await api.fetchMovieData(title: title) else { return nil }
+    func searchMovieMetadata(title: String, year: String) async throws -> MovieSearchResults {
+        let result = try await api.searchMovieMetadata(title: title, releaseYear: year)
+        return MovieSearchResults(record: result)
+    }
+
+    func fetchMovieData(imdbID: String) async throws -> FetchedMovieData? {
+        guard let record = try await api.fetchMovieData(imdbId: imdbID) else { return nil }
         return FetchedMovieData(record: record)
     }
 

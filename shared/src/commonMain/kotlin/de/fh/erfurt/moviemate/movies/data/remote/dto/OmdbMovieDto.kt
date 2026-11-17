@@ -35,3 +35,19 @@ data class OmdbMovieDto(
     @SerialName("Error")
     val error: String? = null,
 )
+
+@Serializable
+data class OmdbSearchResponse(
+    @SerialName("Search") val matches: List<OmdbSearchMatchDto> = emptyList(),
+    val totalResults: String? = null,
+    @SerialName("Response") val response: String? = null,
+    @SerialName("Error") val error: String? = null,
+)
+
+@Serializable
+data class OmdbSearchMatchDto(
+    @SerialName("imdbID") val imdbId: String? = null,
+    @SerialName("Title") val title: String? = null,
+    @SerialName("Year") val year: String? = null,
+    @SerialName("Poster") val poster: String? = null,
+)

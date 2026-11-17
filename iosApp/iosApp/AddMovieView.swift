@@ -32,16 +32,16 @@ struct AddMovieView: View {
                         MovieFormView(
                             editor: $editor,
                             categories: store.categories,
-                            isFetching: isFetching,
-                            onFetch: fetchMetadata,
-                            onAddCategory: store.addCategory
+                            isFetching: $isFetching,
+                            onAddCategory: store.addCategory,
+                            suggestsCategory: true
                         )
 
                         MovieMatePrimaryButton(
                             title: "Save movie",
                             symbol: "checkmark",
                             isLoading: isSaving,
-                            isEnabled: editor.canSave,
+                            isEnabled: editor.canSave && !isFetching,
                             action: { Task { await save() } }
                         )
                     }
@@ -54,44 +54,8 @@ struct AddMovieView: View {
         }
     }
 
-    private func fetchMetadata() async {
-        let title = editor.title.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !title.isEmpty else { return }
-        isFetching = true
-        statusMessage = nil
-        defer { isFetching = false }
-
-        do {
-            guard let fetched = try await store.fetchMovieData(title: title) else {
-                statusIsError = true
-                statusMessage = "No movie data found for this title."
-                return
-            }
-            editor.title = fetched.title
-            editor.description = fetched.description
-            editor.releaseYear = fetched.releaseYear
-            editor.posterURL = fetched.posterURL
-            editor.runtimeMinutes = fetched.runtimeMinutes
-            editor.imdbRating = fetched.imdbRating
-
-            if editor.categoryID.isEmpty,
-               let match = store.categories.first(where: { category in
-                   fetched.genres.contains(where: { genre in
-                       genre.localizedCaseInsensitiveCompare(category.name) == .orderedSame
-                   })
-               }) {
-                editor.categoryID = match.id
-            }
-            statusIsError = false
-            statusMessage = "Movie data loaded."
-        } catch {
-            statusIsError = true
-            statusMessage = MovieMateStore.message(for: error)
-        }
-    }
-
     private func save() async {
-        guard editor.canSave else { return }
+        guard editor.canSave, !isFetching else { return }
         isSaving = true
         statusMessage = nil
         defer { isSaving = false }

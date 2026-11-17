@@ -3,15 +3,25 @@ import SwiftUI
 import UIKit
 
 struct MovieFormView: View {
+    @EnvironmentObject private var store: MovieMateStore
     @Binding var editor: MovieEditorState
     let categories: [CategoryItem]
-    let isFetching: Bool
-    let onFetch: () async -> Void
+    @Binding var isFetching: Bool
     let onAddCategory: (String, String) async throws -> CategoryItem?
+    var suggestsCategory = false
 
     @State private var selectedPoster: PhotosPickerItem?
     @State private var isAddingCategory = false
     @State private var posterError: String?
+    @State private var lookupRequest: LookupRequest?
+    @State private var searchResults: MovieSearchResults?
+    @State private var lookupError: String?
+
+    private struct LookupRequest: Equatable {
+        let title: String
+        let year: String
+        let imdbID: String?
+    }
 
     var body: some View {
         VStack(spacing: 18) {
@@ -26,7 +36,7 @@ struct MovieFormView: View {
                     }
 
                     Button {
-                        Task { await onFetch() }
+                        startLookup()
                     } label: {
                         Group {
                             if isFetching {
@@ -44,6 +54,13 @@ struct MovieFormView: View {
                     .buttonStyle(.plain)
                     .disabled(editor.title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isFetching)
                     .opacity(editor.title.isEmpty ? 0.55 : 1)
+                }
+
+                if let lookupError {
+                    Label(lookupError, systemImage: "exclamationmark.triangle.fill")
+                        .font(.caption)
+                        .foregroundStyle(MovieMateTheme.destructive)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                 }
 
                 categorySelector
@@ -105,10 +122,92 @@ struct MovieFormView: View {
             .presentationDetents([.medium, .large])
             .presentationDragIndicator(.visible)
         }
+        .sheet(item: $searchResults) { results in
+            MovieMatchSheet(results: results) { match in
+                searchResults = nil
+                startLookup(imdbID: match.id)
+            }
+            .presentationDetents([.medium, .large])
+            .presentationDragIndicator(.visible)
+        }
+        .task(id: lookupRequest) {
+            if let request = lookupRequest {
+                await fetchMetadata(request)
+            }
+        }
+        .onDisappear {
+            lookupRequest = nil
+            isFetching = false
+        }
         .onChange(of: selectedPoster) { _, item in
             guard let item else { return }
             Task { await importPoster(item) }
         }
+    }
+
+    private func startLookup(imdbID: String? = nil) {
+        let title = editor.title.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !isFetching, !title.isEmpty else { return }
+        lookupError = nil
+        isFetching = true
+        lookupRequest = LookupRequest(title: title, year: editor.releaseYear, imdbID: imdbID)
+    }
+
+    private func fetchMetadata(_ request: LookupRequest) async {
+        defer {
+            if lookupRequest == request {
+                lookupRequest = nil
+                isFetching = false
+            }
+        }
+
+        do {
+            let imdbID: String
+            if let selectedID = request.imdbID {
+                imdbID = selectedID
+            } else {
+                let results = try await store.searchMovieMetadata(title: request.title, year: request.year)
+                guard isCurrent(request) else { return }
+                guard let firstMatch = results.matches.first else {
+                    lookupError = "No movies found. Try another title or year."
+                    return
+                }
+                guard results.totalResults == 1, results.matches.count == 1 else {
+                    searchResults = results
+                    return
+                }
+                imdbID = firstMatch.id
+            }
+
+            let details = try await store.fetchMovieData(imdbID: imdbID)
+            guard isCurrent(request) else { return }
+            guard let details else {
+                lookupError = "No details found for this movie."
+                return
+            }
+
+            if !details.title.isEmpty { editor.title = details.title }
+            if !details.description.isEmpty { editor.description = details.description }
+            if !details.releaseYear.isEmpty { editor.releaseYear = details.releaseYear }
+            if !details.posterURL.isEmpty { editor.posterURL = details.posterURL }
+            if !details.runtimeMinutes.isEmpty { editor.runtimeMinutes = details.runtimeMinutes }
+            if !details.imdbRating.isEmpty { editor.imdbRating = details.imdbRating }
+
+            if suggestsCategory, editor.categoryID.isEmpty,
+               let match = categories.first(where: { category in
+                   details.genres.contains { $0.localizedCaseInsensitiveCompare(category.name) == .orderedSame }
+               }) {
+                editor.categoryID = match.id
+            }
+        } catch {
+            if isCurrent(request) { lookupError = MovieMateStore.message(for: error) }
+        }
+    }
+
+    private func isCurrent(_ request: LookupRequest) -> Bool {
+        !Task.isCancelled && lookupRequest == request &&
+            editor.title.trimmingCharacters(in: .whitespacesAndNewlines) == request.title &&
+            editor.releaseYear == request.year
     }
 
     private var posterPicker: some View {
@@ -289,6 +388,63 @@ struct MovieFormView: View {
         } catch {
             posterError = "The selected image could not be loaded."
         }
+    }
+}
+
+private struct MovieMatchSheet: View {
+    @Environment(\.dismiss) private var dismiss
+    let results: MovieSearchResults
+    let onSelect: (MovieSearchMatch) -> Void
+
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                MovieMateBackground()
+                ScrollView {
+                    LazyVStack(alignment: .leading, spacing: 10) {
+                        if results.totalResults > results.matches.count {
+                            Text("Showing the first \(results.matches.count) of \(results.totalResults) matches. Add a year or refine the title to narrow the search.")
+                                .font(.footnote)
+                                .foregroundStyle(MovieMateTheme.secondaryText)
+                        }
+                        ForEach(results.matches) { match in
+                            Button {
+                                onSelect(match)
+                            } label: {
+                                HStack(spacing: 12) {
+                                    MoviePosterView(source: match.posterURL)
+                                        .frame(width: 42, height: 62)
+                                        .accessibilityHidden(true)
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        Text(match.title).font(.headline)
+                                            .foregroundStyle(MovieMateTheme.primaryText)
+                                        if !match.year.isEmpty {
+                                            Text(match.year).font(.subheadline)
+                                                .foregroundStyle(MovieMateTheme.secondaryText)
+                                        }
+                                    }
+                                    Spacer()
+                                }
+                                .padding(8)
+                                .contentShape(Rectangle())
+                                .movieMateCard()
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                    .padding(MovieMateTheme.horizontalPadding)
+                }
+            }
+            .navigationTitle("Choose a movie")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") { dismiss() }
+                }
+            }
+            .tint(MovieMateTheme.accentLight)
+        }
+        .preferredColorScheme(.dark)
     }
 }
 

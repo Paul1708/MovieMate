@@ -26,6 +26,8 @@ import de.fh.erfurt.moviemate.presentation.components.ScreenErrorState
 import de.fh.erfurt.moviemate.presentation.components.MovieMateScreenDefaults
 import de.fh.erfurt.moviemate.presentation.components.ScreenLoadingState
 import de.fh.erfurt.moviemate.presentation.movies.components.MovieFormTopBar
+import de.fh.erfurt.moviemate.presentation.movies.components.MovieLookupState
+import de.fh.erfurt.moviemate.presentation.movies.components.MovieMatchDialog
 import de.fh.erfurt.moviemate.presentation.movies.categories.CategoryUiModel
 import de.fh.erfurt.moviemate.presentation.preview.previewCategories
 import de.fh.erfurt.moviemate.presentation.preview.previewMovieDetailUiState
@@ -46,6 +48,7 @@ fun MovieDetailScreen(
     onRetryClicked: () -> Unit,
     modifier: Modifier = Modifier,
     isSaving: Boolean = false,
+    lookup: MovieLookupState = MovieLookupState(),
 ) {
     val errorMessage = state.errorMessage
     val movie = state.movie
@@ -118,6 +121,7 @@ fun MovieDetailScreen(
                         onAction = onAction,
                         modifier = Modifier.fillMaxSize(),
                         isSaving = isSaving,
+                        lookup = lookup,
                     )
                 }
             }
@@ -136,6 +140,16 @@ fun MovieDetailScreen(
                         .padding(top = MovieMateSpacing.detailTopBarOverlayPadding)
                 )
             }
+        }
+    }
+
+    if (isEditMode) {
+        lookup.results?.let { results ->
+            MovieMatchDialog(
+                results = results,
+                onSelect = { onAction(MovieDetailAction.MovieMatchSelected(it)) },
+                onDismiss = { onAction(MovieDetailAction.MovieMatchesDismissed) },
+            )
         }
     }
 
