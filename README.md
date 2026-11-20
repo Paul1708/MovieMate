@@ -28,6 +28,25 @@ Rather than sharing UI widgets across platforms, MovieMate delivers native platf
 
 ---
 
+## Screenshots
+
+<div align="center">
+  <table>
+    <tr>
+      <td align="center"><strong>Library &amp; Watchlist</strong></td>
+      <td align="center"><strong>Movie Details</strong></td>
+      <td align="center"><strong>Custom Categories</strong></td>
+    </tr>
+    <tr>
+      <td><img src="docs/screenshots/home.png" width="240" alt="MovieMate Home Screen" /></td>
+      <td><img src="docs/screenshots/movie-detail.png" width="240" alt="MovieMate Movie Detail Screen" /></td>
+      <td><img src="docs/screenshots/categories.png" width="240" alt="MovieMate Categories Screen" /></td>
+    </tr>
+  </table>
+</div>
+
+---
+
 ## Key Features
 
 - **Library & Watchlist Management**: Browse movies across `All`, `Watched`, and `Watchlist` tabs; search by title or description; filter by category; sort by `Recently updated`, `Title`, `Newest year`, `Best rating`, or `Runtime`; and remove entries via long-press wiggle delete mode with confirmation dialogs.
