@@ -14,7 +14,7 @@
     <img src="https://img.shields.io/badge/iOS-SwiftUI%2017%2B-007AFF?logo=apple&logoColor=white" alt="SwiftUI iOS 17+" />
     <img src="https://img.shields.io/badge/Database-SQLDelight%202.3.2-003B57?logo=sqlite&logoColor=white" alt="SQLDelight" />
     <img src="https://img.shields.io/badge/Networking-Ktor%203.4.3-087CFA" alt="Ktor" />
-    <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-green.svg" alt="MIT License" /></a>
+    <a href="LICENSE"><img src="https://img.shields.io/badge/License-All%20Rights%20Reserved-red.svg" alt="All Rights Reserved" /></a>
   </p>
 </div>
 
@@ -149,7 +149,7 @@ MovieMate/
 ├── docs/                           # Android UI architecture guides
 ├── gradle/libs.versions.toml       # Centralized Gradle version catalog
 ├── local.properties.example        # Template for local OMDb key & Android SDK path
-└── LICENSE                         # MIT License
+└── LICENSE                         # All Rights Reserved (Copyright Notice)
 ```
 
 ---
@@ -229,4 +229,4 @@ The project includes unit and integration tests covering domain use cases & vali
 
 ## License
 
-This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
+Copyright (c) 2026 Paul Brinkmann, Mohammad Assaf, and Seyedamirreza Hosseini. All rights reserved. See the [LICENSE](LICENSE) file for details.
