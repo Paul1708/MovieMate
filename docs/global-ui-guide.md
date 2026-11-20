@@ -1,67 +1,58 @@
-# Global UI Guide
+# Android UI Architecture Guide
 
-Diese Datei beschreibt die aktuelle Android-Presentation-Schicht von MovieMate.
-Die iOS-Oberfläche ist nicht Bestandteil dieser UI-Implementierung.
+This guide documents the Jetpack Compose presentation layer in the `composeApp` module.
+The native SwiftUI client in `iosApp` implements its own iOS presentation layer while sharing the same Kotlin Multiplatform `shared` module.
 
-## Screen-Architektur
+## Screen Architecture
 
-Jedes größere Feature folgt demselben Aufbau:
+Each major feature follows a consistent three-layer Unidirectional Data Flow (UDF) structure:
 
 ```text
 Route
-  -> erstellt ein screen-spezifisches AndroidX-ViewModel
-  -> sammelt StateFlow mit collectAsStateWithLifecycle()
-  -> sammelt einmalige SharedFlow-Effects in LaunchedEffect
-  -> führt Android-Navigation und Plattformaktionen aus
+  -> instantiates a screen-scoped AndroidX ViewModel
+  -> collects StateFlow with collectAsStateWithLifecycle()
+  -> collects one-shot SharedFlow effects inside LaunchedEffect
+  -> performs Android navigation and platform actions
 
 ViewModel
-  -> verarbeitet UiAction/Event
-  -> ruft UseCases auf
-  -> aktualisiert unveränderlichen UiState
-  -> emittiert einmalige Effects
+  -> processes UiAction events
+  -> invokes shared domain UseCases
+  -> updates an immutable UiState
+  -> emits one-shot Effects
 
 Screen
-  -> rendert ausschließlich über UiState
-  -> meldet Benutzeraktionen nach außen
+  -> renders purely from UiState
+  -> delegates user interactions outward via callbacks
 ```
 
-Businessrelevante Coroutines laufen in `viewModelScope`. Routes verwenden keine
-eigenen Coroutine-Scopes für UseCase-Aufrufe. Der `AppContainer` stellt UseCases
-bereit, besitzt aber keine langlebigen ViewModel-Instanzen.
+Business-relevant coroutines run inside `viewModelScope`. Routes do not launch their own coroutine scopes for UseCase invocations. `AppContainer` provides UseCases and shared dependencies, without holding long-lived ViewModel instances.
 
-## State, Actions und Effects
+## State, Actions, and Effects
 
-- `UiState` enthält dauerhaften, renderbaren Screen-Zustand.
-- `UiAction` beschreibt Benutzer- und Systemereignisse.
-- `Effect` beschreibt einmalige Ausgaben wie Navigation oder Dateiauswahl.
+- `UiState` represents durable, renderable screen state.
+- `UiAction` models user interactions and lifecycle triggers.
+- `Effect` models one-shot side effects such as navigation, snackbars/toasts, or system file pickers.
 
-Initiales Laden wird als Action an das ViewModel gesendet. Navigation wird nicht im
-ViewModel ausgeführt; das ViewModel emittiert nur eine semantische Absicht, die von
-der Route bzw. `MovieMateApp` umgesetzt wird.
+Initial loading is dispatched as an action to the ViewModel. ViewModels never perform navigation directly; they emit a semantic navigation intent handled by the Route or `MovieMateApp`.
 
-## Gemeinsame UI-Bausteine
+## Shared UI Components
 
-- `ScreenHeader.kt`: einheitliche Header-Struktur.
-- `SearchField.kt`: gemeinsames Suchfeld.
-- `ScreenStateContent.kt`: Loading-, Empty- und Error-Zustände.
-- `TopBarIconButton.kt`: einheitliche Topbar-Aktionen.
-- `MovieMateColors.kt`, `MovieMateSpacing.kt`, `MovieMateShapes.kt`: Design-Tokens.
-- `MovieMateIcons.kt`: wiederverwendbare App-Icons.
+- `MovieMateScreenBackground.kt`, `MovieMateScreenDefaults.kt`: shared screen containers and layout defaults.
+- `SearchField.kt`: reusable search bar across list screens.
+- `ScreenStateContent.kt`: standardized Loading, Empty, and Error state composables.
+- `TopBarIconButton.kt`: uniform top-bar icon actions with consistent touch targets.
+- `DeleteModeControls.kt`, `SelectionOptionRow.kt`: reusable delete-mode controls and dialog option rows.
+- `MovieMateColors.kt`, `MovieMateSpacing.kt`, `MovieMateShapes.kt`: design tokens.
+- `MovieMateIcons.kt`: bundled drawable icon catalog.
 
 ## Navigation
 
-`MovieMateDestination.kt` kapselt die Android-Routen. Leaf-Composables kennen keine
-Route-Strings. Sie melden semantische Actions, während `MovieMateApp.kt` den
-NavController und den Backstack koordiniert.
+`MovieMateDestination.kt` encapsulates Android route definitions. Leaf composables remain unaware of route strings and emit semantic actions, while `MovieMateApp.kt` coordinates the `NavHost`, bottom navigation, and back stack.
 
-## Listen und Previews
+## Lists and Previews
 
-Dynamische Lazy-Listen verwenden stabile fachliche IDs als Keys. Stateless Screens
-besitzen Previews mit eigenständigen Preview-Daten und benötigen dafür weder
-Repositories noch ViewModels.
+Dynamic lazy lists use stable domain IDs as item keys. Stateless screens provide `@Preview` functions backed by standalone preview fixtures so they render without repositories or ViewModels.
 
-## Tests
+## Testing
 
-ViewModel-Tests prüfen State-Übergänge und einmalige Effects. Reine Screen-Previews
-bleiben zusätzlich erhalten, damit Loading-, Error-, Empty- und Content-Zustände
-isoliert geprüft werden können.
+ViewModel unit tests verify state transitions and one-shot effects using fake repositories and test dispatchers. Compose previews allow visual inspection of Loading, Empty, Error, and Content states in isolation.

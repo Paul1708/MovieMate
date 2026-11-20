@@ -1,33 +1,28 @@
 # Homescreen UI Guide
 
-## Aufbau
+## Structure
 
-- `HomeRoute.kt` ist der Android-Container. Die Route erstellt das AndroidX-
-  `HomeViewModel`, sammelt dessen `StateFlow` lifecycle-aware und verarbeitet
-  Navigationseffekte.
-- `HomeViewModel.kt` lädt Filme und Kategorien über UseCases und verarbeitet Suche,
-  Tabs, Kategorie-Filter, Sortierung und Löschen.
-- `HomeScreen.kt` ist die stateless Compose-Oberfläche. Sie rendert `HomeUiState`
-  und meldet ausschließlich `HomeUiAction`.
-- `MovieUiMappers.kt` übersetzt Domain-Daten explizit in renderorientierte UI-Modelle.
+- `HomeRoute.kt` is the Android container. It creates the screen-scoped AndroidX `HomeViewModel`, collects its `StateFlow` lifecycle-aware, and handles navigation effects.
+- `HomeViewModel.kt` loads movies and categories via shared UseCases and handles search, tabs (`All`, `Watched`, `Watchlist`), category filtering, sorting, and deletion.
+- `HomeScreen.kt` is the stateless Jetpack Compose screen. It renders `HomeUiState` and dispatches `HomeUiAction` events.
+- `HomeTopBar.kt` and `HomeFilterDialog.kt` provide top-bar controls and category/sort selection dialogs.
+- `MovieUiMappers.kt` explicitly maps domain models to presentation-ready UI models.
 
-## Datenfluss
+## Data Flow
 
 ```text
 HomeScreen
   -> HomeUiAction
   -> HomeViewModel
-  -> UseCase
-  -> Domain-Daten
-  -> UI-Mapping
+  -> UseCases
+  -> Domain Models
+  -> UI Mapping
   -> HomeUiState
   -> HomeScreen
 ```
 
-Navigation zu Detail oder Add wird als `HomeEffect` emittiert und erst in der Route
-ausgeführt. Die Filmliste verwendet die Film-ID als stabilen LazyColumn-Key.
+Navigation to movie details or the add-movie flow is emitted as a one-shot `HomeEffect` and executed in `HomeRoute.kt`. The movie list uses each movie's domain ID as a stable `LazyColumn` key.
 
-## Testbarkeit
+## Testability
 
-`HomeScreen` kann ohne ViewModel in Previews gerendert werden. `HomeViewModelTest`
-prüft getrennt davon State-Übergänge und Navigationseffekte.
+`HomeScreen` renders in `@Preview` functions without a ViewModel. `HomeViewModelTest.kt` tests state transitions, filtering, sorting, and navigation effects independently.

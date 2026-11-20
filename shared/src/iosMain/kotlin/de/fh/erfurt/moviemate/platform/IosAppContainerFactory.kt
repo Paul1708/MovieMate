@@ -25,31 +25,6 @@ class IosAppContainerFactory {
     fun createApi(): IosMovieMateApi = IosMovieMateApi(create())
 
     fun create(): AppContainer {
-
-        // Movies configuration (shared HttpClient from MoviesHttpClientFactory)
-        /*val moviesApiConfiguration = MoviesApiConfiguration(
-            rawBaseUrl = "https://example.invalid/api",
-        )
-        val moviesHttpClientFactory = MoviesHttpClientFactory()
-        val moviesHttpClient = moviesHttpClientFactory.create(Darwin)
-        val movieRemoteDataSource = KtorMovieRemoteDataSource(
-            httpClient = moviesHttpClient,
-            apiConfiguration = moviesApiConfiguration,
-        )
-        val movieRepository = RemoteMovieRepository(movieRemoteDataSource)
-
-        // Categories configuration
-        val categoryRemoteDataSource = KtorCategoryRemoteDataSource(
-            httpClient = moviesHttpClient,
-            apiConfiguration = moviesApiConfiguration,
-        )
-        val categoryRepository = RemoteCategoryRepository(categoryRemoteDataSource)
-
-        return SharedModuleFactory.createAppContainer(
-            movieRepository = movieRepository,
-            categoryRepository = categoryRepository,
-        )
-        */
         val driver = NativeSqliteDriver(
             schema = MovieMateDatabase.Schema,
             name = "movie-mate.db",

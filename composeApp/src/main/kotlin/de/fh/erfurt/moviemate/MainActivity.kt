@@ -181,16 +181,16 @@ private fun MovieMateStartupState.startupMessage(): String {
     return when (this) {
         is MovieMateStartupState.Loading -> step.message
         is MovieMateStartupState.Ready -> MovieMateStartupStep.LoadStartView.message
-        is MovieMateStartupState.Error -> "Start fehlgeschlagen"
+        is MovieMateStartupState.Error -> "Startup failed"
     }
 }
 
 private fun Throwable.startupMessage(): String {
     val detail = message?.takeIf { it.isNotBlank() }
     return if (detail == null) {
-        "Die App konnte nicht vorbereitet werden."
+        "The app could not be initialized."
     } else {
-        "Die App konnte nicht vorbereitet werden: $detail"
+        "The app could not be initialized: $detail"
     }
 }
 

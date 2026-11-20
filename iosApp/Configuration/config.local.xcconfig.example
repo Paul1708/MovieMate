@@ -1,0 +1,4 @@
+// Copy this file to config.local.xcconfig. Never commit config.local.xcconfig.
+TEAM_ID=YOUR_APPLE_DEVELOPMENT_TEAM_ID
+GOOGLE_CLIENT_ID=YOUR_IOS_OAUTH_CLIENT_ID.apps.googleusercontent.com
+GOOGLE_REVERSED_CLIENT_ID=com.googleusercontent.apps.YOUR_IOS_OAUTH_CLIENT_ID

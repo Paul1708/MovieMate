@@ -19,9 +19,9 @@ sealed interface MovieMateStartupState {
 enum class MovieMateStartupStep(
     val message: String
 ) {
-    PrepareApp("App vorbereiten..."),
-    OpenDatabase("Datenbank öffnen..."),
-    CheckCategories("Kategorien prüfen..."),
-    LoadMovies("Filme vorbereiten..."),
-    LoadStartView("Startansicht laden...")
+    PrepareApp("Preparing app..."),
+    OpenDatabase("Opening database..."),
+    CheckCategories("Checking categories..."),
+    LoadMovies("Loading movies..."),
+    LoadStartView("Loading home screen...")
 }

@@ -6,7 +6,8 @@ Gradle wrapper. The project targets iOS 17 or newer.
 
 ## Local configuration
 
-Create `Configuration/config.local.xcconfig` (ignored by Git) next to `Config.xcconfig`:
+Copy `Configuration/config.local.xcconfig.example` to `Configuration/config.local.xcconfig`
+(ignored by Git) next to `Config.xcconfig`, then fill in your local values:
 
 ```xcconfig
 TEAM_ID=YOUR_APPLE_DEVELOPMENT_TEAM_ID

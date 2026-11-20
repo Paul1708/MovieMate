@@ -99,6 +99,7 @@ fastlane/*.p12
 
 secrets.properties
 config.local.*
+!config.local.xcconfig.example
 backend.local.*
 api.local.*
 

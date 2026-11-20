@@ -24,29 +24,6 @@ class AndroidAppContainerFactory(
     private val context: Context,
 ) {
     fun create(): AppContainer {
-        // Movies configuration (shared HttpClient from NotesHttpClientFactory)
-        /*val moviesApiConfiguration = MoviesApiConfiguration(
-            rawBaseUrl = "https://example.invalid/api",
-        )
-        val moviesHttpClientFactory = MoviesHttpClientFactory()
-        val moviesHttpClient = moviesHttpClientFactory.create(OkHttp)
-        val movieRemoteDataSource = KtorMovieRemoteDataSource(
-            httpClient = moviesHttpClient,
-            apiConfiguration = moviesApiConfiguration,
-        )
-        val movieRepository = RemoteMovieRepository(movieRemoteDataSource)
-
-        // Categories configuration
-        val categoryRemoteDataSource = KtorCategoryRemoteDataSource(
-            httpClient = moviesHttpClient,
-            apiConfiguration = moviesApiConfiguration,
-        )
-        val categoryRepository = RemoteCategoryRepository(categoryRemoteDataSource)
-
-        return SharedModuleFactory.createAppContainer(
-            movieRepository = movieRepository,
-            categoryRepository = categoryRepository,
-        )*/
         val driver = AndroidSqliteDriver(
             schema = MovieMateDatabase.Schema,
             context = context,

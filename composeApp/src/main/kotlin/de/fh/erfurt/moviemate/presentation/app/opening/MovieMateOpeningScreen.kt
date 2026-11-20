@@ -48,7 +48,7 @@ import de.fh.erfurt.moviemate.presentation.theme.MovieMateSpacing
 @Composable
 fun MovieMateOpeningScreen(
     modifier: Modifier = Modifier,
-    message: String = "App vorbereiten...",
+    message: String = "Preparing app...",
     errorMessage: String? = null,
     onRetryClicked: (() -> Unit)? = null,
 ) {
@@ -71,7 +71,7 @@ fun MovieMateOpeningScreen(
             Spacer(modifier = Modifier.height(ClaimTopSpacing))
 
             Text(
-                text = "Deine Filme. Deine Sammlung.",
+                text = "Your movies. Your collection.",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MovieMateColors.SecondaryText,
                 letterSpacing = 0.sp
@@ -104,7 +104,7 @@ private fun OpeningStatus(
             CircularProgressIndicator(
                 modifier = Modifier
                     .size(SpinnerSize)
-                    .semantics { contentDescription = "MovieMate wird geladen" },
+                    .semantics { contentDescription = "Loading MovieMate" },
                 color = MovieMateColors.AccentLight,
                 strokeWidth = SpinnerStrokeWidth
             )
@@ -130,7 +130,7 @@ private fun OpeningStatus(
                 )
             ) {
                 Text(
-                    text = "Erneut versuchen",
+                    text = "Try again",
                     style = MaterialTheme.typography.labelMedium,
                     fontWeight = FontWeight.Bold
                 )
