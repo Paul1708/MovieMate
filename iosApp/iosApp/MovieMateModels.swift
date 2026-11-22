@@ -51,6 +51,14 @@ enum MovieSort: String, CaseIterable, Identifiable {
     var id: Self { self }
 }
 
+enum MediaType: String, CaseIterable, Identifiable {
+    case movie = "MOVIE"
+    case series = "SERIES"
+
+    var id: Self { self }
+    var title: String { self == .movie ? "Movie" : "Series" }
+}
+
 struct MovieItem: Identifiable, Hashable {
     let id: String
     let title: String
@@ -59,6 +67,8 @@ struct MovieItem: Identifiable, Hashable {
     let categoryID: String
     let posterURL: String
     let runtimeMinutes: String
+    let mediaType: MediaType
+    let totalSeasons: String
     let isWatched: Bool
     let comment: String
     let userRating: String
@@ -74,12 +84,19 @@ struct MovieItem: Identifiable, Hashable {
         categoryID = record.categoryId
         posterURL = record.posterUrl
         runtimeMinutes = record.runtimeMinutes
+        totalSeasons = record.totalSeasons
+        mediaType = MediaType(rawValue: record.mediaType) ?? .movie
         isWatched = record.isWatched
         comment = record.comment
         userRating = record.userRating
         imdbRating = record.imdbRating
         watchProviders = record.watchProviders
         updatedAtEpochMillis = record.updatedAtEpochMillis
+    }
+
+    var seasonCountLabel: String? {
+        guard let count = Int(totalSeasons), count > 0 else { return nil }
+        return count == 1 ? "1 season" : "\(count) seasons"
     }
 
     var preferredRating: String {
@@ -108,6 +125,8 @@ struct MovieEditorState: Equatable {
     var posterURL = ""
     var releaseYear = ""
     var runtimeMinutes = ""
+    var mediaType: MediaType = .movie
+    var totalSeasons = ""
     var userRating = ""
     var imdbRating = ""
     var isWatched = false
@@ -124,6 +143,8 @@ struct MovieEditorState: Equatable {
         posterURL = movie.posterURL
         releaseYear = movie.releaseYear
         runtimeMinutes = movie.runtimeMinutes
+        mediaType = movie.mediaType
+        totalSeasons = movie.totalSeasons
         userRating = movie.userRating
         imdbRating = movie.imdbRating
         isWatched = movie.isWatched
@@ -170,6 +191,7 @@ struct FetchedMovieData {
     let runtimeMinutes: String
     let imdbRating: String
     let genres: [String]
+    let totalSeasons: String
 
     init(record: IosFetchedMovieRecord) {
         title = record.title
@@ -177,6 +199,7 @@ struct FetchedMovieData {
         releaseYear = record.releaseYear
         posterURL = record.posterUrl
         runtimeMinutes = record.runtimeMinutes
+        totalSeasons = record.totalSeasons
         imdbRating = record.imdbRating
         genres = record.genres
     }

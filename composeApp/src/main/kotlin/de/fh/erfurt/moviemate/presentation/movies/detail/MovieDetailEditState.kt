@@ -1,13 +1,17 @@
 package de.fh.erfurt.moviemate.presentation.movies.detail
 
+import de.fh.erfurt.moviemate.movies.domain.model.movie.MediaType
 import de.fh.erfurt.moviemate.movies.presentation.detail.MovieDetailUiModel
 import de.fh.erfurt.moviemate.presentation.movies.categories.CategoryUiModel
+import de.fh.erfurt.moviemate.presentation.movies.components.parseOptionalSeasonCount
 
 /**
  * Draft form state owned by MovieDetailScreenViewModel while editing.
  */
 data class MovieDetailEditState(
     val title: String = "",
+    val mediaType: MediaType = MediaType.MOVIE,
+    val totalSeasons: String = "",
     val description: String = "",
     val posterUrl: String? = null,
     val releaseYear: String = "",
@@ -24,6 +28,8 @@ data class MovieDetailEditState(
         fun from(movie: MovieDetailUiModel): MovieDetailEditState {
             return MovieDetailEditState(
                 title = movie.title,
+                mediaType = movie.mediaType,
+                totalSeasons = movie.totalSeasons?.toString().orEmpty(),
                 description = movie.description,
                 posterUrl = movie.posterUrl,
                 releaseYear = movie.releaseYear?.toString().orEmpty(),
@@ -53,7 +59,9 @@ data class MovieDetailEditState(
             categoryId = selectedCategoryId,
             categoryName = selectedCategory?.name ?: selectedCategoryId,
             categoryIconKey = selectedCategory?.iconKey ?: movie.categoryIconKey,
-            runtimeMinutes = runtimeMinutes.trim().toIntOrNull(),
+            runtimeMinutes = if (mediaType == MediaType.MOVIE) runtimeMinutes.trim().toIntOrNull() else null,
+            mediaType = mediaType,
+            totalSeasons = if (mediaType == MediaType.SERIES) totalSeasons.parseOptionalSeasonCount() else null,
             isWatched = isWatched,
             comment = comment.trim().ifBlank { null },
             userRating = userRating.trim().toIntOrNull()?.coerceIn(0, 10),

@@ -2,6 +2,7 @@ package de.fh.erfurt.moviemate.platform
 
 import de.fh.erfurt.moviemate.app.di.AppContainer
 import de.fh.erfurt.moviemate.movies.domain.model.category.CategoryDraft
+import de.fh.erfurt.moviemate.movies.domain.model.movie.MediaType
 import de.fh.erfurt.moviemate.movies.domain.model.movie.Movie
 import de.fh.erfurt.moviemate.movies.domain.model.movie.MovieDraft
 import platform.Foundation.NSDate
@@ -34,6 +35,7 @@ class IosMovieMateApi internal constructor(
 
     @Throws(Exception::class)
     suspend fun addMovie(form: IosMovieForm): IosMovieRecord {
+        val mediaType = MediaType.valueOf(form.mediaType)
         val savedMovie = appContainer.addMovieUseCase(
             MovieDraft(
                 title = form.title,
@@ -41,7 +43,9 @@ class IosMovieMateApi internal constructor(
                 releaseYear = form.releaseYear.toOptionalInt("Release year"),
                 categoryId = form.categoryId.normalizedOrNull(),
                 posterUrl = form.posterUrl.normalizedOrNull(),
-                runtimeMinutes = form.runtimeMinutes.toOptionalInt("Runtime"),
+                runtimeMinutes = if (mediaType == MediaType.MOVIE) form.runtimeMinutes.toOptionalInt("Runtime") else null,
+                mediaType = mediaType,
+                totalSeasons = if (mediaType == MediaType.SERIES) form.totalSeasons.toOptionalInt("Seasons") else null,
                 isWatched = form.isWatched,
                 comment = form.comment.normalizedOrNull(),
                 userRating = form.userRating.toOptionalInt("User rating"),
@@ -56,8 +60,9 @@ class IosMovieMateApi internal constructor(
 
     @Throws(Exception::class)
     suspend fun updateMovie(movieId: String, form: IosMovieForm): IosMovieRecord {
+        val mediaType = MediaType.valueOf(form.mediaType)
         val currentMovie = appContainer.getMovieUseCase(movieId)
-            ?: throw NoSuchElementException("Movie not found: $movieId")
+            ?: throw NoSuchElementException("Title not found: $movieId")
         val savedMovie = appContainer.updateMovieUseCase(
             currentMovie.copy(
                 title = form.title,
@@ -65,7 +70,9 @@ class IosMovieMateApi internal constructor(
                 releaseYear = form.releaseYear.toOptionalInt("Release year"),
                 categoryId = form.categoryId.normalizedOrNull(),
                 posterUrl = form.posterUrl.normalizedOrNull(),
-                runtimeMinutes = form.runtimeMinutes.toOptionalInt("Runtime"),
+                runtimeMinutes = if (mediaType == MediaType.MOVIE) form.runtimeMinutes.toOptionalInt("Runtime") else null,
+                mediaType = mediaType,
+                totalSeasons = if (mediaType == MediaType.SERIES) form.totalSeasons.toOptionalInt("Seasons") else null,
                 isWatched = form.isWatched,
                 comment = form.comment.normalizedOrNull(),
                 userRating = form.userRating.toOptionalInt("User rating"),
@@ -80,7 +87,7 @@ class IosMovieMateApi internal constructor(
     @Throws(Exception::class)
     suspend fun setMovieWatched(movieId: String, isWatched: Boolean): IosMovieRecord {
         val currentMovie = appContainer.getMovieUseCase(movieId)
-            ?: throw NoSuchElementException("Movie not found: $movieId")
+            ?: throw NoSuchElementException("Title not found: $movieId")
         return appContainer.updateMovieUseCase(
             currentMovie.copy(
                 isWatched = isWatched,
@@ -116,8 +123,8 @@ class IosMovieMateApi internal constructor(
     }
 
     @Throws(Exception::class)
-    suspend fun searchMovieMetadata(title: String, releaseYear: String): IosMovieSearchResults {
-        val result = appContainer.fetchMovieDataUseCase.search(title, releaseYear)
+    suspend fun searchMovieMetadata(title: String, releaseYear: String, mediaType: String): IosMovieSearchResults {
+        val result = appContainer.fetchMovieDataUseCase.search(title, releaseYear, MediaType.valueOf(mediaType))
         return IosMovieSearchResults(
             matches = result.matches.map {
                 IosMovieSearchMatch(it.imdbId, it.title, it.year, it.posterUrl.orEmpty())
@@ -127,8 +134,8 @@ class IosMovieMateApi internal constructor(
     }
 
     @Throws(Exception::class)
-    suspend fun fetchMovieData(imdbId: String): IosFetchedMovieRecord? {
-        val movie = appContainer.fetchMovieDataUseCase.byImdbId(imdbId) ?: return null
+    suspend fun fetchMovieData(imdbId: String, mediaType: String): IosFetchedMovieRecord? {
+        val movie = appContainer.fetchMovieDataUseCase.byImdbId(imdbId, MediaType.valueOf(mediaType)) ?: return null
         return IosFetchedMovieRecord(
             title = movie.title,
             description = movie.description,
@@ -137,6 +144,7 @@ class IosMovieMateApi internal constructor(
             runtimeMinutes = movie.runtimeMinutes?.toString().orEmpty(),
             imdbRating = movie.imdbRating?.toString().orEmpty(),
             genres = movie.genres,
+            totalSeasons = movie.totalSeasons?.toString().orEmpty(),
         )
     }
 
@@ -182,6 +190,8 @@ data class IosMovieRecord(
     val imdbRating: String,
     val watchProviders: List<String>,
     val updatedAtEpochMillis: Long,
+    val mediaType: String,
+    val totalSeasons: String,
 )
 
 data class IosCategoryRecord(
@@ -202,6 +212,8 @@ data class IosMovieForm(
     val isWatched: Boolean,
     val comment: String,
     val watchProviders: List<String>,
+    val mediaType: String,
+    val totalSeasons: String,
 )
 
 data class IosMovieSearchResults(
@@ -224,6 +236,7 @@ data class IosFetchedMovieRecord(
     val runtimeMinutes: String,
     val imdbRating: String,
     val genres: List<String>,
+    val totalSeasons: String,
 )
 
 data class IosSyncResult(
@@ -241,6 +254,8 @@ private fun Movie.toIosRecord(): IosMovieRecord = IosMovieRecord(
     categoryId = categoryId.orEmpty(),
     posterUrl = posterUrl.orEmpty(),
     runtimeMinutes = runtimeMinutes?.toString().orEmpty(),
+    mediaType = mediaType.name,
+    totalSeasons = totalSeasons?.toString().orEmpty(),
     isWatched = isWatched,
     comment = comment.orEmpty(),
     userRating = userRating?.toString().orEmpty(),

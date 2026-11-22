@@ -21,6 +21,7 @@ struct MovieFormView: View {
         let title: String
         let year: String
         let imdbID: String?
+        let mediaType: MediaType
     }
 
     var body: some View {
@@ -28,9 +29,16 @@ struct MovieFormView: View {
             posterPicker
 
             VStack(spacing: 12) {
+                Picker("Type", selection: $editor.mediaType) {
+                    ForEach(MediaType.allCases) { type in
+                        Text(type.title).tag(type)
+                    }
+                }
+                .pickerStyle(.segmented)
+
                 HStack(alignment: .bottom, spacing: 10) {
                     labeledField("Title *") {
-                        TextField("Movie name", text: $editor.title)
+                        TextField("Title", text: $editor.title)
                             .textInputAutocapitalization(.words)
                             .movieMateInput()
                     }
@@ -71,8 +79,11 @@ struct MovieFormView: View {
                             .keyboardType(.numberPad)
                             .movieMateInput()
                     }
-                    labeledField("Runtime") {
-                        TextField("120 min", text: $editor.runtimeMinutes)
+                    labeledField(editor.mediaType == .series ? "Seasons" : "Runtime") {
+                        TextField(
+                            editor.mediaType == .series ? "IMDb season count" : "120 min",
+                            text: editor.mediaType == .series ? $editor.totalSeasons : $editor.runtimeMinutes
+                        )
                             .keyboardType(.numberPad)
                             .movieMateInput()
                     }
@@ -101,7 +112,7 @@ struct MovieFormView: View {
             .padding(14)
             .movieMateCard()
 
-            labeledField("About the movie *") {
+            labeledField("Description *") {
                 TextField("Add a short description", text: $editor.description, axis: .vertical)
                     .lineLimit(4...8)
                     .movieMateInput()
@@ -139,6 +150,14 @@ struct MovieFormView: View {
             lookupRequest = nil
             isFetching = false
         }
+        .onChange(of: editor.mediaType) {
+            lookupRequest = nil
+            searchResults = nil
+            lookupError = nil
+            isFetching = false
+            editor.runtimeMinutes = ""
+            editor.totalSeasons = ""
+        }
         .onChange(of: selectedPoster) { _, item in
             guard let item else { return }
             Task { await importPoster(item) }
@@ -150,7 +169,7 @@ struct MovieFormView: View {
         guard !isFetching, !title.isEmpty else { return }
         lookupError = nil
         isFetching = true
-        lookupRequest = LookupRequest(title: title, year: editor.releaseYear, imdbID: imdbID)
+        lookupRequest = LookupRequest(title: title, year: editor.releaseYear, imdbID: imdbID, mediaType: editor.mediaType)
     }
 
     private func fetchMetadata(_ request: LookupRequest) async {
@@ -166,10 +185,10 @@ struct MovieFormView: View {
             if let selectedID = request.imdbID {
                 imdbID = selectedID
             } else {
-                let results = try await store.searchMovieMetadata(title: request.title, year: request.year)
+                let results = try await store.searchMovieMetadata(title: request.title, year: request.year, mediaType: request.mediaType)
                 guard isCurrent(request) else { return }
                 guard let firstMatch = results.matches.first else {
-                    lookupError = "No movies found. Try another title or year."
+                    lookupError = "No matches found. Try another title or year."
                     return
                 }
                 guard results.totalResults == 1, results.matches.count == 1 else {
@@ -179,10 +198,10 @@ struct MovieFormView: View {
                 imdbID = firstMatch.id
             }
 
-            let details = try await store.fetchMovieData(imdbID: imdbID)
+            let details = try await store.fetchMovieData(imdbID: imdbID, mediaType: request.mediaType)
             guard isCurrent(request) else { return }
             guard let details else {
-                lookupError = "No details found for this movie."
+                lookupError = "No details found for this title."
                 return
             }
 
@@ -190,7 +209,11 @@ struct MovieFormView: View {
             if !details.description.isEmpty { editor.description = details.description }
             if !details.releaseYear.isEmpty { editor.releaseYear = details.releaseYear }
             if !details.posterURL.isEmpty { editor.posterURL = details.posterURL }
-            if !details.runtimeMinutes.isEmpty { editor.runtimeMinutes = details.runtimeMinutes }
+            if request.mediaType == .series {
+                if !details.totalSeasons.isEmpty { editor.totalSeasons = details.totalSeasons }
+            } else if !details.runtimeMinutes.isEmpty {
+                editor.runtimeMinutes = details.runtimeMinutes
+            }
             if !details.imdbRating.isEmpty { editor.imdbRating = details.imdbRating }
 
             if suggestsCategory, editor.categoryID.isEmpty,
@@ -207,7 +230,7 @@ struct MovieFormView: View {
     private func isCurrent(_ request: LookupRequest) -> Bool {
         !Task.isCancelled && lookupRequest == request &&
             editor.title.trimmingCharacters(in: .whitespacesAndNewlines) == request.title &&
-            editor.releaseYear == request.year
+            editor.releaseYear == request.year && editor.mediaType == request.mediaType
     }
 
     private var posterPicker: some View {
@@ -435,7 +458,7 @@ private struct MovieMatchSheet: View {
                     .padding(MovieMateTheme.horizontalPadding)
                 }
             }
-            .navigationTitle("Choose a movie")
+            .navigationTitle("Choose a match")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {

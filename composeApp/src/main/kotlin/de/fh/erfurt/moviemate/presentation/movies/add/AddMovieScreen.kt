@@ -25,10 +25,12 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
+import de.fh.erfurt.moviemate.movies.domain.model.movie.MediaType
 import de.fh.erfurt.moviemate.presentation.components.MovieMateScreenBackground
 import de.fh.erfurt.moviemate.presentation.components.MovieMateScreenDefaults
 import de.fh.erfurt.moviemate.presentation.components.ScreenLoadingState
 import de.fh.erfurt.moviemate.presentation.movies.categories.AddCategoryDialog
+import de.fh.erfurt.moviemate.presentation.movies.components.MediaTypeSelector
 import de.fh.erfurt.moviemate.presentation.movies.components.MovieFormTopBar
 import de.fh.erfurt.moviemate.presentation.movies.components.MovieMatchDialog
 import de.fh.erfurt.moviemate.presentation.movies.detail.CategorySelector
@@ -60,9 +62,9 @@ fun AddMovieScreen(
                     .padding(top = MovieMateScreenDefaults.VerticalPadding)
             ) {
                 MovieFormTopBar(
-                    title = "Add movie",
+                    title = "Add title",
                     navigationIcon = MovieMateIcons.close,
-                    navigationContentDescription = "Cancel add movie",
+                    navigationContentDescription = "Cancel",
                     onNavigationClicked = { onAction(AddMovieAction.CancelClicked) },
                     actionLabel = "Save",
                     actionEnabled = state.canSave,
@@ -100,7 +102,7 @@ fun AddMovieScreen(
                             end = MovieMateScreenDefaults.HorizontalPadding,
                             bottom = MovieMateSpacing.detailFloatingButtonBottomPadding
                         )
-                        .semantics { contentDescription = "Fetch movie data" },
+                        .semantics { contentDescription = "Fetch metadata" },
                     containerColor = MovieMateColors.Accent,
                     contentColor = MovieMateColors.PrimaryText
                 ) {
@@ -152,9 +154,9 @@ private fun AddMovieStatus(
 ) {
     val error = state.lookup.error ?: state.errorMessage
     val message = when {
-        state.isSaving -> "Saving movie..."
+        state.isSaving -> "Saving title..."
         state.isAddingCategory -> "Creating category..."
-        state.isFetching -> "Fetching movie data..."
+        state.isFetching -> "Fetching metadata..."
         else -> error
     } ?: return
 
@@ -174,6 +176,7 @@ private fun AddMovieForm(
     onAction: (AddMovieAction) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val isSeries = state.mediaType == MediaType.SERIES
     Column(
         modifier = modifier
             .verticalScroll(rememberScrollState())
@@ -185,10 +188,15 @@ private fun AddMovieForm(
             onClick = { onAction(AddMovieAction.PosterClicked) }
         )
 
+        MediaTypeSelector(
+            selected = state.mediaType,
+            onSelected = { onAction(AddMovieAction.MediaTypeChanged(it)) },
+        )
+
         DetailTextField(
             value = state.title,
             label = "Title *",
-            placeholder = "Movie name",
+            placeholder = "Title",
             onValueChange = { onAction(AddMovieAction.TitleChanged(it)) }
         )
 
@@ -208,10 +216,13 @@ private fun AddMovieForm(
                 modifier = Modifier.weight(1f)
             )
             DetailTextField(
-                value = state.runtimeMinutes,
-                label = "Runtime",
-                placeholder = "120 min",
-                onValueChange = { onAction(AddMovieAction.RuntimeChanged(it)) },
+                value = if (isSeries) state.totalSeasons else state.runtimeMinutes,
+                label = if (isSeries) "Seasons" else "Runtime",
+                placeholder = if (isSeries) "IMDb season count" else "120 min",
+                onValueChange = {
+                    val action = if (isSeries) AddMovieAction.TotalSeasonsChanged(it) else AddMovieAction.RuntimeChanged(it)
+                    onAction(action)
+                },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier.weight(1f)
             )
@@ -243,7 +254,7 @@ private fun AddMovieForm(
 
         DetailTextField(
             value = state.description,
-            label = "About the movie *",
+            label = "Description *",
             placeholder = "Add a short description",
             onValueChange = { onAction(AddMovieAction.DescriptionChanged(it)) },
             minLines = 4

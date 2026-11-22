@@ -6,6 +6,7 @@ import de.fh.erfurt.moviemate.movies.data.local.model.LocalCategoryEntity
 import de.fh.erfurt.moviemate.movies.data.local.model.LocalMovieEntity
 import de.fh.erfurt.moviemate.movies.domain.model.category.Category
 import de.fh.erfurt.moviemate.movies.domain.model.category.CategoryDraft
+import de.fh.erfurt.moviemate.movies.domain.model.movie.MediaType
 import de.fh.erfurt.moviemate.movies.domain.model.movie.Movie
 import de.fh.erfurt.moviemate.movies.domain.model.movie.MovieDraft
 import kotlinx.serialization.builtins.ListSerializer
@@ -34,6 +35,8 @@ fun Movie.toLocalEntity(): LocalMovieEntity = LocalMovieEntity(
     watchProviders = watchProviders.toJsonStringOrNull(),
     updatedAtEpochMillis = updatedAtEpochMillis,
     version = version,
+    mediaType = mediaType.name,
+    totalSeasons = totalSeasons?.toLong(),
 )
 
 fun MovieDraft.toLocalEntity(id: String): LocalMovieEntity = LocalMovieEntity(
@@ -52,6 +55,8 @@ fun MovieDraft.toLocalEntity(id: String): LocalMovieEntity = LocalMovieEntity(
     watchProviders = watchProviders.toJsonStringOrNull(),
     updatedAtEpochMillis = updatedAtEpochMillis,
     version = null,
+    mediaType = mediaType.name,
+    totalSeasons = totalSeasons?.toLong(),
 )
 
 fun LocalMovieEntity.toDomainModel(): Movie = Movie(
@@ -70,6 +75,8 @@ fun LocalMovieEntity.toDomainModel(): Movie = Movie(
     watchProviders = watchProviders.fromJsonStringOrNull(),
     updatedAtEpochMillis = updatedAtEpochMillis,
     version = version,
+    mediaType = MediaType.entries.firstOrNull { it.name == mediaType } ?: MediaType.MOVIE,
+    totalSeasons = totalSeasons?.toInt(),
 )
 
 fun MovieEntity.toLocalModel(): LocalMovieEntity = LocalMovieEntity(
@@ -88,6 +95,8 @@ fun MovieEntity.toLocalModel(): LocalMovieEntity = LocalMovieEntity(
     watchProviders = watchProviders,
     updatedAtEpochMillis = updatedAtEpochMillis,
     version = version,
+    mediaType = mediaType,
+    totalSeasons = totalSeasons,
 )
 
 fun LocalCategoryEntity.toDomainModel(): Category = Category(

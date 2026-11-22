@@ -14,6 +14,8 @@ CREATE TABLE movieEntity (
     watchProviders TEXT,
     updatedAtEpochMillis INTEGER NOT NULL,
     version INTEGER,
+    mediaType TEXT,
+    totalSeasons INTEGER,
     FOREIGN KEY (categoryId) REFERENCES categoryEntity(id) ON DELETE SET NULL
 );
 
@@ -29,9 +31,9 @@ WHERE id = ?;
 
 insertMovie:
 INSERT INTO movieEntity(
-    id, title, description, releaseYear, categoryId, posterUrl, runtimeMinutes, isWatched, comment, userRating, imdbRating, externalIds, watchProviders, updatedAtEpochMillis, version
+    id, title, description, releaseYear, categoryId, posterUrl, runtimeMinutes, isWatched, comment, userRating, imdbRating, externalIds, watchProviders, updatedAtEpochMillis, version, mediaType, totalSeasons
 )
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 updateMovie:
 UPDATE movieEntity
@@ -49,7 +51,9 @@ SET
     externalIds = ?,
     watchProviders = ?,
     updatedAtEpochMillis = ?,
-    version = ?
+    version = ?,
+    mediaType = ?,
+    totalSeasons = ?
 WHERE id = ?;
 
 deleteMovie:

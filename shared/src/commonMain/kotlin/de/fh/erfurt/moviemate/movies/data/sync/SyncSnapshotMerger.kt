@@ -50,11 +50,20 @@ internal class SyncSnapshotMerger(
                 winner
                     .takeIf { deletion == null || winner.updatedAtEpochMillis > deletion.deletedAtEpochMillis }
                     ?.let { movie ->
-                        if (movie.categoryId == null || movie.categoryId in liveCategoryIds) {
-                            movie
+                        // Older clients omit media fields when they edit an entry.
+                        val media = if (movie.mediaType == null) {
+                            candidates.filter { candidate ->
+                                candidate.mediaType != null &&
+                                    (deletion == null || candidate.updatedAtEpochMillis > deletion.deletedAtEpochMillis)
+                            }.maxWithOrNull(movieComparator)
                         } else {
-                            movie.copy(categoryId = null)
+                            movie
                         }
+                        movie.copy(
+                            categoryId = movie.categoryId?.takeIf { it in liveCategoryIds },
+                            mediaType = media?.mediaType,
+                            totalSeasons = media?.totalSeasons,
+                        )
                     }
             }
             .sortedBy(MovieDto::id)

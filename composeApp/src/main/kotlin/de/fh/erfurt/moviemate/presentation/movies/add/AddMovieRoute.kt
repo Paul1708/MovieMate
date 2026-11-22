@@ -29,7 +29,7 @@ fun AddMovieRoute(
 ) {
     if (appContainer == null) {
         AddMovieScreen(
-            state = AddMovieUiState(errorMessage = "Add movie is only available in the running app."),
+            state = AddMovieUiState(errorMessage = "Add title is only available in the running app."),
             onAction = { action -> if (action == AddMovieAction.CancelClicked) onCloseClicked() },
             modifier = modifier,
         )

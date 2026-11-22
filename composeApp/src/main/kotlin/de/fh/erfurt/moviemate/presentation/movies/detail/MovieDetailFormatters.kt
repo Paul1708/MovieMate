@@ -1,6 +1,8 @@
 package de.fh.erfurt.moviemate.presentation.movies.detail
 
+import de.fh.erfurt.moviemate.movies.domain.model.movie.MediaType
 import de.fh.erfurt.moviemate.movies.presentation.detail.MovieDetailUiModel
+import de.fh.erfurt.moviemate.presentation.movies.components.seasonCountLabel
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateIcons
 import kotlin.math.roundToInt
 
@@ -15,9 +17,13 @@ internal fun MovieDetailUiModel.metaItems(): List<MovieDetailMetaItem> {
             value = categoryName.ifBlank { "Unknown" }
         ),
         MovieDetailMetaItem(
-            icon = MovieDetailMetaIcon.Runtime,
-            label = "Runtime",
-            value = runtimeMinutes?.let { "$it min" } ?: "Unknown"
+            icon = if (mediaType == MediaType.SERIES) null else MovieDetailMetaIcon.Runtime,
+            label = if (mediaType == MediaType.SERIES) "Type" else "Runtime",
+            value = if (mediaType == MediaType.SERIES) {
+                totalSeasons?.let { "Series · ${seasonCountLabel(it)}" } ?: "Series"
+            } else {
+                runtimeMinutes?.let { "$it min" } ?: "Unknown"
+            }
         ),
         MovieDetailMetaItem(
             icon = MovieDetailMetaIcon.Date,

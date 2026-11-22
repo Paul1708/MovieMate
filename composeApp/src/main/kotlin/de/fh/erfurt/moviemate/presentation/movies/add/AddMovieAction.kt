@@ -1,5 +1,6 @@
 package de.fh.erfurt.moviemate.presentation.movies.add
 
+import de.fh.erfurt.moviemate.movies.domain.model.movie.MediaType
 /**
  * User intents emitted by the add movie UI and handled by AddMovieViewModel.
  */
@@ -24,6 +25,8 @@ sealed interface AddMovieAction {
     data class CategoryChanged(val value: String) : AddMovieAction
     data class ReleaseYearChanged(val value: String) : AddMovieAction
     data class RuntimeChanged(val value: String) : AddMovieAction
+    data class MediaTypeChanged(val value: MediaType) : AddMovieAction
+    data class TotalSeasonsChanged(val value: String) : AddMovieAction
     data class UserRatingChanged(val value: String) : AddMovieAction
     data class ImdbRatingChanged(val value: String) : AddMovieAction
     data class WatchedChanged(val isWatched: Boolean) : AddMovieAction

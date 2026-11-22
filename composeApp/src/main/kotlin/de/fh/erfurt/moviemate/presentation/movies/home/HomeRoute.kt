@@ -22,7 +22,7 @@ fun HomeRoute(
 ) {
     if (appContainer == null) {
         HomeScreen(
-            state = HomeUiState(errorMessage = "Movies are only available in the running app."),
+            state = HomeUiState(errorMessage = "Titles are only available in the running app."),
             onAction = {},
             modifier = modifier,
         )

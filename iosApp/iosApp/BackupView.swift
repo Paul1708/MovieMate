@@ -28,7 +28,7 @@ struct BackupView: View {
 
                         backupActionCard(
                             title: "Export",
-                            subtitle: "Save your movie list as a JSON backup file.",
+                            subtitle: "Save your library as a JSON backup file.",
                             symbol: "square.and.arrow.up"
                         ) {
                             Task { await prepareExport() }
@@ -167,7 +167,7 @@ struct BackupView: View {
                     .padding(.horizontal, 10)
                 }
             } else {
-                Text("Sign in once to merge movies, categories and their contents across your signed-in devices.")
+                Text("Sign in once to merge titles, categories and their contents across your signed-in devices.")
                     .font(.subheadline)
                     .foregroundStyle(MovieMateTheme.secondaryText)
 
@@ -219,7 +219,7 @@ struct BackupView: View {
             Text("Ready to synchronize")
                 .foregroundStyle(MovieMateTheme.secondaryText)
         case .syncing:
-            Text("Synchronizing movies and categories…")
+            Text("Synchronizing titles and categories…")
                 .foregroundStyle(MovieMateTheme.secondaryText)
         case .success(let date):
             Text("Last synchronized \(date.formatted(date: .omitted, time: .shortened))")

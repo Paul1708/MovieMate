@@ -264,7 +264,9 @@ struct MovieCardView: View {
                     if !movie.releaseYear.isEmpty {
                         Label(movie.releaseYear, systemImage: "calendar")
                     }
-                    if !movie.runtimeMinutes.isEmpty {
+                    if movie.mediaType == .series {
+                        Label(movie.seasonCountLabel.map { "Series · \($0)" } ?? "Series", systemImage: "tv")
+                    } else if !movie.runtimeMinutes.isEmpty {
                         Label("\(movie.runtimeMinutes) min", systemImage: "clock")
                     }
                     Spacer(minLength: 0)
@@ -301,7 +303,7 @@ struct CategoryTileView: View {
                 .font(.headline)
                 .foregroundStyle(MovieMateTheme.primaryText)
                 .lineLimit(1)
-            Text("\(movieCount) \(movieCount == 1 ? "movie" : "movies")")
+            Text("\(movieCount) \(movieCount == 1 ? "title" : "titles")")
                 .font(.caption)
                 .foregroundStyle(MovieMateTheme.secondaryText)
         }

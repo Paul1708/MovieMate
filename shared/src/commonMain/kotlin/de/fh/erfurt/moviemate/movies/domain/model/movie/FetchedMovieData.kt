@@ -8,4 +8,5 @@ data class FetchedMovieData(
     val runtimeMinutes: Int?,
     val imdbRating: Double?,
     val genres: List<String> = emptyList(),
+    val totalSeasons: Int? = null,
 )

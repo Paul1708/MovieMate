@@ -16,4 +16,6 @@ data class Movie(
     val watchProviders: List<String>?,
     val updatedAtEpochMillis: Long,
     val version: Long? = null,
+    val mediaType: MediaType = MediaType.MOVIE,
+    val totalSeasons: Int? = null,
 )

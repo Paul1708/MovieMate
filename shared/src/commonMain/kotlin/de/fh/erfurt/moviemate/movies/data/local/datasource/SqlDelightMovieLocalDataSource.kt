@@ -39,6 +39,8 @@ class SqlDelightMovieLocalDataSource(
             resolvedMovie.watchProviders,
             resolvedMovie.updatedAtEpochMillis,
             resolvedMovie.version,
+            resolvedMovie.mediaType,
+            resolvedMovie.totalSeasons,
         )
         return resolvedMovie
     }
@@ -60,6 +62,8 @@ class SqlDelightMovieLocalDataSource(
             movie.watchProviders,
             movie.updatedAtEpochMillis,
             movie.version,
+            movie.mediaType,
+            movie.totalSeasons,
             movie.id,
         )
         return movie

@@ -161,7 +161,7 @@ fun CategoriesScreen(
     if (pendingDeleteCategory != null) {
         DeleteConfirmationDialog(
             title = "Delete category?",
-            message = "Are you sure you want to delete \"${pendingDeleteCategory.name}\"? Movies in this category will not be deleted.",
+            message = "Are you sure you want to delete \"${pendingDeleteCategory.name}\"? Titles in this category will not be deleted.",
             onConfirm = { onAction(CategoriesUiAction.ConfirmDeleteCategoryClicked) },
             onDismiss = { onAction(CategoriesUiAction.DeleteCategoryDismissed) }
         )
@@ -296,7 +296,7 @@ private fun CategoryTile(
             )
 
             Text(
-                text = category.movieCountText ?: "0 Movies",
+                text = category.movieCountText ?: "0 titles",
                 style = MaterialTheme.typography.labelSmall,
                 color = MovieMateColors.SecondaryText,
                 maxLines = 1,

@@ -39,8 +39,8 @@ fun previewCategoriesUiState(): CategoriesUiState {
 
 private fun Int.toMovieCountText(): String {
     return if (this == 1) {
-        "1 Movie"
+        "1 title"
     } else {
-        "$this Movies"
+        "$this titles"
     }
 }

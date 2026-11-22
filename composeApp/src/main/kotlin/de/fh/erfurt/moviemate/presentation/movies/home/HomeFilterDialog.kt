@@ -16,6 +16,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import de.fh.erfurt.moviemate.movies.domain.model.movie.MediaType
 import de.fh.erfurt.moviemate.movies.domain.repository.movie.SortBy
 import de.fh.erfurt.moviemate.presentation.components.SelectionOptionRow
 import de.fh.erfurt.moviemate.presentation.movies.categories.CategoryGenreIcon
@@ -30,11 +31,12 @@ import de.fh.erfurt.moviemate.presentation.theme.MovieMateSpacing
 fun HomeFilterDialog(
     categories: List<CategoryUiModel>,
     selectedCategoryId: String?,
+    selectedMediaType: MediaType?,
+    onMediaTypeSelected: (MediaType?) -> Unit,
     selectedSortBy: SortBy,
     onCategorySelected: (String?) -> Unit,
     onSortSelected: (SortBy) -> Unit,
-    onClearClicked: () -> Unit,
-    onClearSortClicked: () -> Unit,
+    onResetClicked: () -> Unit,
     onDismiss: () -> Unit
 ) {
     AlertDialog(
@@ -50,6 +52,28 @@ fun HomeFilterDialog(
                 modifier = Modifier.heightIn(max = MovieMateSpacing.dialogMaxHeight)
             ) {
                 item {
+                    Text(
+                        text = "Type",
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MovieMateColors.PrimaryText,
+                        modifier = Modifier.padding(bottom = MovieMateSpacing.dialogSectionBottomPadding),
+                    )
+                }
+
+                items(listOf(null, MediaType.MOVIE, MediaType.SERIES)) { type ->
+                    SelectionOptionRow(
+                        label = when (type) {
+                            null -> "All titles"
+                            MediaType.MOVIE -> "Movies"
+                            MediaType.SERIES -> "Series"
+                        },
+                        selected = selectedMediaType == type,
+                        onClick = { onMediaTypeSelected(type) },
+                    )
+                }
+
+                item {
+                    Spacer(modifier = Modifier.height(MovieMateSpacing.titleSpacing))
                     Text(
                         text = "Category",
                         style = MaterialTheme.typography.titleSmall,
@@ -110,12 +134,7 @@ fun HomeFilterDialog(
             }
         },
         dismissButton = {
-            TextButton(
-                onClick = {
-                    onClearClicked()
-                    onClearSortClicked()
-                }
-            ) {
+            TextButton(onClick = onResetClicked) {
                 Text("Reset")
             }
         }

@@ -1,5 +1,6 @@
 package de.fh.erfurt.moviemate.movies.data.remote.dto
 
+import de.fh.erfurt.moviemate.movies.domain.model.movie.MediaType
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -17,4 +18,6 @@ data class CreateMovieRequestDto(
     val externalIds: Map<String, String>? = null,
     val watchProviders: List<String>? = null,
     val updatedAtEpochMillis: Long,
+    val mediaType: MediaType? = null,
+    val totalSeasons: Int? = null,
 )

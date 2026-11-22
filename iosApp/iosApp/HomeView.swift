@@ -9,6 +9,7 @@ struct HomeView: View {
     @State private var isSearchVisible = false
     @State private var isFilterVisible = false
     @State private var selectedCategoryID = ""
+    @State private var selectedMediaType: MediaType?
     @State private var sort = MovieSort.updated
     @State private var pendingDelete: MovieItem?
 
@@ -21,7 +22,7 @@ struct HomeView: View {
                     HStack(spacing: 9) {
                         MovieMateIconButton(
                             symbol: "magnifyingglass",
-                            accessibilityLabel: "Search movies",
+                            accessibilityLabel: "Search titles",
                             isActive: isSearchVisible
                         ) {
                             withAnimation(.easeInOut(duration: 0.2)) {
@@ -31,8 +32,8 @@ struct HomeView: View {
                         }
                         MovieMateIconButton(
                             symbol: "line.3.horizontal.decrease",
-                            accessibilityLabel: "Filter movies",
-                            isActive: !selectedCategoryID.isEmpty || sort != .updated
+                            accessibilityLabel: "Filter titles",
+                            isActive: !selectedCategoryID.isEmpty || selectedMediaType != nil || sort != .updated
                         ) {
                             isFilterVisible = true
                         }
@@ -47,7 +48,7 @@ struct HomeView: View {
                 .pickerStyle(.segmented)
 
                 if isSearchVisible {
-                    MovieMateSearchField(placeholder: "Find a movie", text: $searchQuery)
+                    MovieMateSearchField(placeholder: "Find a title", text: $searchQuery)
                         .transition(.move(edge: .top).combined(with: .opacity))
                 }
 
@@ -61,7 +62,7 @@ struct HomeView: View {
                     Spacer(minLength: 20)
                     MovieMateEmptyState(
                         symbol: "film.stack",
-                        title: "No movies found",
+                        title: "No titles found",
                         message: emptyMessage
                     )
                     Spacer()
@@ -99,7 +100,7 @@ struct HomeView: View {
                     .clipShape(Circle())
                     .shadow(color: MovieMateTheme.accent.opacity(0.38), radius: 16, y: 8)
             }
-            .accessibilityLabel("Add movie")
+            .accessibilityLabel("Add title")
             .padding(.trailing, MovieMateTheme.horizontalPadding)
             .padding(.bottom, 22)
         }
@@ -107,12 +108,13 @@ struct HomeView: View {
             HomeFilterSheet(
                 categories: store.categories,
                 selectedCategoryID: $selectedCategoryID,
+                selectedMediaType: $selectedMediaType,
                 sort: $sort
             )
-            .presentationDetents([.medium])
+            .presentationDetents([.medium, .large])
             .presentationDragIndicator(.visible)
         }
-        .alert("Delete movie?", isPresented: deleteAlertBinding, presenting: pendingDelete) { movie in
+        .alert("Delete title?", isPresented: deleteAlertBinding, presenting: pendingDelete) { movie in
             Button("Cancel", role: .cancel) { pendingDelete = nil }
             Button("Delete", role: .destructive) {
                 Task {
@@ -138,7 +140,8 @@ struct HomeView: View {
             let matchesSearch = normalizedSearch.isEmpty ||
                 movie.title.localizedCaseInsensitiveContains(normalizedSearch) ||
                 movie.description.localizedCaseInsensitiveContains(normalizedSearch)
-            return matchesCollection && matchesCategory && matchesSearch
+            let matchesType = selectedMediaType == nil || movie.mediaType == selectedMediaType
+            return matchesCollection && matchesCategory && matchesType && matchesSearch
         }
 
         return filtered.sorted { lhs, rhs in
@@ -158,7 +161,7 @@ struct HomeView: View {
     }
 
     private var emptyMessage: String {
-        if store.movies.isEmpty { return "Add your first movie to start your collection." }
+        if store.movies.isEmpty { return "Add your first movie or series to start your collection." }
         return "Try another search or filter."
     }
 
@@ -173,6 +176,7 @@ struct HomeView: View {
 private struct HomeFilterSheet: View {
     let categories: [CategoryItem]
     @Binding var selectedCategoryID: String
+    @Binding var selectedMediaType: MediaType?
     @Binding var sort: MovieSort
     @Environment(\.dismiss) private var dismiss
 
@@ -181,6 +185,13 @@ private struct HomeFilterSheet: View {
             ZStack {
                 MovieMateBackground()
                 VStack(alignment: .leading, spacing: 20) {
+                    Picker("Type", selection: $selectedMediaType) {
+                        Text("All titles").tag(nil as MediaType?)
+                        Text("Movies").tag(MediaType.movie as MediaType?)
+                        Text("Series").tag(MediaType.series as MediaType?)
+                    }
+                    .pickerStyle(.segmented)
+
                     MovieMateSectionTitle("Category")
                     Menu {
                         Button("All categories") { selectedCategoryID = "" }
@@ -209,6 +220,7 @@ private struct HomeFilterSheet: View {
 
                     Button("Clear filters") {
                         selectedCategoryID = ""
+                        selectedMediaType = nil
                         sort = .updated
                     }
                     .foregroundStyle(MovieMateTheme.accentLight)

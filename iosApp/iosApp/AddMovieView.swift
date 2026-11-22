@@ -15,7 +15,7 @@ struct AddMovieView: View {
             MovieMateBackground()
 
             VStack(spacing: 16) {
-                MovieMateHeader("Add movie")
+                MovieMateHeader("Add title")
 
                 ScrollView {
                     VStack(spacing: 20) {
@@ -38,7 +38,7 @@ struct AddMovieView: View {
                         )
 
                         MovieMatePrimaryButton(
-                            title: "Save movie",
+                            title: "Save title",
                             symbol: "checkmark",
                             isLoading: isSaving,
                             isEnabled: editor.canSave && !isFetching,
@@ -64,7 +64,7 @@ struct AddMovieView: View {
             try await store.saveMovie(editor)
             editor = MovieEditorState()
             statusIsError = false
-            statusMessage = "Movie saved."
+            statusMessage = "Title saved."
             onSaved()
         } catch {
             statusIsError = true

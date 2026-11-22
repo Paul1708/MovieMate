@@ -245,4 +245,4 @@ private fun List<Category>.toCategoryUiModels(movies: List<Movie>): List<Categor
     }
 }
 
-private fun Int.toMovieCountText(): String = if (this == 1) "1 Movie" else "$this Movies"
+private fun Int.toMovieCountText(): String = if (this == 1) "1 title" else "$this titles"

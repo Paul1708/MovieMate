@@ -13,6 +13,7 @@ import de.fh.erfurt.moviemate.movies.data.remote.dto.CategoryDto
 import de.fh.erfurt.moviemate.movies.data.remote.dto.MovieDto
 import de.fh.erfurt.moviemate.movies.data.sync.local.LocalDataLock
 import de.fh.erfurt.moviemate.movies.data.sync.local.SyncDeletionTracker
+import de.fh.erfurt.moviemate.movies.domain.model.movie.MediaType
 import de.fh.erfurt.moviemate.movies.domain.model.movie.Movie
 import de.fh.erfurt.moviemate.movies.domain.model.movie.MovieDraft
 import de.fh.erfurt.moviemate.movies.domain.repository.movie.MovieRepository
@@ -62,10 +63,16 @@ class LocalMovieRepository(
     override suspend fun updateMovie(movie: Movie): Movie {
         val result = localDataLock.withLock {
             val existing = localDataSource.getMovie(movie.id)
-            val requested = movie.toLocalEntity()
             if (existing == null) {
-                throw NoSuchElementException("Movie not found: ${movie.id}")
+                throw NoSuchElementException("Title not found: ${movie.id}")
             } else {
+                val requested = movie.toLocalEntity().let { entity ->
+                    if (existing.mediaType == null && movie.mediaType == MediaType.MOVIE) {
+                        entity.copy(mediaType = null)
+                    } else {
+                        entity
+                    }
+                }
                 val contentChanged = requested.copy(
                     updatedAtEpochMillis = existing.updatedAtEpochMillis,
                     version = existing.version,
@@ -154,7 +161,8 @@ class LocalMovieRepository(
     }
 
     override suspend fun exportBackup(): String {
-        val moviesDto = getMovies().map { movie ->
+        val moviesDto = localDataSource.getMovies().map { entity ->
+            val movie = entity.toDomainModel()
             MovieDto(
                 id = movie.id,
                 title = movie.title,
@@ -171,6 +179,8 @@ class LocalMovieRepository(
                 watchProviders = movie.watchProviders,
                 updatedAtEpochMillis = movie.updatedAtEpochMillis,
                 version = movie.version,
+                mediaType = movie.mediaType.takeIf { entity.mediaType != null },
+                totalSeasons = movie.totalSeasons,
             )
         }
 
@@ -207,6 +217,7 @@ class LocalMovieRepository(
             }
 
             backup.movies.forEach { dto ->
+                val existing = localDataSource.getMovie(dto.id)
                 val entity = LocalMovieEntity(
                     id = dto.id,
                     title = dto.title,
@@ -227,8 +238,10 @@ class LocalMovieRepository(
                     },
                     updatedAtEpochMillis = dto.updatedAtEpochMillis,
                     version = dto.version,
+                    mediaType = dto.mediaType?.name ?: existing?.mediaType,
+                    totalSeasons = if (dto.mediaType == null) existing?.totalSeasons else dto.totalSeasons?.toLong(),
                 )
-                if (localDataSource.getMovie(entity.id) != null) {
+                if (existing != null) {
                     localDataSource.updateMovie(entity)
                 } else {
                     localDataSource.insertMovie(entity)

@@ -3,6 +3,7 @@ package de.fh.erfurt.moviemate.presentation.movies.add
 import de.fh.erfurt.moviemate.movies.domain.model.category.Category
 import de.fh.erfurt.moviemate.movies.domain.model.category.CategoryDraft
 import de.fh.erfurt.moviemate.movies.domain.model.movie.FetchedMovieData
+import de.fh.erfurt.moviemate.movies.domain.model.movie.MediaType
 import de.fh.erfurt.moviemate.movies.domain.model.movie.Movie
 import de.fh.erfurt.moviemate.movies.domain.model.movie.MovieDraft
 import de.fh.erfurt.moviemate.movies.domain.model.movie.MovieSearchMatch
@@ -176,13 +177,13 @@ private class StubMovieMetadataRepository : MovieMetadataRepository {
     var requestedImdbId: String? = null
     var matches = listOf(MovieSearchMatch("tt0078748", "Alien", "1979", null))
 
-    override suspend fun searchMovies(title: String, year: String?): MovieSearchResults {
+    override suspend fun searchMovies(title: String, year: String?, mediaType: MediaType): MovieSearchResults {
         requestedTitle = title
         requestedYear = year
         return MovieSearchResults(matches)
     }
 
-    override suspend fun fetchMovieDataByImdbId(imdbId: String): FetchedMovieData? {
+    override suspend fun fetchMovieDataByImdbId(imdbId: String, mediaType: MediaType): FetchedMovieData? {
         requestedImdbId = imdbId
         return result
     }

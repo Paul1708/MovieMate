@@ -6,6 +6,7 @@ import de.fh.erfurt.moviemate.movies.data.remote.dto.CategoryDto
 import de.fh.erfurt.moviemate.movies.data.remote.dto.MovieDto
 import de.fh.erfurt.moviemate.movies.data.sync.dto.SyncSnapshotDto
 import de.fh.erfurt.moviemate.movies.data.sync.dto.SyncTombstoneDto
+import de.fh.erfurt.moviemate.movies.domain.model.movie.MediaType
 import de.fh.erfurt.moviemate.movies.domain.sync.SyncAccountMismatchException
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
@@ -74,6 +75,8 @@ class SqlDelightSyncLocalDataSourceTest {
             movies = listOf(
                 MovieDto(
                     id = "movie-new",
+                    mediaType = MediaType.SERIES,
+                    totalSeasons = 5,
                     title = "New",
                     description = "Description",
                     categoryId = "category-new",
@@ -90,6 +93,8 @@ class SqlDelightSyncLocalDataSourceTest {
         val stored = dataSource.readSnapshot("device-test", "account")
         assertEquals(listOf("movie-new"), stored.movies.map(MovieDto::id))
         assertEquals("category-new", stored.movies.single().categoryId)
+        assertEquals(MediaType.SERIES, stored.movies.single().mediaType)
+        assertEquals(5, stored.movies.single().totalSeasons)
         assertEquals(listOf("category-new"), stored.categories.map(CategoryDto::id))
         assertEquals("movie-old", stored.deletedMovies.single().id)
         assertEquals("category-old", stored.deletedCategories.single().id)
@@ -134,6 +139,8 @@ class SqlDelightSyncLocalDataSourceTest {
             watchProviders = null,
             updatedAtEpochMillis = 10,
             version = 1,
+            mediaType = null,
+            totalSeasons = null,
         )
     }
 }

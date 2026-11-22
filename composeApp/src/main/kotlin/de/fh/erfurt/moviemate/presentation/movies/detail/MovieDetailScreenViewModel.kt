@@ -57,6 +57,7 @@ class MovieDetailScreenViewModel(
                     description = movie.description.ifBlank { description },
                     releaseYear = movie.releaseYear?.toString() ?: releaseYear,
                     posterUrl = movie.posterUrl ?: posterUrl,
+                    totalSeasons = movie.totalSeasons?.toString() ?: totalSeasons,
                     runtimeMinutes = movie.runtimeMinutes?.toString() ?: runtimeMinutes,
                     imdbRating = movie.imdbRating?.toString() ?: imdbRating,
                 )
@@ -76,12 +77,12 @@ class MovieDetailScreenViewModel(
             MovieDetailAction.FetchMovieDataClicked -> {
                 val state = _uiState.value
                 if (state.mode == MovieDetailMode.Edit) {
-                    movieLookup.search(state.editState.title, state.editState.releaseYear)
+                    movieLookup.search(state.editState.title, state.editState.releaseYear, state.editState.mediaType)
                 }
             }
             is MovieDetailAction.MovieMatchSelected -> {
                 if (_uiState.value.lookup.results?.matches?.any { it.imdbId == action.imdbId } == true) {
-                    movieLookup.select(action.imdbId)
+                    movieLookup.select(action.imdbId, _uiState.value.editState.mediaType)
                 }
             }
             MovieDetailAction.MovieMatchesDismissed -> movieLookup.clear()
@@ -102,6 +103,13 @@ class MovieDetailScreenViewModel(
                 updateEditState { copy(releaseYear = action.value) }
             }
             is MovieDetailAction.CategoryChanged -> updateEditState { copy(categoryId = action.value) }
+            is MovieDetailAction.MediaTypeChanged -> {
+                if (_uiState.value.editState.mediaType != action.value) {
+                    movieLookup.clear()
+                    updateEditState { copy(mediaType = action.value, runtimeMinutes = "", totalSeasons = "") }
+                }
+            }
+            is MovieDetailAction.TotalSeasonsChanged -> updateEditState { copy(totalSeasons = action.value) }
             is MovieDetailAction.RuntimeChanged -> updateEditState { copy(runtimeMinutes = action.value) }
             is MovieDetailAction.UserRatingChanged -> updateEditState { copy(userRating = action.value) }
             is MovieDetailAction.ImdbRatingChanged -> updateEditState { copy(imdbRating = action.value) }
@@ -133,7 +141,7 @@ class MovieDetailScreenViewModel(
                 currentMovie = movie
                 if (movie == null) {
                     _uiState.value = MovieDetailScreenState(
-                        detail = MovieDetailUiState(errorMessage = "Movie not found."),
+                        detail = MovieDetailUiState(errorMessage = "Title not found."),
                         availableCategories = categories,
                     )
                 } else {
@@ -151,7 +159,7 @@ class MovieDetailScreenViewModel(
                 throwable.throwIfCancellation()
                 _uiState.update {
                     it.copy(
-                        detail = MovieDetailUiState(errorMessage = throwable.message ?: "Movie could not be loaded."),
+                        detail = MovieDetailUiState(errorMessage = throwable.message ?: "Title could not be loaded."),
                         isSaving = false,
                     )
                 }
@@ -216,7 +224,7 @@ class MovieDetailScreenViewModel(
             state.editState.applyTo(currentDetailMovie, state.availableCategories)
         }.onFailure { throwable ->
             _uiState.update {
-                it.copy(detail = it.detail.copy(errorMessage = throwable.message ?: "Movie data is invalid."))
+                it.copy(detail = it.detail.copy(errorMessage = throwable.message ?: "Title data is invalid."))
             }
         }.getOrNull() ?: return
 
@@ -244,7 +252,7 @@ class MovieDetailScreenViewModel(
                 throwable.throwIfCancellation()
                 _uiState.update {
                     it.copy(
-                        detail = it.detail.copy(errorMessage = throwable.message ?: "Movie could not be saved."),
+                        detail = it.detail.copy(errorMessage = throwable.message ?: "Title could not be saved."),
                         isSaving = false,
                     )
                 }
@@ -282,6 +290,8 @@ private fun MovieDetailUiModel.toDomainModel(originalMovie: Movie): Movie {
         categoryId = categoryId.ifBlank { null },
         posterUrl = posterUrl,
         runtimeMinutes = runtimeMinutes,
+        mediaType = mediaType,
+        totalSeasons = totalSeasons,
         isWatched = isWatched,
         comment = comment,
         userRating = userRating,

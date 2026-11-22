@@ -1,11 +1,13 @@
 package de.fh.erfurt.moviemate.presentation.movies.mapper
 
 import de.fh.erfurt.moviemate.movies.domain.model.category.CategoryType
+import de.fh.erfurt.moviemate.movies.domain.model.movie.MediaType
 import de.fh.erfurt.moviemate.movies.domain.model.movie.Movie
 import de.fh.erfurt.moviemate.movies.presentation.detail.MovieDetailUiModel
 import de.fh.erfurt.moviemate.presentation.movies.categories.CategoryUiModel
 import de.fh.erfurt.moviemate.presentation.movies.categories.defaultIconKey
 import de.fh.erfurt.moviemate.presentation.movies.components.displayName
+import de.fh.erfurt.moviemate.presentation.movies.components.seasonCountLabel
 import de.fh.erfurt.moviemate.presentation.movies.model.MovieUiModel
 
 /**
@@ -31,7 +33,12 @@ fun Movie.toHomeUiModel(
         publishingYear = year,
         yearText = year.takeIf { it > 0 }?.toString().orEmpty(),
         runtimeMinutes = runtime,
-        runtimeText = "$runtime Minutes",
+        runtimeText = if (mediaType == MediaType.SERIES) {
+            totalSeasons?.let { "Series · ${seasonCountLabel(it)}" } ?: "Series"
+        } else {
+            "$runtime Minutes"
+        },
+        mediaType = mediaType,
         posterUri = posterUrl?.ifBlank { null },
         isWatched = isWatched
     )
@@ -54,6 +61,8 @@ fun Movie.toDetailUiModel(
         releaseYear = releaseYear,
         posterUrl = posterUrl?.ifBlank { null },
         runtimeMinutes = runtimeMinutes,
+        mediaType = mediaType,
+        totalSeasons = totalSeasons,
         isWatched = isWatched,
         comment = comment,
         userRating = userRating,

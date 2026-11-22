@@ -47,9 +47,9 @@ fun MovieDetailPoster(
     showPlaceholderIcon: Boolean = false,
 ) {
     val description = if (posterUrl.isNullOrBlank()) {
-        "Movie poster placeholder"
+        "Poster placeholder"
     } else {
-        "Movie poster"
+        "Poster"
     }
     val context = LocalContext.current
     var posterBitmap by remember(posterUrl) { mutableStateOf<ImageBitmap?>(null) }

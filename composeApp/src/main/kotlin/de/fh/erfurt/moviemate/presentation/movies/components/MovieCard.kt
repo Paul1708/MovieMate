@@ -30,6 +30,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import de.fh.erfurt.moviemate.movies.domain.model.movie.MediaType
 import de.fh.erfurt.moviemate.presentation.movies.categories.CategoryGenreIcon
 import de.fh.erfurt.moviemate.presentation.movies.detail.MovieDetailPoster
 import de.fh.erfurt.moviemate.presentation.movies.model.MovieUiModel
@@ -111,9 +112,11 @@ fun MovieCard(
                 Spacer(modifier = Modifier.height(MovieMateSpacing.movieCardMetaSpacing))
                 MovieMetaRow(
                     icon = {
-                        MovieRuntimeIcon(
-                            modifier = Modifier.size(MovieMateSpacing.movieCardMetadataIconSize)
-                        )
+                        if (movie.mediaType == MediaType.MOVIE) {
+                            MovieRuntimeIcon(
+                                modifier = Modifier.size(MovieMateSpacing.movieCardMetadataIconSize)
+                            )
+                        }
                     },
                     text = movie.runtimeText
                 )

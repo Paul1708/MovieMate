@@ -2,6 +2,7 @@ package de.fh.erfurt.moviemate.presentation.movies.home
 
 import de.fh.erfurt.moviemate.movies.domain.model.category.Category
 import de.fh.erfurt.moviemate.movies.domain.model.category.CategoryDraft
+import de.fh.erfurt.moviemate.movies.domain.model.movie.MediaType
 import de.fh.erfurt.moviemate.movies.domain.model.movie.Movie
 import de.fh.erfurt.moviemate.movies.domain.model.movie.MovieDraft
 import de.fh.erfurt.moviemate.movies.domain.repository.category.CategoryRepository
@@ -38,7 +39,11 @@ class HomeViewModelTest {
         movieRepository = InMemoryMovieRepository(
             mutableListOf(
                 movie(id = "1", title = "Alien", updatedAt = 10),
-                movie(id = "2", title = "Arrival", updatedAt = 20),
+                movie(id = "2", title = "Severance", updatedAt = 20).copy(
+                    mediaType = MediaType.SERIES,
+                    runtimeMinutes = null,
+                    totalSeasons = 2,
+                ),
             )
         )
         val categoryRepository = InMemoryCategoryRepository(
@@ -62,11 +67,25 @@ class HomeViewModelTest {
         viewModel.onAction(HomeUiAction.LoadRequested())
 
         assertFalse(viewModel.uiState.value.isLoading)
-        assertEquals(listOf("Arrival", "Alien"), viewModel.uiState.value.movies.map { it.title })
+        assertEquals(listOf("Severance", "Alien"), viewModel.uiState.value.movies.map { it.title })
 
         viewModel.onAction(HomeUiAction.SearchChanged("Alien"))
 
         assertEquals(listOf("Alien"), viewModel.uiState.value.movies.map { it.title })
+    }
+
+    @Test
+    fun mediaTypeFilterCombinesWithWatchlistAndResets() = runTest(dispatcher) {
+        viewModel.onAction(HomeUiAction.LoadRequested())
+        viewModel.onAction(HomeUiAction.TabSelected(HomeTab.WatchLater))
+        viewModel.onAction(HomeUiAction.MediaTypeSelected(MediaType.SERIES))
+
+        val series = viewModel.uiState.value.movies.single()
+        assertEquals("Severance", series.title)
+        assertEquals("Series · 2 seasons", series.runtimeText)
+
+        viewModel.onAction(HomeUiAction.ResetFiltersClicked)
+        assertEquals(listOf("Severance", "Alien"), viewModel.uiState.value.movies.map { it.title })
     }
 
     @Test

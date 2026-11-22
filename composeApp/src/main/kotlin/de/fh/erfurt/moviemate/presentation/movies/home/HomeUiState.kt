@@ -1,5 +1,6 @@
 package de.fh.erfurt.moviemate.presentation.movies.home
 
+import de.fh.erfurt.moviemate.movies.domain.model.movie.MediaType
 import de.fh.erfurt.moviemate.movies.domain.repository.movie.SortBy
 import de.fh.erfurt.moviemate.presentation.movies.categories.CategoryUiModel
 import de.fh.erfurt.moviemate.presentation.movies.model.MovieUiModel
@@ -12,6 +13,7 @@ data class HomeUiState(
     val searchQuery: String = "",
     val isSearchVisible: Boolean = false,
     val selectedCategoryId: String? = null,
+    val selectedMediaType: MediaType? = null,
     val selectedSortBy: SortBy = SortBy.UPDATED_AT,
     val isFilterDialogVisible: Boolean = false,
     val isDeleteMode: Boolean = false,

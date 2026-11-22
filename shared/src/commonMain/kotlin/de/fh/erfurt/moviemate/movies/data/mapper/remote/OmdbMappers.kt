@@ -13,6 +13,7 @@ fun OmdbMovieDto.toFetchedMovieData(): FetchedMovieData {
             ?.replace(" min", "")
             ?.toIntOrNull(),
         imdbRating = imdbRating?.toDoubleOrNull(),
+        totalSeasons = totalSeasons?.toIntOrNull()?.takeIf { it > 0 },
         genres = genre
             .orEmpty()
             .split(",")

@@ -88,7 +88,7 @@ internal fun MovieDetailReadContent(
                 Spacer(modifier = Modifier.height(MovieMateSpacing.detailLargeSpacing))
 
                 MovieDetailSection(
-                    title = "About the movie",
+                    title = "Description",
                     body = movie.description.ifBlank { "No description available." }
                 )
 
@@ -120,7 +120,7 @@ internal fun MovieDetailReadContent(
             MovieMateIcon(
                 icon = MovieMateIcons.edit,
                 tint = MovieMateColors.PrimaryText,
-                contentDescription = "Edit movie",
+                contentDescription = "Edit title",
                 modifier = Modifier.size(MovieMateSpacing.fabIconSize),
             )
         }

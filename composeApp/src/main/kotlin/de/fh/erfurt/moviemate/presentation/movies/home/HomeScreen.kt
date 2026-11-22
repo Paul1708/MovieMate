@@ -70,7 +70,7 @@ fun HomeScreen(
                 SearchField(
                     value = state.searchQuery,
                     onValueChange = { onAction(HomeUiAction.SearchChanged(it)) },
-                    placeholder = "Find a movie",
+                    placeholder = "Find a title",
                     modifier = Modifier.fillMaxWidth()
                 )
             }
@@ -83,9 +83,9 @@ fun HomeScreen(
                     onRetryClicked = { onAction(HomeUiAction.RetryClicked) }
                 )
             } else if (state.isLoading) {
-                ScreenLoadingState(message = "Loading movies...")
+                ScreenLoadingState(message = "Loading titles...")
             } else if (state.movies.isEmpty()) {
-                ScreenEmptyState(message = "No movies found")
+                ScreenEmptyState(message = "No titles found")
             } else {
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(MovieMateSpacing.itemSpacing),
@@ -117,7 +117,7 @@ fun HomeScreen(
 
                             if (state.isDeleteMode) {
                                 DeleteBadge(
-                                    contentDescription = "Delete movie ${movie.title}",
+                                    contentDescription = "Delete title ${movie.title}",
                                     onClick = { onAction(HomeUiAction.DeleteMovieClicked(movie.id)) },
                                     modifier = Modifier
                                         .align(Alignment.TopEnd)
@@ -142,7 +142,7 @@ fun HomeScreen(
                         end = MovieMateScreenDefaults.HorizontalPadding,
                         bottom = MovieMateSpacing.detailLargeSpacing
                     )
-                    .semantics { contentDescription = "Add movie" },
+                    .semantics { contentDescription = "Add title" },
                 shape = CircleShape,
                 containerColor = MovieMateColors.Accent,
                 contentColor = MovieMateColors.PrimaryText
@@ -160,11 +160,12 @@ fun HomeScreen(
         HomeFilterDialog(
             categories = state.availableCategories,
             selectedCategoryId = state.selectedCategoryId,
+            selectedMediaType = state.selectedMediaType,
+            onMediaTypeSelected = { onAction(HomeUiAction.MediaTypeSelected(it)) },
             selectedSortBy = state.selectedSortBy,
             onCategorySelected = { onAction(HomeUiAction.CategorySelected(it)) },
             onSortSelected = { onAction(HomeUiAction.SortSelected(it)) },
-            onClearClicked = { onAction(HomeUiAction.ClearCategoryFilterClicked) },
-            onClearSortClicked = { onAction(HomeUiAction.ClearSortClicked) },
+            onResetClicked = { onAction(HomeUiAction.ResetFiltersClicked) },
             onDismiss = { onAction(HomeUiAction.FilterDismissed) }
         )
     }
@@ -174,7 +175,7 @@ fun HomeScreen(
     }
     if (pendingDeleteMovie != null) {
         DeleteConfirmationDialog(
-            title = "Delete movie?",
+            title = "Delete title?",
             message = "Are you sure you want to delete \"${pendingDeleteMovie.title}\"? This action cannot be undone.",
             onConfirm = { onAction(HomeUiAction.ConfirmDeleteMovieClicked) },
             onDismiss = { onAction(HomeUiAction.DeleteMovieDismissed) }
@@ -215,7 +216,7 @@ private fun HomeScreenErrorPreview() {
     HomeScreen(
         state = previewHomeUiState().copy(
             movies = emptyList(),
-            errorMessage = "Movies could not be loaded."
+            errorMessage = "Titles could not be loaded."
         ),
         onAction = {}
     )

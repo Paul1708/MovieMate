@@ -84,7 +84,7 @@ fun MovieDetailScreen(
                 onBackClicked = onBackClicked
             ) {
                 ScreenLoadingState(
-                    message = "Loading movie...",
+                    message = "Loading title...",
                     modifier = Modifier.padding(horizontal = MovieMateScreenDefaults.HorizontalPadding)
                 )
             }
@@ -93,7 +93,7 @@ fun MovieDetailScreen(
                 onBackClicked = onBackClicked
             ) {
                 ScreenEmptyState(
-                    message = "Movie not found",
+                    message = "Title not found",
                     modifier = Modifier.padding(horizontal = MovieMateScreenDefaults.HorizontalPadding)
                 )
             }
@@ -106,7 +106,7 @@ fun MovieDetailScreen(
                         .padding(top = MovieMateScreenDefaults.VerticalPadding)
                 ) {
                     MovieFormTopBar(
-                        title = "Edit movie",
+                        title = "Edit title",
                         navigationIcon = MovieMateIcons.back,
                         navigationContentDescription = "Go back",
                         onNavigationClicked = { leaveEditMode() }
@@ -173,7 +173,7 @@ private fun MovieDetailStateScaffold(
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
         MovieDetailTopBar(
-            title = "Movie details",
+            title = "Title details",
             onBackClicked = onBackClicked,
             modifier = Modifier.padding(top = MovieMateSpacing.detailTopBarOverlayPadding)
         )

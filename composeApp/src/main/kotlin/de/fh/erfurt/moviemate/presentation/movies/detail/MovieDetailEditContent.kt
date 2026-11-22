@@ -22,8 +22,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import de.fh.erfurt.moviemate.movies.domain.model.movie.MediaType
 import de.fh.erfurt.moviemate.movies.presentation.detail.MovieDetailUiModel
 import de.fh.erfurt.moviemate.presentation.movies.categories.CategoryUiModel
+import de.fh.erfurt.moviemate.presentation.movies.components.MediaTypeSelector
 import de.fh.erfurt.moviemate.presentation.movies.components.MovieLookupState
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateColors
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateIcon
@@ -44,6 +46,7 @@ internal fun MovieDetailEditContent(
     isSaving: Boolean = false,
     lookup: MovieLookupState,
 ) {
+    val isSeries = editState.mediaType == MediaType.SERIES
     Column(
         modifier = modifier
             .verticalScroll(rememberScrollState())
@@ -53,6 +56,11 @@ internal fun MovieDetailEditContent(
         EditablePosterPicker(
             posterUrl = editState.posterUrl,
             onClick = { onAction(MovieDetailAction.ImageClicked) }
+        )
+
+        MediaTypeSelector(
+            selected = editState.mediaType,
+            onSelected = { onAction(MovieDetailAction.MediaTypeChanged(it)) },
         )
 
         Row(
@@ -91,9 +99,12 @@ internal fun MovieDetailEditContent(
                 modifier = Modifier.weight(1f)
             )
             DetailTextField(
-                value = editState.runtimeMinutes,
-                label = "Runtime",
-                onValueChange = { onAction(MovieDetailAction.RuntimeChanged(it)) },
+                value = if (isSeries) editState.totalSeasons else editState.runtimeMinutes,
+                label = if (isSeries) "Seasons" else "Runtime",
+                onValueChange = {
+                    val action = if (isSeries) MovieDetailAction.TotalSeasonsChanged(it) else MovieDetailAction.RuntimeChanged(it)
+                    onAction(action)
+                },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier.weight(1f)
             )
@@ -125,7 +136,7 @@ internal fun MovieDetailEditContent(
 
         DetailTextField(
             value = editState.description,
-            label = "About the movie",
+            label = "Description",
             onValueChange = { onAction(MovieDetailAction.DescriptionChanged(it)) },
             minLines = 4
         )

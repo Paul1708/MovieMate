@@ -4,6 +4,7 @@ import de.fh.erfurt.moviemate.movies.data.remote.dto.CategoryDto
 import de.fh.erfurt.moviemate.movies.data.remote.dto.MovieDto
 import de.fh.erfurt.moviemate.movies.data.sync.dto.SyncSnapshotDto
 import de.fh.erfurt.moviemate.movies.data.sync.dto.SyncTombstoneDto
+import de.fh.erfurt.moviemate.movies.domain.model.movie.MediaType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
@@ -38,6 +39,28 @@ class SyncSnapshotMergerTest {
 
         assertEquals("New", merged.movies.single().title)
         assertEquals("New", merged.categories.single().name)
+    }
+
+    @Test
+    fun `legacy changes retain the most recent explicit series metadata`() {
+        val entry = movie(id = "show", title = "Series", updatedAt = 10).copy(
+            mediaType = MediaType.SERIES,
+            totalSeasons = 3,
+        )
+        val snapshots = listOf(
+            snapshot("new-client", movies = listOf(entry)),
+            snapshot("legacy-client", movies = listOf(entry.copy(
+                updatedAtEpochMillis = 30,
+                isWatched = true,
+                mediaType = null,
+                totalSeasons = null,
+            ))),
+            snapshot("other-client", movies = listOf(entry.copy(updatedAtEpochMillis = 20, totalSeasons = 4))),
+        )
+        val merged = merger.merge(snapshots, targetDeviceId = "local", accountId = AccountId)
+        assertEquals(true, merged.movies.single().isWatched)
+        assertEquals(MediaType.SERIES, merged.movies.single().mediaType)
+        assertEquals(4, merged.movies.single().totalSeasons)
     }
 
     @Test

@@ -1,5 +1,6 @@
 package de.fh.erfurt.moviemate.presentation.movies.detail
 
+import de.fh.erfurt.moviemate.movies.domain.model.movie.MediaType
 /**
  * User intents emitted by the detail UI and handled by MovieDetailScreenViewModel.
  */
@@ -21,6 +22,8 @@ sealed interface MovieDetailAction {
     data class ReleaseYearChanged(val value: String) : MovieDetailAction
     data class CategoryChanged(val value: String) : MovieDetailAction
     data class RuntimeChanged(val value: String) : MovieDetailAction
+    data class MediaTypeChanged(val value: MediaType) : MovieDetailAction
+    data class TotalSeasonsChanged(val value: String) : MovieDetailAction
     data class UserRatingChanged(val value: String) : MovieDetailAction
     data class ImdbRatingChanged(val value: String) : MovieDetailAction
     data class CommentChanged(val value: String) : MovieDetailAction

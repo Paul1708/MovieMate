@@ -58,7 +58,7 @@ class AddMovieUseCaseTest {
                 )
             )
         }
-        assertEquals("Movie title cannot be empty",error.message)
+        assertEquals("Title cannot be empty",error.message)
 
     }
 
@@ -83,7 +83,7 @@ class AddMovieUseCaseTest {
                 )
             )
         }
-        assertEquals( "Movie description cannot be empty",error.message)
+        assertEquals( "Description cannot be empty",error.message)
     }
 
     @Test

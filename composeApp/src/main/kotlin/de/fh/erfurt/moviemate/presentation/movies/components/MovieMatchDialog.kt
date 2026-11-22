@@ -30,7 +30,7 @@ internal fun MovieMatchDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Choose a movie") },
+        title = { Text("Choose a match") },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 if (results.totalResults > results.matches.size) {

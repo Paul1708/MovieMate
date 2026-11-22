@@ -1,6 +1,7 @@
 package de.fh.erfurt.moviemate.presentation.movies.components
 
 import de.fh.erfurt.moviemate.movies.domain.model.movie.FetchedMovieData
+import de.fh.erfurt.moviemate.movies.domain.model.movie.MediaType
 import de.fh.erfurt.moviemate.movies.domain.model.movie.MovieSearchResults
 import de.fh.erfurt.moviemate.movies.domain.usecase.movie.FetchMovieDataUseCase
 import kotlinx.coroutines.CancellationException
@@ -26,17 +27,17 @@ internal class MovieLookup(
 ) {
     private var job: Job? = null
 
-    fun search(title: String, year: String) = launchLookup {
-        val results = withContext(dispatcher) { metadata.search(title, year) }
+    fun search(title: String, year: String, mediaType: MediaType) = launchLookup {
+        val results = withContext(dispatcher) { metadata.search(title, year, mediaType) }
         val match = results.singleMatch
         when {
-            results.matches.isEmpty() -> update(MovieLookupState(error = "No movies found. Try another title or year."))
-            match != null -> loadDetails(match.imdbId)
+            results.matches.isEmpty() -> update(MovieLookupState(error = "No matches found. Try another title or year."))
+            match != null -> loadDetails(match.imdbId, mediaType)
             else -> update(MovieLookupState(results = results))
         }
     }
 
-    fun select(imdbId: String) = launchLookup { loadDetails(imdbId) }
+    fun select(imdbId: String, mediaType: MediaType) = launchLookup { loadDetails(imdbId, mediaType) }
 
     fun clear() {
         job?.cancel()
@@ -56,15 +57,15 @@ internal class MovieLookup(
                     is IllegalArgumentException, is IllegalStateException -> error.message
                     else -> null
                 }
-                update(MovieLookupState(error = message ?: "Movie lookup is unavailable. Please try again."))
+                update(MovieLookupState(error = message ?: "Title lookup is unavailable. Please try again."))
             }
         }
     }
 
-    private suspend fun loadDetails(imdbId: String) {
-        val details = withContext(dispatcher) { metadata.byImdbId(imdbId) }
+    private suspend fun loadDetails(imdbId: String, mediaType: MediaType) {
+        val details = withContext(dispatcher) { metadata.byImdbId(imdbId, mediaType) }
         if (details == null) {
-            update(MovieLookupState(error = "No details found for this movie."))
+            update(MovieLookupState(error = "No details found for this title."))
         } else {
             applyDetails(details)
             update(MovieLookupState())

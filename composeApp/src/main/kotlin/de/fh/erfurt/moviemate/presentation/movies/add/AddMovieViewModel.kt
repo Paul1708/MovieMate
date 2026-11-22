@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import de.fh.erfurt.moviemate.movies.domain.model.category.Category
 import de.fh.erfurt.moviemate.movies.domain.model.category.CategoryDraft
 import de.fh.erfurt.moviemate.movies.domain.model.movie.FetchedMovieData
+import de.fh.erfurt.moviemate.movies.domain.model.movie.MediaType
 import de.fh.erfurt.moviemate.movies.domain.model.movie.MovieDraft
 import de.fh.erfurt.moviemate.movies.domain.usecase.category.AddCategoryUseCase
 import de.fh.erfurt.moviemate.movies.domain.usecase.category.GetCategoriesUseCase
@@ -15,6 +16,7 @@ import de.fh.erfurt.moviemate.presentation.movies.categories.CategoryIconOptions
 import de.fh.erfurt.moviemate.presentation.movies.categories.CategoryUiModel
 import de.fh.erfurt.moviemate.presentation.movies.categories.DefaultCategoryIconKey
 import de.fh.erfurt.moviemate.presentation.movies.components.MovieLookup
+import de.fh.erfurt.moviemate.presentation.movies.components.parseOptionalSeasonCount
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -58,11 +60,11 @@ class AddMovieViewModel(
             AddMovieAction.FetchMovieDataClicked -> {
                 val state = _uiState.value
                 updateState { copy(errorMessage = null) }
-                movieLookup.search(state.title, state.releaseYear)
+                movieLookup.search(state.title, state.releaseYear, state.mediaType)
             }
             is AddMovieAction.MovieMatchSelected -> {
                 if (_uiState.value.lookup.results?.matches?.any { it.imdbId == action.imdbId } == true) {
-                    movieLookup.select(action.imdbId)
+                    movieLookup.select(action.imdbId, _uiState.value.mediaType)
                 }
             }
             AddMovieAction.MovieMatchesDismissed -> movieLookup.clear()
@@ -84,6 +86,13 @@ class AddMovieViewModel(
                 movieLookup.clear()
                 updateState { copy(releaseYear = action.value, errorMessage = null) }
             }
+            is AddMovieAction.MediaTypeChanged -> {
+                if (_uiState.value.mediaType != action.value) {
+                    movieLookup.clear()
+                    updateState { copy(mediaType = action.value, runtimeMinutes = "", totalSeasons = "", errorMessage = null) }
+                }
+            }
+            is AddMovieAction.TotalSeasonsChanged -> updateState { copy(totalSeasons = action.value, errorMessage = null) }
             is AddMovieAction.RuntimeChanged -> updateState { copy(runtimeMinutes = action.value, errorMessage = null) }
             is AddMovieAction.UserRatingChanged -> updateState { copy(userRating = action.value, errorMessage = null) }
             is AddMovieAction.ImdbRatingChanged -> updateState { copy(imdbRating = action.value, errorMessage = null) }
@@ -147,7 +156,7 @@ class AddMovieViewModel(
                 _uiState.update {
                     it.copy(
                         isSaving = false,
-                        errorMessage = throwable.message ?: "Movie could not be saved.",
+                        errorMessage = throwable.message ?: "Title could not be saved.",
                     )
                 }
             }
@@ -246,6 +255,7 @@ class AddMovieViewModel(
             releaseYear = fetchedMovie.releaseYear?.toString() ?: releaseYear,
             posterUrl = fetchedMovie.posterUrl ?: posterUrl,
             runtimeMinutes = fetchedMovie.runtimeMinutes?.toString() ?: runtimeMinutes,
+            totalSeasons = fetchedMovie.totalSeasons?.toString() ?: totalSeasons,
             imdbRating = fetchedMovie.imdbRating?.toString() ?: imdbRating,
             categoryId = categoryId.ifBlank { matchedCategory?.id.orEmpty() },
             isAddCategoryDialogVisible = shouldCreateCategory,
@@ -268,7 +278,9 @@ class AddMovieViewModel(
                 releaseYear = releaseYear.parseOptionalInt("Release year"),
                 categoryId = categoryId.trim().ifBlank { null },
                 posterUrl = posterUrl?.takeIf(String::isNotBlank),
-                runtimeMinutes = runtimeMinutes.parseOptionalInt("Runtime"),
+                runtimeMinutes = if (mediaType == MediaType.MOVIE) runtimeMinutes.parseOptionalInt("Runtime") else null,
+                mediaType = mediaType,
+                totalSeasons = if (mediaType == MediaType.SERIES) totalSeasons.parseOptionalSeasonCount() else null,
                 isWatched = isWatched,
                 comment = comment.trim().ifBlank { null },
                 userRating = userRating.parseOptionalInt("User rating"),
@@ -278,7 +290,7 @@ class AddMovieViewModel(
                 updatedAtEpochMillis = System.currentTimeMillis(),
             )
         }.onFailure { throwable ->
-            _uiState.update { it.copy(errorMessage = throwable.message ?: "Movie data is invalid.") }
+            _uiState.update { it.copy(errorMessage = throwable.message ?: "Title data is invalid.") }
         }.getOrNull()
     }
 

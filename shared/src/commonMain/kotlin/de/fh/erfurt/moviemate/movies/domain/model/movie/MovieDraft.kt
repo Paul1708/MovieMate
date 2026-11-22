@@ -13,5 +13,7 @@ data class MovieDraft(
     val imdbRating: Double? = null,
     val externalIds: Map<String, String>? = null,
     val watchProviders: List<String>? = null,
-    val updatedAtEpochMillis: Long
-    )
+    val updatedAtEpochMillis: Long,
+    val mediaType: MediaType = MediaType.MOVIE,
+    val totalSeasons: Int? = null,
+)

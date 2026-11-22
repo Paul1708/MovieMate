@@ -27,7 +27,7 @@ import de.fh.erfurt.moviemate.presentation.theme.MovieMateShapes
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateSpacing
 
 data class MovieDetailMetaItem(
-    val icon: MovieDetailMetaIcon,
+    val icon: MovieDetailMetaIcon?,
     val label: String,
     val value: String
 )
@@ -84,9 +84,7 @@ private fun MovieDetailMetaChip(
             horizontalArrangement = Arrangement.spacedBy(MovieMateSpacing.detailMicroSpacing),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            MovieDetailMetaIconContent(
-                icon = item.icon
-            )
+            item.icon?.let { MovieDetailMetaIconContent(icon = it) }
             Text(
                 text = item.value,
                 style = MaterialTheme.typography.bodySmall,

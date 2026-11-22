@@ -83,7 +83,7 @@ fun BackupScreen(
 
                 BackupActionCard(
                     title = "Export",
-                    subtitle = "Export your movie list and categories as a backup file.",
+                    subtitle = "Export your titles and categories as a backup file.",
                     icon = MovieMateIcons.uploadFile,
                     contentDescription = "Export backup",
                     enabled = !state.isBusy,
@@ -203,7 +203,7 @@ private fun SignedOutContent(
     onSignInClicked: () -> Unit,
 ) {
     Text(
-        text = "Connect your Google account to keep movies, categories, and their contents in sync across devices.",
+        text = "Connect your Google account to keep titles, categories, and their contents in sync across devices.",
         style = MaterialTheme.typography.bodySmall,
         color = MovieMateColors.SecondaryText,
     )
@@ -280,7 +280,7 @@ private fun SignedInContent(
     }
 
     when {
-        state.isSyncing -> InlineProgress(message = "Syncing movies and categories...")
+        state.isSyncing -> InlineProgress(message = "Syncing titles and categories...")
         syncErrorMessage != null -> SyncErrorText(message = syncErrorMessage)
         lastSyncEpochMillis != null -> Text(
             text = "Last sync: ${formatSyncTime(lastSyncEpochMillis)}",

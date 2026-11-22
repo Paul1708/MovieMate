@@ -1,5 +1,6 @@
 package de.fh.erfurt.moviemate.movies.presentation.detail
 
+import de.fh.erfurt.moviemate.movies.domain.model.movie.MediaType
 /** Render state for a movie detail screen. */
 data class MovieDetailUiState(
     val isLoading: Boolean = false,
@@ -18,6 +19,8 @@ data class MovieDetailUiModel(
     val releaseYear: Int? = null,
     val posterUrl: String? = null,
     val runtimeMinutes: Int? = null,
+    val mediaType: MediaType = MediaType.MOVIE,
+    val totalSeasons: Int? = null,
     val isWatched: Boolean = false,
     val comment: String? = null,
     val userRating: Int? = null,

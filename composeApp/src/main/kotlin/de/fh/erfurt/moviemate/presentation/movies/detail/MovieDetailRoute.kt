@@ -32,7 +32,7 @@ fun MovieDetailRoute(
 ) {
     if (appContainer == null) {
         MovieDetailScreen(
-            state = MovieDetailUiState(errorMessage = "Movie details are only available in the running app."),
+            state = MovieDetailUiState(errorMessage = "Title details are only available in the running app."),
             mode = MovieDetailMode.View,
             editState = MovieDetailEditState(),
             availableCategories = emptyList(),

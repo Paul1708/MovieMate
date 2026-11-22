@@ -28,13 +28,13 @@ struct MovieDetailView: View {
             } else {
                 MovieMateEmptyState(
                     symbol: "exclamationmark.triangle",
-                    title: "Movie not found",
+                    title: "Title not found",
                     message: "It may have been removed on another device."
                 )
                 .padding(MovieMateTheme.horizontalPadding)
             }
         }
-        .navigationTitle(isEditing ? "Edit movie" : "Movie details")
+        .navigationTitle(isEditing ? "Edit title" : "Title details")
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(MovieMateTheme.backgroundTop, for: .navigationBar)
         .toolbarBackground(.visible, for: .navigationBar)
@@ -66,7 +66,7 @@ struct MovieDetailView: View {
         .onChange(of: movie) { _, updated in
             if let updated, !isEditing { editor = MovieEditorState(movie: updated) }
         }
-        .alert("Delete movie?", isPresented: $showDeleteConfirmation) {
+        .alert("Delete title?", isPresented: $showDeleteConfirmation) {
             Button("Cancel", role: .cancel) { }
             Button("Delete", role: .destructive) {
                 Task {
@@ -75,7 +75,7 @@ struct MovieDetailView: View {
                 }
             }
         } message: {
-            Text("This movie will be removed on all synchronized devices.")
+            Text("This title will be removed on all synchronized devices.")
         }
     }
 
@@ -114,7 +114,7 @@ struct MovieDetailView: View {
                         .clipShape(Capsule())
                 }
 
-                if !movie.releaseYear.isEmpty ||
+                if movie.mediaType == .series || !movie.releaseYear.isEmpty ||
                     !movie.runtimeMinutes.isEmpty ||
                     !movie.userRating.isEmpty ||
                     !movie.imdbRating.isEmpty {
@@ -130,7 +130,14 @@ struct MovieDetailView: View {
                                 tint: MovieMateTheme.accentLight
                             )
                         }
-                        if !movie.runtimeMinutes.isEmpty {
+                        if movie.mediaType == .series {
+                            infoTile(
+                                title: "Type",
+                                value: movie.seasonCountLabel.map { "Series · \($0)" } ?? "Series",
+                                symbol: "tv",
+                                tint: MovieMateTheme.accentLight
+                            )
+                        } else if !movie.runtimeMinutes.isEmpty {
                             infoTile(
                                 title: "Runtime",
                                 value: "\(movie.runtimeMinutes) min",
@@ -173,7 +180,7 @@ struct MovieDetailView: View {
                 }
                 .buttonStyle(.plain)
 
-                detailSection(title: "About the movie", text: movie.description)
+                detailSection(title: "Description", text: movie.description)
 
                 if !movie.comment.isEmpty {
                     detailSection(title: "My comment", text: movie.comment)

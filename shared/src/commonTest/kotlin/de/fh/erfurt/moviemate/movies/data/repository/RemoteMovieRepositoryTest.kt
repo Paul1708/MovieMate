@@ -1,5 +1,6 @@
 package de.fh.erfurt.moviemate.movies.data.repository
 
+import de.fh.erfurt.moviemate.movies.domain.model.movie.MediaType
 import de.fh.erfurt.moviemate.movies.data.remote.datasource.MovieRemoteDataSource
 import de.fh.erfurt.moviemate.movies.data.remote.datasource.CategoryRemoteDataSource
 import de.fh.erfurt.moviemate.movies.data.remote.dto.CreateMovieRequestDto
@@ -120,6 +121,7 @@ class RemoteMovieRepositoryTest {
 
         assertEquals(
             expected = CreateMovieRequestDto(
+                mediaType = MediaType.MOVIE,
                 title = "New Movie",
                 description = "A new movie to be created",
                 releaseYear = 2021,
@@ -170,7 +172,9 @@ class RemoteMovieRepositoryTest {
             Movie(
                 id = "movie-id",
                 title = "Updated Movie",
-                description = "An existing movie to be updated",
+                description = "An existing title to be updated",
+                mediaType = MediaType.SERIES,
+                totalSeasons = 2,
                 releaseYear = 2021,
                 categoryId = "cat2",
                 posterUrl = "https://example.com/poster2.jpg",
@@ -188,7 +192,9 @@ class RemoteMovieRepositoryTest {
         assertEquals(
             expected = UpdateMovieRequestDto(
                 title = "Updated Movie",
-                description = "An existing movie to be updated",
+                description = "An existing title to be updated",
+                mediaType = MediaType.SERIES,
+                totalSeasons = 2,
                 releaseYear = 2021,
                 categoryId = "cat2",
                 posterUrl = "https://example.com/poster2.jpg",

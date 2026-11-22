@@ -226,6 +226,8 @@ class SqlDelightSyncLocalDataSource(
                 watchProviders = watchProviders,
                 updatedAtEpochMillis = movie.updatedAtEpochMillis,
                 version = movie.version,
+                mediaType = movie.mediaType?.name,
+                totalSeasons = movie.totalSeasons?.toLong(),
             )
         } else if (existing.toSyncDto() != movie) {
             movieQueries.updateMovie(
@@ -243,6 +245,8 @@ class SqlDelightSyncLocalDataSource(
                 watchProviders = watchProviders,
                 updatedAtEpochMillis = movie.updatedAtEpochMillis,
                 version = movie.version,
+                mediaType = movie.mediaType?.name,
+                totalSeasons = movie.totalSeasons?.toLong(),
                 id = movie.id,
             )
         }
@@ -266,6 +270,8 @@ class SqlDelightSyncLocalDataSource(
             watchProviders = movie.watchProviders,
             updatedAtEpochMillis = movie.updatedAtEpochMillis,
             version = movie.version,
+            mediaType = movie.mediaType.takeIf { mediaType != null },
+            totalSeasons = movie.totalSeasons,
         )
     }
 

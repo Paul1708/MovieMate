@@ -3,6 +3,7 @@ package de.fh.erfurt.moviemate.presentation.movies.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import de.fh.erfurt.moviemate.movies.domain.model.category.Category
+import de.fh.erfurt.moviemate.movies.domain.model.movie.MediaType
 import de.fh.erfurt.moviemate.movies.domain.model.movie.Movie
 import de.fh.erfurt.moviemate.movies.domain.repository.movie.SortBy
 import de.fh.erfurt.moviemate.movies.domain.usecase.category.GetCategoriesUseCase
@@ -48,13 +49,12 @@ class HomeViewModel(
             HomeUiAction.SearchClicked -> updateState(isSearchVisible = !_uiState.value.isSearchVisible)
             is HomeUiAction.SearchChanged -> updateState(searchQuery = action.query)
             HomeUiAction.FilterClicked -> updateState(isFilterDialogVisible = true)
+            is HomeUiAction.MediaTypeSelected -> updateState(selectedMediaType = action.mediaType)
             is HomeUiAction.CategorySelected -> updateState(selectedCategoryId = action.categoryId)
             is HomeUiAction.SortSelected -> updateState(selectedSortBy = action.sortCriterion)
-            HomeUiAction.ClearCategoryFilterClicked -> updateState(
+            HomeUiAction.ResetFiltersClicked -> updateState(
                 selectedCategoryId = null,
-                isFilterDialogVisible = false,
-            )
-            HomeUiAction.ClearSortClicked -> updateState(
+                selectedMediaType = null,
                 selectedSortBy = SortBy.UPDATED_AT,
                 isFilterDialogVisible = false,
             )
@@ -108,7 +108,7 @@ class HomeViewModel(
                         movies = emptyList(),
                         availableCategories = categories,
                         isLoading = false,
-                        errorMessage = throwable.message ?: "Movies could not be loaded.",
+                        errorMessage = throwable.message ?: "Titles could not be loaded.",
                         selectedCategoryId = selectedCategoryId,
                     )
                 }
@@ -132,6 +132,7 @@ class HomeViewModel(
                     selectedTab = state.selectedTab,
                     searchQuery = state.searchQuery,
                     selectedCategoryId = state.selectedCategoryId,
+                    selectedMediaType = state.selectedMediaType,
                     selectedSortBy = state.selectedSortBy,
                 ).isNotEmpty()
                 updateState(
@@ -143,7 +144,7 @@ class HomeViewModel(
                 _uiState.update {
                     it.copy(
                         pendingDeleteMovieId = null,
-                        errorMessage = throwable.message ?: "Movie could not be deleted.",
+                        errorMessage = throwable.message ?: "Title could not be deleted.",
                     )
                 }
             }
@@ -155,6 +156,7 @@ class HomeViewModel(
         searchQuery: String = _uiState.value.searchQuery,
         isSearchVisible: Boolean = _uiState.value.isSearchVisible,
         selectedCategoryId: String? = _uiState.value.selectedCategoryId,
+        selectedMediaType: MediaType? = _uiState.value.selectedMediaType,
         selectedSortBy: SortBy = _uiState.value.selectedSortBy,
         isFilterDialogVisible: Boolean = _uiState.value.isFilterDialogVisible,
         isDeleteMode: Boolean = _uiState.value.isDeleteMode,
@@ -163,13 +165,14 @@ class HomeViewModel(
         errorMessage: String? = _uiState.value.errorMessage,
     ) {
         _uiState.value = _uiState.value.copy(
-            movies = visibleMovies(selectedTab, searchQuery, selectedCategoryId, selectedSortBy),
+            movies = visibleMovies(selectedTab, searchQuery, selectedCategoryId, selectedMediaType, selectedSortBy),
             availableCategories = categories,
             selectedTab = selectedTab,
             searchQuery = searchQuery,
             isSearchVisible = isSearchVisible,
             selectedCategoryId = selectedCategoryId,
             selectedSortBy = selectedSortBy,
+            selectedMediaType = selectedMediaType,
             isFilterDialogVisible = isFilterDialogVisible,
             isDeleteMode = isDeleteMode,
             pendingDeleteMovieId = pendingDeleteMovieId,
@@ -182,6 +185,7 @@ class HomeViewModel(
         selectedTab: HomeTab,
         searchQuery: String,
         selectedCategoryId: String?,
+        selectedMediaType: MediaType?,
         selectedSortBy: SortBy,
     ): List<MovieUiModel> {
         return allMovies
@@ -194,6 +198,7 @@ class HomeViewModel(
             }
             .filter { movie -> searchQuery.isBlank() || movie.title.contains(searchQuery, ignoreCase = true) }
             .filter { movie -> selectedCategoryId == null || movie.categoryId == selectedCategoryId }
+            .filter { movie -> selectedMediaType == null || movie.mediaType == selectedMediaType }
             .sortForHome(selectedSortBy)
             .map { movie -> movie.toHomeUiModel(categories) }
     }

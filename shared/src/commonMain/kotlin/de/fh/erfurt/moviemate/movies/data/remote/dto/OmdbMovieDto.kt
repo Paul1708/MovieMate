@@ -20,6 +20,7 @@ data class OmdbMovieDto(
     @SerialName("Runtime")
     val runtime: String? = null,
 
+    val totalSeasons: String? = null,
     @SerialName("Genre")
     val genre: String? = null,
 

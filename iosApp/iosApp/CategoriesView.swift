@@ -101,7 +101,7 @@ struct CategoriesView: View {
                 }
             }
         } message: { category in
-            Text("Delete “\(category.name)”? Movies in this category will remain in your library.")
+            Text("Delete “\(category.name)”? Titles in this category will remain in your library.")
         }
     }
 
@@ -131,8 +131,8 @@ struct CategoryMoviesView: View {
                     if movies.isEmpty {
                         MovieMateEmptyState(
                             symbol: "film",
-                            title: "No movies yet",
-                            message: "Movies assigned to this category will appear here."
+                            title: "No titles yet",
+                            message: "Titles assigned to this category will appear here."
                         )
                     } else {
                         ForEach(movies) { movie in

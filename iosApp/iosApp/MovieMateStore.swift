@@ -76,7 +76,9 @@ final class MovieMateStore: ObservableObject {
             imdbRating: state.imdbRating,
             isWatched: state.isWatched,
             comment: state.comment,
-            watchProviders: state.watchProviders
+            watchProviders: state.watchProviders,
+            mediaType: state.mediaType.rawValue,
+            totalSeasons: state.totalSeasons
         )
 
         if let movieID {
@@ -126,13 +128,13 @@ final class MovieMateStore: ObservableObject {
         }
     }
 
-    func searchMovieMetadata(title: String, year: String) async throws -> MovieSearchResults {
-        let result = try await api.searchMovieMetadata(title: title, releaseYear: year)
+    func searchMovieMetadata(title: String, year: String, mediaType: MediaType) async throws -> MovieSearchResults {
+        let result = try await api.searchMovieMetadata(title: title, releaseYear: year, mediaType: mediaType.rawValue)
         return MovieSearchResults(record: result)
     }
 
-    func fetchMovieData(imdbID: String) async throws -> FetchedMovieData? {
-        guard let record = try await api.fetchMovieData(imdbId: imdbID) else { return nil }
+    func fetchMovieData(imdbID: String, mediaType: MediaType) async throws -> FetchedMovieData? {
+        guard let record = try await api.fetchMovieData(imdbId: imdbID, mediaType: mediaType.rawValue) else { return nil }
         return FetchedMovieData(record: record)
     }
 

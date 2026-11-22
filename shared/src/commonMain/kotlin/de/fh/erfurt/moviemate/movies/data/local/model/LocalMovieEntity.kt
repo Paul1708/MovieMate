@@ -15,5 +15,7 @@ data class LocalMovieEntity(
     val externalIds: String?,
     val watchProviders: String?,
     val updatedAtEpochMillis: Long,
-    val version: Long?
+    val version: Long?,
+    val mediaType: String? = null,
+    val totalSeasons: Long? = null,
 )

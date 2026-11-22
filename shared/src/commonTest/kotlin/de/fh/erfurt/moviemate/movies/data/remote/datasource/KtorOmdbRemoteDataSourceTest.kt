@@ -2,6 +2,7 @@ package de.fh.erfurt.moviemate.movies.data.remote.datasource
 
 import de.fh.erfurt.moviemate.movies.data.remote.client.MoviesHttpClientFactory
 import de.fh.erfurt.moviemate.movies.data.repository.remote.OmdbMovieMetadataRepository
+import de.fh.erfurt.moviemate.movies.domain.model.movie.MediaType
 import de.fh.erfurt.moviemate.movies.domain.usecase.movie.FetchMovieDataUseCase
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
@@ -45,6 +46,32 @@ class KtorOmdbRemoteDataSourceTest {
             val details = useCase.byImdbId(results.matches.single().imdbId)
             assertEquals(2021, details?.releaseYear)
             assertEquals(155, details?.runtimeMinutes)
+        } finally {
+            client.close()
+        }
+    }
+
+    @Test
+    fun seriesSearchAndDetailsUseTheSeriesType() = runTest {
+        val engine = MockEngine { request ->
+            val query = request.url.parameters
+            assertEquals("series", query["type"])
+            val body = if (query["s"] == "Breaking Bad") {
+                """{"Search":[{"Title":"Breaking Bad","Year":"2008–2013","imdbID":"tt0903747"}],"totalResults":"1","Response":"True"}"""
+            } else {
+                assertEquals("tt0903747", query["i"])
+                """{"Title":"Breaking Bad","Year":"2008–2013","totalSeasons":"5","Response":"True"}"""
+            }
+            respond(body, headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()))
+        }
+
+        val client = MoviesHttpClientFactory().create(engine)
+        try {
+            val useCase = FetchMovieDataUseCase(OmdbMovieMetadataRepository(KtorOmdbRemoteDataSource(client, "test-key")))
+            val match = useCase.search("Breaking Bad", "", MediaType.SERIES).matches.single()
+            val details = useCase.byImdbId(match.imdbId, MediaType.SERIES)
+            assertEquals(2008, details?.releaseYear)
+            assertEquals(5, details?.totalSeasons)
         } finally {
             client.close()
         }

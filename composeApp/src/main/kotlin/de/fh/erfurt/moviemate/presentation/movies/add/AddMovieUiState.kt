@@ -1,5 +1,6 @@
 package de.fh.erfurt.moviemate.presentation.movies.add
 
+import de.fh.erfurt.moviemate.movies.domain.model.movie.MediaType
 import de.fh.erfurt.moviemate.presentation.movies.categories.CategoryUiModel
 import de.fh.erfurt.moviemate.presentation.movies.categories.DefaultCategoryIconKey
 import de.fh.erfurt.moviemate.presentation.movies.components.MovieLookupState
@@ -10,6 +11,8 @@ import de.fh.erfurt.moviemate.presentation.movies.components.MovieLookupState
  */
 data class AddMovieUiState(
     val title: String = "",
+    val mediaType: MediaType = MediaType.MOVIE,
+    val totalSeasons: String = "",
     val description: String = "",
     val posterUrl: String? = null,
     val categoryId: String = "",
