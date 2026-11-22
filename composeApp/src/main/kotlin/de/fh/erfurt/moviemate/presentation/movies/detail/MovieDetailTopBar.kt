@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,8 +22,7 @@ fun MovieDetailTopBar(
     onBackClicked: () -> Unit,
     modifier: Modifier = Modifier,
     title: String = "",
-    actionLabel: String? = null,
-    onActionClicked: (() -> Unit)? = null,
+    onEditClicked: (() -> Unit)? = null,
 ) {
     Box(
         modifier = modifier
@@ -49,15 +47,15 @@ fun MovieDetailTopBar(
             )
         }
 
-        if (actionLabel != null && onActionClicked != null) {
-            TextButton(
-                onClick = onActionClicked,
+        if (onEditClicked != null) {
+            TopBarIconButton(
+                icon = MovieMateIcons.edit,
+                contentDescription = "Edit title",
+                onClick = onEditClicked,
                 modifier = Modifier
                     .align(Alignment.CenterEnd)
                     .padding(end = MovieMateScreenDefaults.HorizontalPadding)
-            ) {
-                Text(actionLabel)
-            }
+            )
         }
     }
 }

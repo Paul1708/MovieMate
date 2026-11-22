@@ -1,12 +1,9 @@
 package de.fh.erfurt.moviemate.presentation.movies.detail
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -15,13 +12,16 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.dp
 import de.fh.erfurt.moviemate.movies.domain.model.movie.MediaType
 import de.fh.erfurt.moviemate.movies.presentation.detail.MovieDetailUiModel
 import de.fh.erfurt.moviemate.presentation.movies.categories.CategoryUiModel
@@ -183,42 +183,36 @@ private fun EditablePosterPicker(
     posterUrl: String?,
     onClick: () -> Unit,
 ) {
-    Box {
-        MovieDetailPoster(
-            posterUrl = posterUrl,
-            onClick = onClick,
-            modifier = Modifier.height(MovieMateSpacing.detailEditPosterHeight)
-        )
-
-        Column(
-            modifier = Modifier
-                .align(Alignment.Center)
-                .background(
-                    color = MovieMateColors.ScreenBackground.copy(alpha = 0.78f),
-                    shape = RoundedCornerShape(MovieMateShapes.chipRadius)
-                )
-                .padding(MovieMateSpacing.detailCardPadding),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+    Surface(
+        onClick = onClick,
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(MovieMateShapes.cardRadius),
+        color = MovieMateColors.CardBackground,
+    ) {
+        Row(
+            modifier = Modifier.padding(MovieMateSpacing.detailCardPadding),
+            horizontalArrangement = Arrangement.spacedBy(MovieMateSpacing.detailMediumSpacing),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            MovieMateIcon(
-                icon = MovieMateIcons.image,
-                tint = MovieMateColors.AccentLight,
-                modifier = Modifier.size(MovieMateSpacing.posterActionIconSize)
+            MovieDetailPoster(
+                posterUrl = posterUrl,
+                modifier = Modifier.size(width = 96.dp, height = MovieMateSpacing.addPosterHeight),
+                showPlaceholderIcon = true,
+                contentScale = ContentScale.Fit,
             )
-            Text(
-                text = if (posterUrl.isNullOrBlank()) "Click to add image" else "Click to change image",
-                style = MaterialTheme.typography.titleSmall,
-                color = MovieMateColors.PrimaryText,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(top = MovieMateSpacing.compactSpacing)
-            )
-            Text(
-                text = "Choose a poster from your device",
-                style = MaterialTheme.typography.bodySmall,
-                color = MovieMateColors.SecondaryText,
-                modifier = Modifier.padding(top = MovieMateSpacing.detailMicroSpacing)
-            )
+            Column(verticalArrangement = Arrangement.spacedBy(MovieMateSpacing.detailMicroSpacing)) {
+                Text(
+                    text = if (posterUrl.isNullOrBlank()) "Add poster" else "Change poster",
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MovieMateColors.PrimaryText,
+                    fontWeight = FontWeight.Bold,
+                )
+                Text(
+                    text = "Choose an image from your device",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MovieMateColors.SecondaryText,
+                )
+            }
         }
     }
 }

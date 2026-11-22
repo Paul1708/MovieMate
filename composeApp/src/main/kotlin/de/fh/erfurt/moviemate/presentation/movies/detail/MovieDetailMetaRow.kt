@@ -2,13 +2,11 @@ package de.fh.erfurt.moviemate.presentation.movies.detail
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -39,19 +37,19 @@ sealed class MovieDetailMetaIcon {
 }
 
 /**
- * Horizontale Übersicht der wichtigsten Filmdaten direkt unter dem Titel.
+ * Übersicht der wichtigsten Filmdaten mit Umbruch für schmale Layouts.
  */
 @Composable
 fun MovieDetailMetaRow(
     items: List<MovieDetailMetaItem>,
     modifier: Modifier = Modifier
 ) {
-    LazyRow(
+    FlowRow(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(MovieMateSpacing.compactSpacing),
-        contentPadding = PaddingValues()
+        verticalArrangement = Arrangement.spacedBy(MovieMateSpacing.compactSpacing),
     ) {
-        items(items) { item ->
+        items.forEach { item ->
             MovieDetailMetaChip(item = item)
         }
     }

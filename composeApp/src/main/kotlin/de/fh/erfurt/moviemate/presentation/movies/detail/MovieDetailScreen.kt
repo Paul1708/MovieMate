@@ -6,8 +6,10 @@ import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -126,18 +128,24 @@ fun MovieDetailScreen(
                 }
             }
 
-            else -> {
+            else -> Column(
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                MovieDetailTopBar(
+                    onBackClicked = onBackClicked,
+                    onEditClicked = { onAction(MovieDetailAction.EditClicked) },
+                    modifier = Modifier
+                        .widthIn(max = MovieMateSpacing.detailMaxWidth)
+                        .padding(top = MovieMateScreenDefaults.VerticalPadding),
+                )
                 MovieDetailReadContent(
                     movie = movie,
                     onAction = onAction,
-                    modifier = Modifier.fillMaxSize()
-                )
-
-                MovieDetailTopBar(
-                    onBackClicked = onBackClicked,
                     modifier = Modifier
-                        .align(Alignment.TopCenter)
-                        .padding(top = MovieMateSpacing.detailTopBarOverlayPadding)
+                        .weight(1f)
+                        .widthIn(max = MovieMateSpacing.detailMaxWidth)
+                        .fillMaxWidth(),
                 )
             }
         }
@@ -175,7 +183,7 @@ private fun MovieDetailStateScaffold(
         MovieDetailTopBar(
             title = "Title details",
             onBackClicked = onBackClicked,
-            modifier = Modifier.padding(top = MovieMateSpacing.detailTopBarOverlayPadding)
+            modifier = Modifier.padding(top = MovieMateScreenDefaults.VerticalPadding)
         )
 
         Box(

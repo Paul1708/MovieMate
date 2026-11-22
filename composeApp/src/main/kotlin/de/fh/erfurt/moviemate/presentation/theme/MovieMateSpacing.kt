@@ -11,7 +11,6 @@ object MovieMateSpacing {
     val fieldSpacing = 10.dp
     val detailMicroSpacing = 3.dp
     val detailTinySpacing = 5.dp
-    val detailContentSpacing = 14.dp
     val detailMediumSpacing = 16.dp
     val detailLargeSpacing = 20.dp
     val stateTopSpacing = 48.dp
@@ -45,11 +44,8 @@ object MovieMateSpacing {
     val inlineActionIconSize = 16.dp
     val detailInfoVerticalPadding = 9.dp
     val detailStatusButtonHeight = 50.dp
-    val detailHeroHeight = 270.dp
-    val detailEditPosterHeight = 170.dp
+    val detailMaxWidth = 640.dp
     val detailFloatingButtonBottomPadding = 20.dp
-    val detailReadBottomPadding = 92.dp
-    val detailTopBarOverlayPadding = 20.dp
 
     val addPosterHeight = 132.dp
     val posterActionIconSize = 32.dp

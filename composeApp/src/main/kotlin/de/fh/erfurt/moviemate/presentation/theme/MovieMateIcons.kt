@@ -34,9 +34,6 @@ object MovieMateIcons {
     @DrawableRes val filter = R.drawable.ic_tune_24
     @DrawableRes val uploadFile = R.drawable.ic_upload_file_24
     @DrawableRes val watched = R.drawable.ic_check_circle_24
-
-    const val ratingFilledText = "★"
-    const val ratingEmptyText = "☆"
 }
 
 @Composable
