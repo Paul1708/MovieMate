@@ -14,11 +14,12 @@ android {
         applicationId = "de.fh.erfurt.moviemate"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "1.1.0"
     }
 
     buildFeatures {
+        buildConfig = true
         compose = true
     }
 
@@ -59,6 +60,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodelCompose)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.google.play.services.auth)
+    implementation(libs.kotlinx.serialization.json)
 
     testImplementation(libs.kotlin.test)
     testImplementation(libs.coroutines.test)

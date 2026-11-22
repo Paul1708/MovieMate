@@ -196,6 +196,29 @@ The app works completely offline without Google Cloud credentials. To enable cro
 ./gradlew :composeApp:assembleDebug
 ```
 
+#### Android APK Releases
+
+MovieMate checks the latest public GitHub Release at startup. When it finds a newer Android version, it opens the APK download on request. Android handles installation and may ask you to allow installs from the browser.
+
+Set these repository secrets in GitHub under **Settings → Secrets and variables → Actions** before publishing:
+
+| Secret | Value |
+| --- | --- |
+| `ANDROID_KEYSTORE_BASE64` | Base64-encoded release keystore file |
+| `ANDROID_KEYSTORE_PASSWORD` | Keystore password |
+| `ANDROID_KEY_ALIAS` | Signing key alias |
+| `ANDROID_KEY_PASSWORD` | Signing key password |
+| `OMDB_API_KEY` | OMDb API key for distributed builds. The existing build embeds this key in the APK. |
+
+For each release, increase `versionCode` and set `versionName` in [composeApp/build.gradle.kts](composeApp/build.gradle.kts). Push a matching tag from the release commit. The workflow runs the Android unit tests, signs and verifies the APK, and publishes it as `MovieMate-android-<versionCode>.apk`.
+
+```shell
+git tag v1.1.0
+git push origin v1.1.0
+```
+
+Use the same signing certificate as the installed app to update in place. If your current copy is an Android Studio debug build signed with a different certificate, export your MovieMate backup before switching to the first release APK, then restore it after installation. Register the release certificate SHA-1 for Google Drive sign-in as described above.
+
 **iOS (macOS):**
 
 Open `iosApp/iosApp.xcodeproj` in Xcode 16.2+, wait for Swift Package Manager to resolve `GoogleSignIn`, select your team (or configure `config.local.xcconfig`), and run the `iosApp` scheme on iOS 17+.

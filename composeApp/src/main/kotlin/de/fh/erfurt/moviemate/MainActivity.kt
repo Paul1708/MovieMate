@@ -24,6 +24,7 @@ import de.fh.erfurt.moviemate.presentation.app.opening.MovieMateOpeningScreen
 import de.fh.erfurt.moviemate.presentation.app.startup.MovieMateStartupRunner
 import de.fh.erfurt.moviemate.presentation.app.startup.MovieMateStartupState
 import de.fh.erfurt.moviemate.presentation.app.startup.MovieMateStartupStep
+import de.fh.erfurt.moviemate.presentation.app.update.AndroidUpdateNotice
 import de.fh.erfurt.moviemate.presentation.theme.MovieMateTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -129,6 +130,10 @@ private fun MovieMateStartupContent(
         Box(modifier = Modifier.fillMaxSize()) {
             if (readyState != null) {
                 MovieMateApp(appContainer = readyState.appContainer)
+            }
+
+            if (readyState != null && !isOpeningVisible) {
+                AndroidUpdateNotice()
             }
 
             if (isOpeningVisible) {

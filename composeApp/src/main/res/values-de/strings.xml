@@ -1,0 +1,7 @@
+<resources>
+    <string name="update_title">Update verfügbar</string>
+    <string name="update_message">MovieMate %1$s ist verfügbar. Lade das Update herunter und bestätige die Installation in Android.</string>
+    <string name="update_download">APK herunterladen</string>
+    <string name="update_later">Später</string>
+    <string name="update_open_failed">Der APK-Download konnte nicht geöffnet werden.</string>
+</resources>

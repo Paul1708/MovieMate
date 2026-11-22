@@ -1,0 +1,119 @@
+name: Android release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+defaults:
+  run:
+    shell: bash
+
+concurrency:
+  group: android-release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Validate release tag
+        run: |
+          if [[ ! "$GITHUB_REF_NAME" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::Expected a release tag such as v1.1.0."
+            exit 1
+          fi
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: jetbrains
+          java-version: '21'
+
+      - name: Install Android SDK packages
+        run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
+
+      - name: Build and test Android app
+        env:
+          OMDB_API_KEY: ${{ secrets.OMDB_API_KEY }}
+        run: ./gradlew --no-configuration-cache :composeApp:testDebugUnitTest :composeApp:assembleRelease
+
+      - name: Sign and verify release APK
+        id: apk
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          : "${ANDROID_KEYSTORE_BASE64:?Missing ANDROID_KEYSTORE_BASE64}"
+          : "${ANDROID_KEYSTORE_PASSWORD:?Missing ANDROID_KEYSTORE_PASSWORD}"
+          : "${ANDROID_KEY_ALIAS:?Missing ANDROID_KEY_ALIAS}"
+          : "${ANDROID_KEY_PASSWORD:?Missing ANDROID_KEY_PASSWORD}"
+
+          release_dir=composeApp/build/outputs/apk/release
+          metadata="$release_dir/output-metadata.json"
+          version_name=$(jq -er '.elements[0].versionName' "$metadata")
+          version_code=$(jq -er '.elements[0].versionCode' "$metadata")
+          unsigned_apk="$release_dir/$(jq -er '.elements[0].outputFile' "$metadata")"
+          if [[ "v$version_name" != "$GITHUB_REF_NAME" || ! "$version_code" =~ ^[1-9][0-9]*$ ]]; then
+            echo "::error::The tag must match Android versionName, and versionCode must be positive."
+            exit 1
+          fi
+
+          umask 077
+          keystore=$(mktemp "$RUNNER_TEMP/moviemate-keystore.XXXXXX")
+          trap 'rm -f -- "$keystore"' EXIT
+          printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "$keystore"
+
+          build_tools="$ANDROID_HOME/build-tools/36.0.0"
+          aligned_apk="$RUNNER_TEMP/moviemate-aligned.apk"
+          signed_apk="$RUNNER_TEMP/MovieMate-android-$version_code.apk"
+          "$build_tools/zipalign" -P 16 -f 4 "$unsigned_apk" "$aligned_apk"
+          "$build_tools/apksigner" sign --ks "$keystore" --ks-key-alias "$ANDROID_KEY_ALIAS" \
+            --ks-pass env:ANDROID_KEYSTORE_PASSWORD --key-pass env:ANDROID_KEY_PASSWORD \
+            --out "$signed_apk" "$aligned_apk"
+          "$build_tools/apksigner" verify "$signed_apk"
+          echo "path=$signed_apk" >> "$GITHUB_OUTPUT"
+          echo "version_code=$version_code" >> "$GITHUB_OUTPUT"
+
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          APK_PATH: ${{ steps.apk.outputs.path }}
+          VERSION_CODE: ${{ steps.apk.outputs.version_code }}
+        run: |
+          tag="$GITHUB_REF_NAME"
+          if release=$(gh release view "$tag" --json isDraft,assets 2>/dev/null); then
+            if [[ "$(jq -r '.isDraft' <<< "$release")" == false ]]; then
+              if jq -e --arg name "${APK_PATH##*/}" '.assets | any(.name == $name and .state == "uploaded")' <<< "$release" > /dev/null; then
+                echo "Release $tag is already published."
+                exit 0
+              fi
+              echo "::error::Release $tag already exists without the expected APK."
+              exit 1
+            fi
+          fi
+
+          latest_code=$(gh api "repos/$GITHUB_REPOSITORY/releases" --paginate --slurp | jq '
+            [ .[][] | select(.draft == false and .prerelease == false)
+              | .assets[] | select(.state == "uploaded") | .name
+              | capture("^MovieMate-android-(?<code>[1-9][0-9]*)\\.apk$").code | tonumber
+            ] | max // 0
+          ')
+          if (( VERSION_CODE <= latest_code )); then
+            echo "::error::Increase Android versionCode above $latest_code before publishing."
+            exit 1
+          fi
+
+          if [[ -z "$release" ]]; then
+            gh release create "$tag" --verify-tag --draft --title "MovieMate ${tag#v}" --generate-notes
+          fi
+          gh release upload "$tag" "$APK_PATH" --clobber
+          gh release edit "$tag" --verify-tag --draft=false --latest
