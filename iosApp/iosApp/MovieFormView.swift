@@ -112,7 +112,7 @@ struct MovieFormView: View {
             .padding(14)
             .movieMateCard()
 
-            labeledField("Description *") {
+            labeledField("Description") {
                 TextField("Add a short description", text: $editor.description, axis: .vertical)
                     .lineLimit(4...8)
                     .movieMateInput()

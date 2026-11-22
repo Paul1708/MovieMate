@@ -5,7 +5,6 @@ import de.fh.erfurt.moviemate.movies.domain.model.movie.MovieDraft
 
 internal fun validateMovieDraft(draft: MovieDraft) {
     require(draft.title.isNotBlank()) { "Title cannot be empty" }
-    require(draft.description.isNotBlank()) { "Description cannot be empty" }
     draft.runtimeMinutes?.let { rt -> require(rt > 0) { "Runtime must be positive" } }
     validateSeasonCount(draft.mediaType, draft.totalSeasons)
     draft.userRating?.let { ur -> require(ur in 1..10) { "User rating must be between 1 and 10" } }

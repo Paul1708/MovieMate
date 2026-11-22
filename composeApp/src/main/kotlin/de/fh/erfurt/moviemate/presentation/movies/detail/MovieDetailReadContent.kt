@@ -87,12 +87,10 @@ internal fun MovieDetailReadContent(
 
                 Spacer(modifier = Modifier.height(MovieMateSpacing.detailLargeSpacing))
 
-                MovieDetailSection(
-                    title = "Description",
-                    body = movie.description.ifBlank { "No description available." }
-                )
-
-                Spacer(modifier = Modifier.height(MovieMateSpacing.sectionSpacing))
+                if (movie.description.isNotBlank()) {
+                    MovieDetailSection(title = "Description", body = movie.description)
+                    Spacer(modifier = Modifier.height(MovieMateSpacing.sectionSpacing))
+                }
 
                 MovieDetailSection(
                     title = "Comment",

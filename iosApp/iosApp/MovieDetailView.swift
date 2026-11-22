@@ -180,7 +180,9 @@ struct MovieDetailView: View {
                 }
                 .buttonStyle(.plain)
 
-                detailSection(title: "Description", text: movie.description)
+                if !movie.description.isEmpty {
+                    detailSection(title: "Description", text: movie.description)
+                }
 
                 if !movie.comment.isEmpty {
                     detailSection(title: "My comment", text: movie.comment)

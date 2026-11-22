@@ -84,16 +84,12 @@ class UpdateMovieUseCaseTest {
     }
 
     @Test
-    fun `invoke rejects a blank description`() = runTest {
-        val error = assertFailsWith<IllegalArgumentException> {
-            val updatedMovie = movies[0].copy(description = "  ")
-            useCase(
-                updatedMovie
-            )
-        }
-        assertEquals( "Description cannot be empty",error.message)
+    fun `invoke clears the existing description`() = runTest {
+        val updatedMovie = useCase(movies[0].copy(description = "  "))
 
+        assertEquals("", updatedMovie.description)
     }
+
     @Test
     fun `invoke rejects a negative runtimeMinutes`() = runTest {
         val error = assertFailsWith<IllegalArgumentException> {

@@ -63,27 +63,25 @@ class AddMovieUseCaseTest {
     }
 
     @Test
-    fun `invoke rejects a blank description`() = runTest {
-        val error = assertFailsWith<IllegalArgumentException> {
-            useCase(
-                draft = MovieDraft(
-                    title = "Test Movie",
-                    description = " ",
-                    releaseYear = 2024,
-                    categoryId = "3",
-                    posterUrl = "https://example.com/poster.jpg",
-                    runtimeMinutes = 120,
-                    isWatched = false,
-                    comment = "Test Comment",
-                    userRating = 7,
-                    imdbRating = 7.8,
-                    externalIds = mapOf("imdb" to "tt1234567"),
-                    watchProviders = listOf("Amazon Prime"),
-                    updatedAtEpochMillis = 1_717_171_717L
-                )
+    fun `invoke saves a title without a description`() = runTest {
+        val saved = useCase(
+            draft = MovieDraft(
+                title = "Test Movie",
+                description = " ",
+                releaseYear = 2024,
+                categoryId = "3",
+                posterUrl = "https://example.com/poster.jpg",
+                runtimeMinutes = 120,
+                isWatched = false,
+                comment = "Test Comment",
+                userRating = 7,
+                imdbRating = 7.8,
+                externalIds = mapOf("imdb" to "tt1234567"),
+                watchProviders = listOf("Amazon Prime"),
+                updatedAtEpochMillis = 1_717_171_717L
             )
-        }
-        assertEquals( "Description cannot be empty",error.message)
+        )
+        assertEquals("", saved.description)
     }
 
     @Test

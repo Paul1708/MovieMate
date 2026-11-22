@@ -39,7 +39,6 @@ data class AddMovieUiState(
 
     val canSave: Boolean
         get() = title.isNotBlank() &&
-            description.isNotBlank() &&
             !isLoading &&
             !isFetching &&
             lookup.results == null &&

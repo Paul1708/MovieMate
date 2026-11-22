@@ -254,7 +254,7 @@ private fun AddMovieForm(
 
         DetailTextField(
             value = state.description,
-            label = "Description *",
+            label = "Description",
             placeholder = "Add a short description",
             onValueChange = { onAction(AddMovieAction.DescriptionChanged(it)) },
             minLines = 4
