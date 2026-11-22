@@ -213,8 +213,8 @@ Set these repository secrets in GitHub under **Settings → Secrets and variable
 For each release, increase `versionCode` and set `versionName` in [composeApp/build.gradle.kts](composeApp/build.gradle.kts). Push a matching tag from the release commit. The workflow runs the Android unit tests, signs and verifies the APK, and publishes it as `MovieMate-android-<versionCode>.apk`.
 
 ```shell
-git tag v1.1.0
-git push origin v1.1.0
+git tag v1.1.1
+git push origin v1.1.1
 ```
 
 Use the same signing certificate as the installed app to update in place. If your current copy is an Android Studio debug build signed with a different certificate, export your MovieMate backup before switching to the first release APK, then restore it after installation. Register the release certificate SHA-1 for Google Drive sign-in as described above.
