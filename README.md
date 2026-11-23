@@ -14,7 +14,7 @@
     <img src="https://img.shields.io/badge/iOS-SwiftUI%2017%2B-007AFF?logo=apple&logoColor=white" alt="SwiftUI iOS 17+" />
     <img src="https://img.shields.io/badge/Database-SQLDelight%202.3.2-003B57?logo=sqlite&logoColor=white" alt="SQLDelight" />
     <img src="https://img.shields.io/badge/Networking-Ktor%203.4.3-087CFA" alt="Ktor" />
-    <a href="LICENSE"><img src="https://img.shields.io/badge/License-All%20Rights%20Reserved-red.svg" alt="All Rights Reserved" /></a>
+    <a href="LICENSE"><img src="https://img.shields.io/badge/License-GPLv3-blue.svg" alt="GPLv3 license" /></a>
   </p>
 </div>
 
@@ -150,7 +150,7 @@ MovieMate/
 ├── docs/                           # Android UI architecture guides
 ├── gradle/libs.versions.toml       # Centralized Gradle version catalog
 ├── local.properties.example        # Template for local OMDb key & Android SDK path
-└── LICENSE                         # All Rights Reserved (Copyright Notice)
+└── LICENSE                         # GNU General Public License v3.0
 ```
 
 ---
@@ -253,4 +253,6 @@ The project includes unit and integration tests covering domain use cases & vali
 
 ## License
 
-Copyright (c) 2026 Paul Brinkmann, Mohammad Assaf, and Seyedamirreza Hosseini. All rights reserved. See the [LICENSE](LICENSE) file for details.
+Copyright (c) 2026 Paul Brinkmann, Mohammad Assaf, and Seyedamirreza Hosseini.
+
+MovieMate is licensed under the GNU General Public License, version 3 (`GPL-3.0-only`). See [LICENSE](LICENSE) for the full terms.
