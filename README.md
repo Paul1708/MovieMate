@@ -38,12 +38,12 @@ Rather than sharing UI widgets across platforms, MovieMate delivers native platf
       <td align="center"><strong>Custom Categories</strong></td>
     </tr>
     <tr>
-      <td><img src="docs/screenshots/home.png" width="240" alt="MovieMate Home Screen" /></td>
+      <td><img src="docs/screenshots/home.png" width="240" alt="MovieMate Android library and watchlist" /></td>
       <td><img src="docs/screenshots/movie-detail.png" width="240" alt="MovieMate Android movie details with the full poster visible" /></td>
-      <td><img src="docs/screenshots/categories.png" width="240" alt="MovieMate Categories Screen" /></td>
+      <td><img src="docs/screenshots/categories.png" width="240" alt="MovieMate Android custom categories" /></td>
     </tr>
   </table>
-  <sub>Example poster courtesy of <a href="https://www.jpl.nasa.gov/images/titan-jpl-travel-poster/">NASA/JPL-Caltech</a>.</sub>
+  <sub>Example posters courtesy of <a href="https://www.jpl.nasa.gov/galleries/visions-of-the-future/">NASA/JPL-Caltech</a>.</sub>
 </div>
 
 ---
